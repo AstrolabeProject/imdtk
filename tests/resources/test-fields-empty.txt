@@ -1,0 +1,10 @@
+# Comments should be ignored.
+# Blank lines should be ignored.
+
+	
+      
+# Default column names: obsCoreKey, datatype, required, default
+# the optional next line can redefine the default column names:
+_COLUMN_NAMES_, obs_core_key, data_type, Required, DEFAULT
+
+# another comment

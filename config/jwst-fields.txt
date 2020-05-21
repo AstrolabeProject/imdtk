@@ -1,0 +1,126 @@
+# Information about FITS header fields to be processed.
+#  Format: obsCoreKey, datatype, required, default
+#   where:
+#     obsCoreKey = the ObsCore or custom field name (keyword) to be extracted or created
+#     datatype   = field data type (double, integer, string)
+#     required   = true if field is required, false if optional
+#     default    = default value for an unspecified field (* = set by program or no default)
+
+
+# Mandatory ObsCore Data Model fields
+#
+
+# Observation Information (section B.1)
+#
+dataproduct_type, string, true, image
+calib_level, integer, true, 3
+
+# Target Information (section B.2)
+#
+target_name, string, true, *
+
+# Data Descriptions (section B.3)
+#
+obs_id, string, true, FAKE_OBS_ID_1
+obs_collection, string, true, JWST
+
+# Curation Information (section B.4)
+#
+obs_publisher_did, string, true, ivo://astrolabe.arizona.edu/jwst
+
+# Access Information (section B.5)
+#
+access_url, string, true, *
+access_format, string, true, application/fits
+access_estsize, integer, true, *
+
+# Spatial Characterisation (section B.6.1)
+#
+s_ra, double, true, *
+s_dec, double, true, *
+s_fov, double, true, *
+s_region, string, true, *
+s_resolution, double, true, *
+s_xel1, integer, true, *
+s_xel2, integer, true, *
+
+# Spectral Characterisation (section B.6.2)
+#
+# em_xel, integer, true, *
+# em_min, double, true, *
+# em_max, double, true, *
+# em_res_power, double, true, *
+
+# Time Characterisation (section B.6.3)
+#
+t_xel, integer, true, *
+t_min, double, true, *
+t_max, double, true, *
+t_exptime, double, true, *
+t_resolution, double, true, *
+
+# Observable Axis (section B.6.4)
+#
+o_ucd, string, true, phot.count
+
+# Polarization Characterisation (section B.6.5)
+#
+# pol_xel, integer, true, *
+# pol_states, string, true, *
+
+# Provenance (section B.7)
+#
+facility_name, string, true, JWST
+instrument_name, string, true, *
+
+
+#
+# Non-Mandatory ObsCore
+#
+obs_creator_name, string, false, JWST
+
+
+#
+# DALserver Mandatory
+#
+spat_lolimit1, double, true, *
+spat_hilimit1, double, true, *
+spat_lolimit2, double, true, *
+spat_hilimit2, double, true, *
+im_scale, double, true, *
+im_ra1, double, true, *
+im_dec1, double, true, *
+im_ra2, double, true, *
+im_dec2, double, true, *
+im_ra3, double, true, *
+im_dec3, double, true, *
+im_ra4, double, true, *
+im_dec4, double, true, *
+im_naxes, integer, true, 2
+im_naxis1, integer, true, *
+im_naxis2, integer, true, *
+im_nsubarrays, integer, true, 1
+im_pixtype, string, true, *
+im_wcsaxes1, string, true, *
+im_wcsaxes2, string, true, *
+
+#
+# DALserver needed
+#
+file_name, string, true, *
+file_path, string, true, *
+
+#
+# JWST-specific fieldnames
+#
+is_public, integer, true, 0
+equinox, double, false, 2000.0
+radesys, string, false, ICRS
+
+nircam_channel, string, false, LONG
+nircam_module, string, false, A
+filter, string, false, *
+pupil, string, false, CLEAR
+
+# for JWST, DATE is the FITS timestamp (GMT):
+gmt_date, string, false, *
