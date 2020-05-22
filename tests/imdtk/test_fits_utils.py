@@ -16,34 +16,51 @@ class TestFitsUtils(object):
     m13_file = '/imdtk/tests/resources/m13.fits'
 
     def test_get_header_fields_default(self):
-        hdrs = {}
+        hdrs = None
         with fits.open(self.m13_file) as hdus:
             hdrs = utils.get_header_fields(hdus)
 
         assert hdrs is not None
         assert len(hdrs) > 0
-        assert len(hdrs) == 19              # really 25 but duplicate cards are elided
+        assert len(hdrs) == 18              # were 25 but duplicate cards are elided
         assert 'CTYPE1' in hdrs
-        assert 'COMMENT' in hdrs
+        assert 'NAXIS' in hdrs
+        assert 'COMMENT' not in hdrs        # these are removed by default
+        assert 'HISTORY' not in hdrs        # these are removed by default
 
 
     def test_get_header_fields_indexed(self):
-        hdrs = {}
+        hdrs = None
         with fits.open(self.m13_file) as hdus:
             hdrs = utils.get_header_fields(hdus, 0)
 
         assert hdrs is not None
         assert len(hdrs) > 0
-        assert len(hdrs) == 19              # really 25 but duplicate cards are elided
+        assert len(hdrs) == 18              # were 25 but duplicate cards are elided
         assert 'CTYPE1' in hdrs
-        assert 'COMMENT' in hdrs
+        assert 'NAXIS' in hdrs
+        assert 'COMMENT' not in hdrs        # these are removed by default
+        assert 'HISTORY' not in hdrs        # these are removed by default
 
 
     def test_get_header_fields_badindex(self):
-        hdrs = {}
+        hdrs = None
         with fits.open(self.m13_file) as hdus:
             hdrs = utils.get_header_fields(hdus, 1) # no HDU at index 1
         assert hdrs is None
+
+
+    def test_get_header_fields_ignore(self):
+        hdrs = None
+        with fits.open(self.m13_file) as hdus:
+            hdrs = utils.get_header_fields(hdus, ignore=['HISTORY', ''])
+
+        assert hdrs is not None
+        assert len(hdrs) > 0
+        assert len(hdrs) == 19              # were 25 but duplicate cards are elided
+        assert 'CTYPE1' in hdrs
+        assert 'NAXIS' in hdrs
+        assert 'COMMENT' in hdrs
 
 
 
