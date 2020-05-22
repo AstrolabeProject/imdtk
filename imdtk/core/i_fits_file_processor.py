@@ -27,17 +27,6 @@ class IFitsFileProcessor (abc.ABC):
 
 
 
-    def filter_header_fields (self, header_fields, ignore=None):
-        """
-        Remove any entries whose keys are in the ignore list from the given header fields dictionary.
-        If not given, the ignore list defaults to the value of the FITS_IGNORE_KEYS class variable.
-        """
-        if (ignore is None):
-            ignore = self.FITS_IGNORE_KEYS
-        for key in ignore:
-            header_fields.pop(key, None)    # remove keyed entry: ignore key errors
-
-
     def get_obs_core_key_from_alias (self, hdr_key):
         """ Return the ObsCore keyword for the given FITS header keyword, or None if not found. """
         return self._fits_aliases.get(hdr_key)

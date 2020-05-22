@@ -24,4 +24,4 @@ RUN pip install .
 
 # ENTRYPOINT [ "python", "/imdtk/imdtk/cli.py" ]
 ENTRYPOINT [ "imdtk_cli" ]
-CMD [ "-v", "/images" ]
+CMD [ "-v", "-h" ]
