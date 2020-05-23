@@ -1,8 +1,8 @@
 # Configuration information
 CONFIG_DIR = '/imdtk/config'
 
-# Logging level (currently unused)
-# LOG_LEVEL = 'INFO'  # CRITICAL / ERROR / WARNING / INFO / DEBUG
+# Logging level
+LOG_LEVEL = 'INFO'  # CRITICAL / ERROR / WARNING / INFO / DEBUG
 
 # Image and Cutout Server information
 IMAGES_DIR = '/vos'
