@@ -2,7 +2,7 @@
 #
 # Module to extract image metadata from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 5/21/2020.
-#   Last Modified: Update for intermediate file removal. Minor cleanups.
+#   Last Modified: Different call for ignore_list. Use tool name in messages. Use raw help formatting.
 #
 import os
 import sys
@@ -35,7 +35,13 @@ def main (argv=None):
 
     parser = argparse.ArgumentParser(
         prog=TOOL_NAME,
+        formatter_class=argparse.RawTextHelpFormatter,
         description='Extract image metadata from a FITS file and output it as JSON.'
+    )
+
+    parser.add_argument(
+        '--version', action='version', version="%(prog)s version {}".format(VERSION),
+        help='Show version information and exit.'
     )
 
     parser.add_argument(
@@ -62,8 +68,10 @@ def main (argv=None):
     )
 
     parser.add_argument(
-        '--version', action='version', version="%(prog)s version {}".format(VERSION),
-        help='Show version information and exit.'
+        '-of', '--output-format', dest='output_format',
+        default='json',
+        choices=['json', 'pickle'],
+        help='Output format for results: "json" or "pickle" [default: "json"]'
     )
 
     parser.add_argument(
@@ -77,26 +85,32 @@ def main (argv=None):
     # if debugging, set verbose and echo input arguments
     if (args.get('debug')):
         args['verbose'] = True              # if debug turn on verbose too
-        print("(cli_headers): ARGS={}".format(args))
+        print("({}): ARGS={}".format(TOOL_NAME, args))
 
     # filter the given input file path for validity
     file_path = args.get('image_path')
     if (not validate_file_path(file_path, fits_utils.FITS_EXTENTS)):
-        print("(cli_headers): A readable, valid FITS image file must be given. Exiting...", file=sys.stderr)
+        print("({}): A readable, valid FITS image file must be given. Exiting...".format(TOOL_NAME),
+              file=sys.stderr)
         sys.exit(20)
 
     # process the given, validated FITS file
     if (args.get('verbose')):
-        log.info("(cli_headers): Processing FITS file '{}'".format(file_path))
+        log.info("({}): Processing FITS file '{}'".format(TOOL_NAME, file_path))
 
     which_hdu = args.get('which_hdu', 0)
     ignore_list = args.get('ignore_list', [])
 
     try:
         with fits.open(file_path) as hdus_list:
-            hdrs = fits_utils.get_header_fields(hdus_list, which_hdu, ignore_list)
+            if (ignore_list):
+                hdrs = fits_utils.get_header_fields(hdus_list, which_hdu, ignore_list)
+            else:
+                hdrs = fits_utils.get_header_fields(hdus_list, which_hdu)
+
             if (hdrs is None):
-                print("(cli_headers): Unable to read metadata from FITS file '{}'.".format(file_path), file=sys.stderr)
+                print("({}): Unable to read metadata from FITS file '{}'.".format(TOOL_NAME, file_path),
+                      file=sys.stderr)
                 sys.exit(21)
 
             print("HEADERS: {}".format(hdrs)) # REMOVE LATER
