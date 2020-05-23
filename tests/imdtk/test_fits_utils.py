@@ -1,6 +1,6 @@
 # Tests of the FITS specific utilities module.
 #   Written by: Tom Hicks. 4/7/2020.
-#   Last Modified: Add a test for lookup_pixtype.
+#   Last Modified: Update/add tests for get_header_fields.
 #
 import imdtk.core.fits_utils as utils
 
@@ -20,13 +20,13 @@ class TestFitsUtils(object):
         with fits.open(self.m13_file) as hdus:
             hdrs = utils.get_header_fields(hdus)
 
+        print(hdrs)
         assert hdrs is not None
         assert len(hdrs) > 0
-        assert len(hdrs) == 18              # were 25 but duplicate cards are elided
+        assert len(hdrs) == 18              # really 25 but duplicates elided, comments removed
         assert 'CTYPE1' in hdrs
-        assert 'NAXIS' in hdrs
-        assert 'COMMENT' not in hdrs        # these are removed by default
-        assert 'HISTORY' not in hdrs        # these are removed by default
+        assert 'SIMPLE' in hdrs
+        assert 'COMMENT' not in hdrs        # removed by default
 
 
     def test_get_header_fields_indexed(self):
@@ -34,13 +34,13 @@ class TestFitsUtils(object):
         with fits.open(self.m13_file) as hdus:
             hdrs = utils.get_header_fields(hdus, 0)
 
+        print(hdrs)
         assert hdrs is not None
         assert len(hdrs) > 0
-        assert len(hdrs) == 18              # were 25 but duplicate cards are elided
+        assert len(hdrs) == 18              # really 25 but duplicates elided, comments removed
         assert 'CTYPE1' in hdrs
-        assert 'NAXIS' in hdrs
-        assert 'COMMENT' not in hdrs        # these are removed by default
-        assert 'HISTORY' not in hdrs        # these are removed by default
+        assert 'SIMPLE' in hdrs
+        assert 'COMMENT' not in hdrs        # removed by default
 
 
     def test_get_header_fields_badindex(self):
@@ -50,17 +50,46 @@ class TestFitsUtils(object):
         assert hdrs is None
 
 
-    def test_get_header_fields_ignore(self):
+    def test_get_header_fields_ignore_key(self):
         hdrs = None
         with fits.open(self.m13_file) as hdus:
-            hdrs = utils.get_header_fields(hdus, ignore=['HISTORY', ''])
+            hdrs = utils.get_header_fields(hdus, ignore=['SIMPLE', ''])
 
+        print(hdrs)
         assert hdrs is not None
         assert len(hdrs) > 0
-        assert len(hdrs) == 19              # were 25 but duplicate cards are elided
+        assert len(hdrs) == 18              # really 25 but duplicates elided
         assert 'CTYPE1' in hdrs
-        assert 'NAXIS' in hdrs
-        assert 'COMMENT' in hdrs
+        assert 'SIMPLE' not in hdrs         # removed explicitly
+        assert 'COMMENT' in hdrs            # should not be removed
+
+
+    def test_get_header_fields_ignore_min(self):
+        hdrs = None
+        with fits.open(self.m13_file) as hdus:
+            hdrs = utils.get_header_fields(hdus, ignore=[''])
+
+        print(hdrs)
+        assert hdrs is not None
+        assert len(hdrs) > 0
+        assert len(hdrs) == 19              # really 25 but duplicates elided
+        assert 'CTYPE1' in hdrs
+        assert 'SIMPLE' in hdrs
+        assert 'COMMENT' in hdrs            # should not be removed
+
+
+    def test_get_header_fields_ignore_empty(self):
+        hdrs = None
+        with fits.open(self.m13_file) as hdus:
+            hdrs = utils.get_header_fields(hdus, ignore=[])
+
+        print(hdrs)
+        assert hdrs is not None
+        assert len(hdrs) > 0
+        assert len(hdrs) == 19              # really 25 but duplicates elided
+        assert 'CTYPE1' in hdrs
+        assert 'SIMPLE' in hdrs
+        assert 'COMMENT' in hdrs            # should not be removed
 
 
 

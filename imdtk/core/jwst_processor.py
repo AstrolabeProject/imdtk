@@ -1,7 +1,7 @@
 #
 # Class which implements the interface for processing JWST FITS file images.
 #   Written by: Tom Hicks. 4/4/2020.
-#   Last Modified: Basterdize this program while breaking it down.
+#   Last Modified: Continue updating this program while breaking it down.
 #
 import os
 import sys
@@ -9,7 +9,6 @@ import configparser
 from astropy.io import fits
 
 import imdtk.core.fits_utils as fits_utils
-import imdtk.tools.headers as headers
 from config.settings import CONFIG_DIR
 from imdtk.core.fields_info_factory import FieldsInfoFactory
 from imdtk.core.information_outputter import InformationOutputter
@@ -173,12 +172,8 @@ class JwstProcessor (IFitsFileProcessor, MetadataFields):
         if (header_fields is None):          # if unable to read the FITS file headers
             if (self._DEBUG):
                 errMsg = "Unable to read FITS file '{}' headers. File skipped.".format(file_path)
-                log.error('JwstProcessor.processAnImageFile', errMsg)
+                print("JwstProcessor.processAnImageFile): {}".format(errMsg), file=sys.stderr)
             return 0                        # then skip this file
-
-        # filter out any header fields with keys in the ignore list
-        # self.filter_header_fields(header_fields) # ORIGINAL
-        headers.filter_header_fields(header_fields)
 
         if (self._DEBUG):
             print("(jwst_processor.process_an_image_file): Read and kept {} FITS metadata fields:".format(len(header_fields)))

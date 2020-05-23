@@ -1,7 +1,7 @@
 #
 # Module to provide FITS utility functions for Astrolabe code.
 #   Written by: Tom Hicks. 1/26/2020.
-#   Last Modified: Add minimal datetime string conversion.
+#   Last Modified: Merge/enhance get_header_fields methods here.
 #
 import fnmatch
 import os
@@ -17,6 +17,10 @@ _GZFITS_PAT = "*.fits.gz"
 
 # suffixes for identifying FITS and gzipped FITS files
 FITS_EXTENTS = [ '.fits', '.fits.gz' ]
+
+# Common keys to be ignored when reading FITS file header.
+# The empty key string is important: it removes any non-Key/Value lines.
+FITS_IGNORE_KEYS = [ 'COMMENT', 'HISTORY', '' ]
 
 # MIME type for FITS files
 FITS_MIME_TYPE = 'image/fits'
@@ -40,14 +44,21 @@ def fits_utc_date (value_str, scale='utc'):
     return Time(value_str)
 
 
-def get_header_fields (ff_hdus_list, which_hdu=0):
+def get_header_fields (hdus_list, which_hdu=0, ignore=FITS_IGNORE_KEYS):
     """
     Return a dictionary of keys and values for the cards in the selected HDU
-    (default: the first HDU) or None, if the given HDU index is out of range.
+    (default: 0 (the first HDU)) or None, if the given HDU index is out of range.
+    The result dictionary will not contain entries for cards whose keys are
+    in the given "ignore list". Note that the result dictionary will contain only the
+    last value found for duplicate keys.
     """
-    if (which_hdu >= len(ff_hdus_list)):    # sanity check
+    if (which_hdu >= len(hdus_list)):       # sanity check
         return None
-    return dict(ff_hdus_list[which_hdu].header)
+    hdrs = dict()
+    header = hdus_list[which_hdu].header
+    filtered = [ card for card in header.items() if (card[0] not in ignore) ]
+    hdrs.update(filtered)
+    return hdrs
 
 
 def get_image_corners (wcs):
