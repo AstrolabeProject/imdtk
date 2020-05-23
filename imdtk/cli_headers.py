@@ -2,17 +2,17 @@
 #
 # Module to extract image metadata from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 5/21/2020.
-#   Last Modified: Different call for ignore_list. Use tool name in messages. Use raw help formatting.
+#   Last Modified: Refactor into separate cli and tool components. Change some argument short names.
 #
 import os
 import sys
 import logging as log
 import argparse
 
-from astropy.io import fits
-
+from config.settings import LOG_LEVEL
 from imdtk.core.file_utils import validate_file_path
-import imdtk.core.fits_utils as fits_utils
+from imdtk.core.fits_utils import FITS_EXTENTS, FITS_IGNORE_KEYS
+from imdtk.tools.headers import HeadersTool
 
 
 # Program name for this tool.
@@ -33,6 +33,10 @@ def main (argv=None):
     if (argv is None):                      # if called by setuptools
         argv = sys.argv[1:]                 # then fetch the arguments from the system
 
+    # setup logging configuration
+    log.basicConfig(level=LOG_LEVEL)
+
+    # setup command line argument parsing
     parser = argparse.ArgumentParser(
         prog=TOOL_NAME,
         formatter_class=argparse.RawTextHelpFormatter,
@@ -64,18 +68,18 @@ def main (argv=None):
     parser.add_argument(
         '-ig', '--ignore', dest='ignore_list', action="append", metavar='header_key_to_ignore',
         default=argparse.SUPPRESS,
-        help="Single header key to ignore (may repeat). [default: {} ]".format(fits_utils.FITS_IGNORE_KEYS)
+        help="Single header key to ignore (may repeat). [default: {} ]".format(FITS_IGNORE_KEYS)
     )
 
     parser.add_argument(
-        '-of', '--output-format', dest='output_format',
+        '-ofmt', '--output-format', dest='output_format',
         default='json',
         choices=['json', 'pickle'],
         help='Output format for results: "json" or "pickle" [default: "json"]'
     )
 
     parser.add_argument(
-        '-f', '--file', dest='image_path', required=True, metavar='path_to_image_file',
+        '-ff', '--fits_file', dest='fits_file', required=True, metavar='path_to_image_file',
         help='Path to a readable FITS image file from which to extract metadata [required]'
     )
 
@@ -88,38 +92,24 @@ def main (argv=None):
         print("({}): ARGS={}".format(TOOL_NAME, args))
 
     # filter the given input file path for validity
-    file_path = args.get('image_path')
-    if (not validate_file_path(file_path, fits_utils.FITS_EXTENTS)):
+    fits_file = args.get('fits_file')
+    if (not validate_file_path(fits_file, FITS_EXTENTS)):
         print("({}): A readable, valid FITS image file must be given. Exiting...".format(TOOL_NAME),
               file=sys.stderr)
         sys.exit(20)
 
-    # process the given, validated FITS file
-    if (args.get('verbose')):
-        log.info("({}): Processing FITS file '{}'".format(TOOL_NAME, file_path))
+    # add additional arguments to args
+    args['TOOL_NAME'] = TOOL_NAME
+    args['VERSION'] = VERSION
 
-    which_hdu = args.get('which_hdu', 0)
-    ignore_list = args.get('ignore_list', [])
-
+    # call the tool layer to process the given, validated FITS file
     try:
-        with fits.open(file_path) as hdus_list:
-            if (ignore_list):
-                hdrs = fits_utils.get_header_fields(hdus_list, which_hdu, ignore_list)
-            else:
-                hdrs = fits_utils.get_header_fields(hdus_list, which_hdu)
-
-            if (hdrs is None):
-                print("({}): Unable to read metadata from FITS file '{}'.".format(TOOL_NAME, file_path),
-                      file=sys.stderr)
-                sys.exit(21)
-
-            print("HEADERS: {}".format(hdrs)) # REMOVE LATER
-
-            # TODO: IMPLEMENT WRITING OUTPUT AS JSON
-
+        tool = HeadersTool(args)
+        tool.process_and_output()
+        tool.cleanup()
 
     except Exception as ex:
-        print("({}): Exception while reading metadata from FITS file '{}': {}.".format(TOOL_NAME, file_path, ex), file=sys.stderr)
+        print("({}): Exception while processing FITS file '{}': {}.".format(TOOL_NAME, fits_file, ex), file=sys.stderr)
         sys.exit(22)
 
 
