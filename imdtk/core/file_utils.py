@@ -1,9 +1,16 @@
 #
 # Module to provide general file utility functions.
 #   Written by: Tom Hicks. 1/29/2020.
-#   Last Modified: Separate path string validation for files.
+#   Last Modified: Add method to get filename core string.
 #
 import os
+
+def filename_core (apath):
+    """ Return the core filename string without the path prefix or extension. """
+    if (apath is None):                     # sanity check
+        return ''
+    return os.path.basename(os.path.splitext(apath)[0])
+
 
 def gen_file_paths (root_dir):
     """ Generator to yield all files in the file tree under the given root directory. """
