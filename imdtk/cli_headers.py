@@ -2,7 +2,7 @@
 #
 # Module to extract image metadata from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 5/21/2020.
-#   Last Modified: Refactor into separate cli and tool components. Change some argument short names.
+#   Last Modified: Add output sink argument. Instantiate and call headers tool.
 #
 import os
 import sys
@@ -61,7 +61,8 @@ def main (argv=None):
     )
 
     parser.add_argument(
-        '-hdu', '--hdu', dest='which_hdu', metavar='HDU_index', default=0,
+        '-hdu', '--hdu', dest='which_hdu', metavar='HDU_index',
+        default=0,
         help='Index of HDU containing the metadata [default: 0 (the first)]'
     )
 
@@ -69,6 +70,13 @@ def main (argv=None):
         '-ig', '--ignore', dest='ignore_list', action="append", metavar='header_key_to_ignore',
         default=argparse.SUPPRESS,
         help="Single header key to ignore (may repeat). [default: {} ]".format(FITS_IGNORE_KEYS)
+    )
+
+    parser.add_argument(
+        '-os', '--output-sink', dest='output_sink', nargs='?',
+        default='stdout',
+        choices=['file', 'stdout'],
+        help='Where to send the results of processing [default: stdout (standard output)]'
     )
 
     parser.add_argument(
@@ -89,9 +97,9 @@ def main (argv=None):
     # if debugging, set verbose and echo input arguments
     if (args.get('debug')):
         args['verbose'] = True              # if debug turn on verbose too
-        print("({}): ARGS={}".format(TOOL_NAME, args))
+        print("({}.main): ARGS={}".format(TOOL_NAME, args))
 
-    # filter the given input file path for validity
+    # filter the given FITS file path for validity
     fits_file = args.get('fits_file')
     if (not validate_file_path(fits_file, FITS_EXTENTS)):
         print("({}): A readable, valid FITS image file must be given. Exiting...".format(TOOL_NAME),
@@ -103,14 +111,9 @@ def main (argv=None):
     args['VERSION'] = VERSION
 
     # call the tool layer to process the given, validated FITS file
-    try:
-        tool = HeadersTool(args)
-        tool.process_and_output()
-        tool.cleanup()
-
-    except Exception as ex:
-        print("({}): Exception while processing FITS file '{}': {}.".format(TOOL_NAME, fits_file, ex), file=sys.stderr)
-        sys.exit(22)
+    tool = HeadersTool(args)
+    tool.process_and_output()
+    tool.cleanup()
 
 
 
