@@ -37,7 +37,7 @@ bash:
 	docker run -it --rm --name ${NAME} -v ${IMGS}:/images:ro -v ${OUTDIR}:/out --entrypoint /bin/bash ${TSTIMG}
 
 cleanout:
-	rm -f ${OUTDIR}/imdtk*
+	rm -f ${OUTDIR}/*.json
 
 docker:
 	docker build -t ${IMG} .
