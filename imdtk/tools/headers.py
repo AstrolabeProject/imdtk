@@ -1,8 +1,7 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: Use sink arg to write headers to JSON output. Add stubs for pickle output.
-#                  Generate/use output filepath.
+#   Last Modified: Inherit from abstract base class IImdTool. Rename this tool class.
 #
 import os
 import sys
@@ -15,10 +14,10 @@ from astropy.io import fits
 from config.settings import OUTPUT_DIR
 import imdtk.core.file_utils as file_utils
 import imdtk.core.fits_utils as fits_utils
-# from imdtk.core.i_tool import ITool         # LATER: IMPLEMENT and uncomment
+from imdtk.tools.i_tool import IImdTool
 
 
-class HeadersTool ():
+class HeadersSourceTool (IImdTool):
     """ Class for extracting header information from FITS files. """
 
     def __init__(self, args):
@@ -47,7 +46,6 @@ class HeadersTool ():
 
         # Where to send the processing results from this tool.
         self._output_sink = args.get('output_sink')
-
 
 
     #
@@ -107,7 +105,6 @@ class HeadersTool ():
 
     def output_results (self, results):
         """ Output the given results in the selected format. """
-
         sink = self._output_sink
         if (sink == 'file'):                # if output file specified
             self._output_file = open(self.gen_output_file_path(), 'w')
