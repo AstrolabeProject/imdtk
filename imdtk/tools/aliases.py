@@ -1,7 +1,7 @@
 #
-# Class for adding aliases (fields) for the header fields in the FITS metadata structure.
+# Class to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/29/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Implement first working version, cleanup.
 #
 import os
 import sys
@@ -11,21 +11,19 @@ import json
 import pickle
 import logging as log
 
-import imdtk.core.file_utils as file_utils
-import imdtk.core.fits_utils as fits_utils
 from config.settings import CONFIG_DIR
 from imdtk.tools.i_tool import IImdTool
 
 
+# Default resource file for header keyword aliases.
+DEFAULT_ALIASES_FILEPATH = "{}/jwst-aliases.ini".format(CONFIG_DIR)
+
+
 class AliasesTool (IImdTool):
-    """ Class for adding aliases to the the FITS metadata structure. """
-
-    # Default resource file for header keyword aliases.
-    DEFAULT_ALIASES_FILEPATH = "{}/jwst-aliases.ini".format(CONFIG_DIR)
-
+    """ Class which adds aliases for the header fields of a metadata structure. """
 
     def __init__(self, args):
-        """ Constructor for the class adding aliases to the FITS metadata structure. """
+        """ Constructor of the class which adds aliases for the header fields of a metadata structure. """
 
         # Display name of this tool
         self.TOOL_NAME = args.get('TOOL_NAME') or 'aliases'
@@ -39,17 +37,17 @@ class AliasesTool (IImdTool):
         # Debug setting: when true, show internal information for debugging.
         self._DEBUG = args.get('debug', False)
 
-        # Path to a readable input metadata file.
+        # Path to a readable input metadata file. Argument is optional so could be None.
         self._input_file = args.get('input_file')
-
-        # An output file created within the output directory.
-        self._output_file = None
 
         # Output format for the information when output.
         self._output_format = args.get('output_format') or 'json'
 
         # Where to send the processing results from this tool.
         self._output_sink = args.get('output_sink')
+
+        # An output file to be created within the output directory.
+        self._output_file = None
 
 
     #
@@ -79,44 +77,54 @@ class AliasesTool (IImdTool):
         if (self._DEBUG):
             print("({}.process): ARGS={}".format(self.TOOL_NAME, self.args))
 
-        # process the given, validated FITS file
-        input_file = self.args.get('input_file')
+        # load the FITS field name aliases from a given file path or a default resource path
+        alias_file = self.args.get('alias_file') or DEFAULT_ALIASES_FILEPATH
+        aliases = self.load_aliases(alias_file)
+
+        # process the given, validated input file
+        if (self._input_file is None):
+            self._input_file = sys.stdin
+        else:
+            self._input_file = open(self._input_file, 'r')
+
         if (self._VERBOSE):
-            print("({}): Processing metadata file '{}'".format(self.TOOL_NAME, input_file))
+            if (self._input_file == sys.stdin):
+                print("({}): Processing metadata from standard input".format(self.TOOL_NAME))
+            else:
+                print("({}): Processing metadata file '{}'".format(self.TOOL_NAME, self._input_file.name))
 
         try:
-            metadata = json.load(input_file)
-
-            # load the FITS field name aliases from a given file path or a default resource path
-            alias_file = self._args.get('alias_file') or self.DEFAULT_ALIASES_FILEPATH
-            aliases = self.load_aliases(alias_file)
-
-            self.copy_aliased_fields(aliases, metadata)
+            metadata = json.load(self._input_file)
+            self.copy_aliased_headers(aliases, metadata)
             return metadata                 # return the results of processing
 
         except Exception as ex:
-            errMsg = "({}.process): Exception while reading metadata from file '{}': {}.".format(self.TOOL_NAME, input_file, ex)
+            errMsg = "({}.process): Exception while reading metadata from file '{}': {}.".format(self.TOOL_NAME, self._input_file, ex)
             log.error(errMsg)
             raise RuntimeError(errMsg)
 
 
-    def output_results (self, headers):
-        """ Output the given headers in the selected format. """
+    def output_results (self, metadata):
+        """ Output the given metadata in the selected format. """
         out_fmt = self._output_format
+
+        fname = metadata.get('file_info').get('file_name')
 
         sink = self._output_sink
         if (sink == 'file'):                # if output file specified
             if (out_fmt == 'pickle'):
-                self._output_file = open(self.gen_output_file_path(), 'wb')
+                self._output_file = open(
+                    self.gen_output_file_path(fname, self._output_format, self.TOOL_NAME), 'wb')
             else:
-                self._output_file = open(self.gen_output_file_path(), 'w')
+                self._output_file = open(
+                    self.gen_output_file_path(fname, self._output_format, self.TOOL_NAME), 'w')
         else:                               # else default to standard output
             self._output_file = sys.stdout
 
         if (out_fmt == 'json'):
-            self.output_JSON(headers)
+            self.output_JSON(metadata)
         elif (out_fmt == 'pickle'):
-            self.output_pickle(headers)
+            self.output_pickle(metadata)
         else:
             errMsg = "({}.process): Invalid output format '{}'.".format(self.TOOL_NAME, out_fmt)
             log.error(errMsg)
@@ -135,25 +143,23 @@ class AliasesTool (IImdTool):
     #
 
     def copy_aliased_headers (self, aliases, metadata):
+        """
+        Copy each header card whose key is in aliases, replacing the header key with the alias.
+        """
         copied = dict()
         headers = metadata.get('headers')
         if (headers is not None):
-            copied = { key: val for key, val in headers.items() if (key in aliases) }
-        metadata['aliases'] = copied
-
-
-    def into_context (self, headers):
-        """ Embed the headers into a larger structure; include input_file info, if possible. """
-        results = dict()
-        self.add_file_info(results)
-        results['headers'] = headers
-        return results
+            for hdr_key, hdr_val in headers.items():
+                a_key = aliases.get(hdr_key)
+                if (a_key is not None):
+                    copied[a_key] = hdr_val
+        metadata['aliased'] = copied        # add copied aliases dictionary to metadata
 
 
     def load_aliases (self, alias_file):
         """ Load field name aliases from the given alias filepath. """
         if (self._VERBOSE):
-            print("({}.load_aliases): Loading from aliases file '{}'".format(TOOL_NAME, alias_file))
+            print("({}.load_aliases): Loading from aliases file '{}'".format(self.TOOL_NAME, alias_file))
 
         config = configparser.ConfigParser(strict=False, empty_lines_in_values=False)
         config.optionxform = lambda option: option
@@ -161,18 +167,14 @@ class AliasesTool (IImdTool):
         aliases = config['aliases']
 
         if (self._VERBOSE):
-            print("({}.load_aliases): Read {} field name aliases.".format(TOOL_NAME, len(aliases)))
+            print("({}.load_aliases): Read {} field name aliases.".format(self.TOOL_NAME, len(aliases)))
         return dict(aliases)
 
 
-    def output_JSON (self, headers):
-        # embed the headers into a larger structure, including input_file info
-        results = self.into_context(headers)
-        json.dump(results, self._output_file, indent=2)
+    def output_JSON (self, metadata):
+        json.dump(metadata, self._output_file, indent=2)
         self._output_file.write('\n')
 
 
-    def output_pickle (self, headers):
-        # embed the headers into a larger structure, including input_file info
-        results = self.into_context(headers)
-        pickle.dump(results, self._output_file)
+    def output_pickle (self, metadata):
+        pickle.dump(metadata, self._output_file)
