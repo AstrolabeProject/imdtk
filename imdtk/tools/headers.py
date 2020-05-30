@@ -1,11 +1,10 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: Enable pickling results.
+#   Last Modified: Refactor file path generator to parent class.
 #
 import os
 import sys
-import datetime
 import json
 import pickle
 import logging as log
@@ -111,9 +110,11 @@ class HeadersSourceTool (IImdTool):
         sink = self._output_sink
         if (sink == 'file'):                # if output file specified
             if (out_fmt == 'pickle'):
-                self._output_file = open(self.gen_output_file_path(), 'wb')
+                self._output_file = open(
+                    self.gen_output_file_path(self._fits_file, self._output_format), 'wb')
             else:
-                self._output_file = open(self.gen_output_file_path(), 'w')
+                self._output_file = open(
+                    self.gen_output_file_path(self._fits_file, self._output_format), 'w')
         else:                               # else default to standard output
             self._output_file = sys.stdout
 
@@ -146,18 +147,6 @@ class HeadersSourceTool (IImdTool):
         file_info['file_path'] = os.path.abspath(fits_file)
         file_info['file_size'] = os.path.getsize(fits_file)
         results['file_info'] = file_info
-
-
-    def gen_output_file_path (self, out_dir=OUTPUT_DIR):
-        """
-        Return a unique output filepath, within the specified output directory,
-        for the result file. Use the given file_name string and extension to create the name.
-        """
-        time_now = datetime.datetime.now()
-        now_str = time_now.strftime("%Y%m%d_%H%M%S-%f")
-        fname = file_utils.filename_core(self._fits_file)
-        extension = self._output_format
-        return "{0}/{1}_{2}.{3}".format(out_dir, fname, now_str, extension)
 
 
     def into_context (self, headers):
