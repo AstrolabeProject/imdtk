@@ -1,7 +1,7 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: Inherit from abstract base class IImdTool. Rename this tool class.
+#   Last Modified: Make context for header results and add file info.
 #
 import os
 import sys
@@ -63,9 +63,9 @@ class HeadersSourceTool (IImdTool):
 
     def process_and_output (self):
         """ Perform the main work of the tool and output the results in the selected format. """
-        results = self.process()
-        if (results):
-            self.output_results(results)
+        headers = self.process()
+        if (headers):
+            self.output_results(headers)
 
 
     def process (self):
@@ -80,7 +80,7 @@ class HeadersSourceTool (IImdTool):
         if (self._VERBOSE):
             print("({}): Processing FITS file '{}'".format(self.TOOL_NAME, fits_file))
 
-        ignore_list = self.args.get('ignore_list', [])
+        ignore_list = self.args.get('ignore_list')
         which_hdu = self.args.get('which_hdu', 0)
 
         try:
@@ -103,8 +103,8 @@ class HeadersSourceTool (IImdTool):
             raise RuntimeError(errMsg)
 
 
-    def output_results (self, results):
-        """ Output the given results in the selected format. """
+    def output_results (self, headers):
+        """ Output the given headers in the selected format. """
         sink = self._output_sink
         if (sink == 'file'):                # if output file specified
             self._output_file = open(self.gen_output_file_path(), 'w')
@@ -113,9 +113,9 @@ class HeadersSourceTool (IImdTool):
 
         out_fmt = self._output_format
         if (out_fmt == 'json'):
-            self.output_JSON(results)
+            self.output_JSON(headers)
         elif (out_fmt == 'pickle'):
-            self.output_pickle(results)
+            self.output_pickle(headers)
         else:
             errMsg = "({}.process): Invalid output format '{}'.".format(self.TOOL_NAME, out_fmt)
             log.error(errMsg)
@@ -133,6 +133,16 @@ class HeadersSourceTool (IImdTool):
     # Non-interface Methods
     #
 
+    def add_file_info (self, results):
+        """ Add information about the input file to the given results map. """
+        file_info = dict()
+        fits_file = self.args.get('fits_file')
+        file_info['file_name'] = os.path.basename(fits_file)
+        file_info['file_path'] = os.path.abspath(fits_file)
+        file_info['file_size'] = os.path.getsize(fits_file)
+        results['file_info'] = file_info
+
+
     def gen_output_file_path (self, out_dir=OUTPUT_DIR):
         """
         Return a unique output filepath, within the specified output directory,
@@ -145,18 +155,25 @@ class HeadersSourceTool (IImdTool):
         return "{0}/{1}_{2}.{3}".format(out_dir, fname, now_str, extension)
 
 
-    def output_JSON (self, results):
-        # TODO: merge results into a larger structure, including fits_file info
+    def into_context (self, headers):
+        """ Embed the headers into a larger structure; include fits_file info, if possible. """
+        results = dict()
+        self.add_file_info(results)
+        results['headers'] = headers
+        return results
 
+
+    def output_JSON (self, headers):
+        # embed the headers into a larger structure, including fits_file info
+        results = self.into_context(headers)
         json.dump(results, self._output_file, indent=2)
         self._output_file.write('\n')
 
 
-    def output_pickle (self, results):
+    def output_pickle (self, headers):
+        # embed the headers into a larger structure, including fits_file info
+        results = self.into_context(headers)
+
         # TODO: IMPLEMENT WRITING OUTPUT AS Pickle
-        pass
-
-
-    def to_JSON (self, fields_info):
-        """ Return the given field information formatted as a JSON string. """
-        return '[]'                         # JSON NOT YET IMPLEMENTED
+        pickle.dump(results, self._output_file)
+        self._output_file.write('\n')
