@@ -8,8 +8,8 @@ LOG_LEVEL = 'INFO'  # CRITICAL / ERROR / WARNING / INFO / DEBUG
 IMAGES_DIR = '/vos'
 IMAGE_FETCH_PREFIX = 'https://hector.cyverse.org/cuts/image_fetch?path='
 
-# Output directory: the mount point in the container for textual output.
-OUTPUT_DIR = '/out'
+# Work directory: the mount point in the container for file input and output.
+WORK_DIR = '/work'
 
 # Name of this program: used programmatically so keeping it lower case.
 PROGRAM_NAME = 'imdtk'

@@ -6,7 +6,7 @@ ARG TESTS=notests
 
 ENV INSTALL_PATH /imdtk
 
-RUN mkdir -p $INSTALL_PATH /images /out
+RUN mkdir -p $INSTALL_PATH /images /work
 
 WORKDIR $INSTALL_PATH
 

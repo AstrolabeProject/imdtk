@@ -1,14 +1,14 @@
 #
 # Class which implements the interface for storing or outputting image metadata.
 #   Written by: Tom Hicks. 4/9/2020.
-#   Last Modified: Get output directory from settings.
+#   Last Modified: Update to work directory.
 #
 import os
 import logging as log
 import datetime
 import psycopg2
 
-from config.settings import PROGRAM_NAME, OUTPUT_DIR
+from config.settings import PROGRAM_NAME, WORK_DIR
 from imdtk.core.i_information_outputter import IInformationOutputter
 
 
@@ -50,7 +50,7 @@ class InformationOutputter (IInformationOutputter):
         self._metadata_table_name = args.get('metadata_table_name') or 'sia.jwst'
 
         if (self._output_format != 'db'):   # if writing to a file
-            out_file_path = self.gen_output_file_path(OUTPUT_DIR)
+            out_file_path = self.gen_output_file_path(WORK_DIR)
             self._output_file = open(out_file_path, 'w')
 
         else:                               # else writing to a database
