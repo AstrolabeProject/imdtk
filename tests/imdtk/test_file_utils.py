@@ -1,3 +1,7 @@
+# Tests for the file utilities module.
+#   Written by: Tom Hicks. 5/22/2020.
+#   Last Modified: Add another test for validate_path_strings.
+#
 import imdtk.core.file_utils as utils
 
 import os
@@ -168,9 +172,9 @@ class TestFileUtils(object):
 
 
     def test_validate_path_strings(self):
-        FILE_EXTENTS = ['.fits', '.fits.gz']
+        FILE_EXTENTS = ['.txt']
         testpaths = [ '.', '/', '/NoSuch',
-                      '/tmp', '/tmp/NoSuch', '/out',
+                      '/tmp', '/tmp/NoSuch', '/work',
                       '/imdtk/tests/resources/empty.txt',
                       '/imdtk/tests/resources/m13.fits',
                       '/images/JADES/NONE.fits',
@@ -179,7 +183,25 @@ class TestFileUtils(object):
         print("PATHLIST={}".format(pathlst))
         assert len(pathlst) == 5
         assert '/tmp' in pathlst
-        assert '/out' in pathlst
+        assert '/work' in pathlst
+        assert '/imdtk/tests/resources/empty.txt' in pathlst
+        assert '/imdtk/tests/resources/m13.fits' not in pathlst
+        assert '/images/JADES/NONE.fits' not in pathlst
+
+
+    def test_validate_path_strings_fits(self):
+        FITS_EXTENTS = ['.fits', '.fits.gz']
+        testpaths = [ '.', '/', '/NoSuch',
+                      '/tmp', '/tmp/NoSuch', '/work',
+                      '/imdtk/tests/resources/empty.txt',
+                      '/imdtk/tests/resources/m13.fits',
+                      '/images/JADES/NONE.fits',
+                      '', None ]
+        pathlst = utils.validate_path_strings(testpaths, FITS_EXTENTS)
+        print("PATHLIST={}".format(pathlst))
+        assert len(pathlst) == 5
+        assert '/tmp' in pathlst
+        assert '/work' in pathlst
         assert '/imdtk/tests/resources/m13.fits' in pathlst
         assert '/images/JADES/NONE.fits' not in pathlst
         assert '/imdtk/tests/resources/empty.txt' not in pathlst
