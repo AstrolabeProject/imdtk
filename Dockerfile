@@ -23,5 +23,5 @@ COPY $TESTS $TESTS
 RUN pip install .
 
 # ENTRYPOINT [ "python", "/imdtk/imdtk/cli.py" ]
-ENTRYPOINT [ "headers" ]
+ENTRYPOINT [ "aliases" ]
 CMD [ "-v", "-h" ]
