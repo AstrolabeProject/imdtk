@@ -1,12 +1,13 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: Make context for header results and add file info.
+#   Last Modified: Enable pickling results.
 #
 import os
 import sys
 import datetime
 import json
+import pickle
 import logging as log
 
 from astropy.io import fits
@@ -105,13 +106,17 @@ class HeadersSourceTool (IImdTool):
 
     def output_results (self, headers):
         """ Output the given headers in the selected format. """
+        out_fmt = self._output_format
+
         sink = self._output_sink
         if (sink == 'file'):                # if output file specified
-            self._output_file = open(self.gen_output_file_path(), 'w')
+            if (out_fmt == 'pickle'):
+                self._output_file = open(self.gen_output_file_path(), 'wb')
+            else:
+                self._output_file = open(self.gen_output_file_path(), 'w')
         else:                               # else default to standard output
             self._output_file = sys.stdout
 
-        out_fmt = self._output_format
         if (out_fmt == 'json'):
             self.output_JSON(headers)
         elif (out_fmt == 'pickle'):
@@ -173,7 +178,4 @@ class HeadersSourceTool (IImdTool):
     def output_pickle (self, headers):
         # embed the headers into a larger structure, including fits_file info
         results = self.into_context(headers)
-
-        # TODO: IMPLEMENT WRITING OUTPUT AS Pickle
         pickle.dump(results, self._output_file)
-        self._output_file.write('\n')
