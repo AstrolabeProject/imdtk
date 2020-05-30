@@ -1,7 +1,7 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: Refactor file path generator to parent class.
+#   Last Modified: Remove unused imports. Include tool name in output filename.
 #
 import os
 import sys
@@ -11,8 +11,6 @@ import logging as log
 
 from astropy.io import fits
 
-from config.settings import OUTPUT_DIR
-import imdtk.core.file_utils as file_utils
 import imdtk.core.fits_utils as fits_utils
 from imdtk.tools.i_tool import IImdTool
 
@@ -38,14 +36,14 @@ class HeadersSourceTool (IImdTool):
         # Path to a readable FITS image file from which to extract metadata.
         self._fits_file = args.get('fits_file')
 
-        # An output file created within the output directory.
-        self._output_file = None
-
         # Output format for the information when output.
         self._output_format = args.get('output_format') or 'json'
 
         # Where to send the processing results from this tool.
         self._output_sink = args.get('output_sink')
+
+        # An output file to be created within the output directory.
+        self._output_file = None
 
 
     #
@@ -111,10 +109,12 @@ class HeadersSourceTool (IImdTool):
         if (sink == 'file'):                # if output file specified
             if (out_fmt == 'pickle'):
                 self._output_file = open(
-                    self.gen_output_file_path(self._fits_file, self._output_format), 'wb')
+                    self.gen_output_file_path(
+                        self._fits_file, self._output_format, self.TOOL_NAME), 'wb')
             else:
                 self._output_file = open(
-                    self.gen_output_file_path(self._fits_file, self._output_format), 'w')
+                    self.gen_output_file_path(
+                        self._fits_file, self._output_format, self.TOOL_NAME), 'w')
         else:                               # else default to standard output
             self._output_file = sys.stdout
 
