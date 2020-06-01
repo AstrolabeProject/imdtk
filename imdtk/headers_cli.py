@@ -2,13 +2,14 @@
 #
 # Module to extract image metadata from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 5/21/2020.
-#   Last Modified: Update for rename of headers tool class.
+#   Last Modified: Rename module. Use new CLI utils module. Increment version number.
 #
 import os
 import sys
 import logging as log
 import argparse
 
+import imdtk.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
 from imdtk.core.file_utils import validate_file_path
 from imdtk.core.fits_utils import FITS_EXTENTS, FITS_IGNORE_KEYS
@@ -19,7 +20,7 @@ from imdtk.tools.headers import HeadersSourceTool
 TOOL_NAME = 'headers'
 
 # Version of this tool.
-VERSION = '0.0.1'
+VERSION = '0.0.3'
 
 
 def main (argv=None):
@@ -36,30 +37,17 @@ def main (argv=None):
     # setup logging configuration
     log.basicConfig(level=LOG_LEVEL)
 
-    # setup command line argument parsing
+    # setup command line argument parsing and add shared arguments
     parser = argparse.ArgumentParser(
         prog=TOOL_NAME,
         formatter_class=argparse.RawTextHelpFormatter,
         description='Extract image metadata from a FITS file and output it as JSON.'
     )
 
-    parser.add_argument(
-        '--version', action='version', version="%(prog)s version {}".format(VERSION),
-        help='Show version information and exit.'
-    )
+    cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION, has_input_file=False)
+    cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
 
-    parser.add_argument(
-        '-d', '--debug', dest='debug', action='store_true',
-        default=False,
-        help='Print debugging output during processing [default: False (non-debug mode)]'
-    )
-
-    parser.add_argument(
-        '-v', '--verbose', dest='verbose', action='store_true',
-        default=False,
-        help='Print informational messages during processing [default: False (non-verbose mode)].'
-    )
-
+    # add arguments specific to this module
     parser.add_argument(
         '-hdu', '--hdu', dest='which_hdu', metavar='HDU_index',
         default=0,
@@ -70,20 +58,6 @@ def main (argv=None):
         '-ig', '--ignore', dest='ignore_list', action="append", metavar='header_key_to_ignore',
         default=argparse.SUPPRESS,
         help="Single header key to ignore (may repeat). [default: {} ]".format(FITS_IGNORE_KEYS)
-    )
-
-    parser.add_argument(
-        '-os', '--output-sink', dest='output_sink', nargs='?',
-        default='stdout',
-        choices=['file', 'stdout'],
-        help='Where to send the results of processing [default: stdout (standard output)]'
-    )
-
-    parser.add_argument(
-        '-ofmt', '--output-format', dest='output_format',
-        default='json',
-        choices=['json', 'pickle'],
-        help='Output format for results: "json" or "pickle" [default: "json"]'
     )
 
     parser.add_argument(

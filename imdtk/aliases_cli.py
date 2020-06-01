@@ -2,13 +2,14 @@
 #
 # Module to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/30/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Rename module. Use new CLI utils module. Increment version number.
 #
 import os
 import sys
 import logging as log
 import argparse
 
+import imdtk.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
 from imdtk.core.file_utils import validate_file_path
 from imdtk.tools.aliases import DEFAULT_ALIASES_FILEPATH, AliasesTool
@@ -19,7 +20,7 @@ from imdtk.tools.i_tool import OUTPUT_EXTENTS
 TOOL_NAME = 'aliases'
 
 # Version of this tool.
-VERSION = '0.0.1'
+VERSION = '0.0.3'
 
 
 def main (argv=None):
@@ -36,54 +37,22 @@ def main (argv=None):
     # setup logging configuration
     log.basicConfig(level=LOG_LEVEL)
 
-    # setup command line argument parsing
+    # setup command line argument parsing and add shared arguments
     parser = argparse.ArgumentParser(
         prog=TOOL_NAME,
         formatter_class=argparse.RawTextHelpFormatter,
         description='Add aliases for headers of a metadata structure and output it.'
     )
 
-    parser.add_argument(
-        '--version', action='version', version="%(prog)s version {}".format(VERSION),
-        help='Show version information and exit.'
-    )
+    cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
+    cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
+    cli_utils.add_input_arguments(parser, TOOL_NAME, VERSION)
 
-    parser.add_argument(
-        '-d', '--debug', dest='debug', action='store_true',
-        default=False,
-        help='Print debugging output during processing [default: False (non-debug mode)]'
-    )
-
-    parser.add_argument(
-        '-v', '--verbose', dest='verbose', action='store_true',
-        default=False,
-        help='Print informational messages during processing [default: False (non-verbose mode)].'
-    )
-
-    parser.add_argument(
-        '-os', '--output-sink', dest='output_sink', nargs='?',
-        default='stdout',
-        choices=['file', 'stdout'],
-        help='Where to send the results of processing [default: stdout (standard output)]'
-    )
-
-    parser.add_argument(
-        '-ofmt', '--output-format', dest='output_format',
-        default='json',
-        choices=['json', 'pickle'],
-        help='Output format for results: "json" or "pickle" [default: "json"]'
-    )
-
+    # add arguments specific to this module
     parser.add_argument(
         '-a', '--aliases', dest='alias_file', metavar='filepath',
         default=argparse.SUPPRESS,
         help="File of aliases for metadata header fields [default: {}]".format(DEFAULT_ALIASES_FILEPATH)
-    )
-
-    parser.add_argument(
-        '-if', '--input_file', dest='input_file', metavar='path_to_input_file',
-        default=argparse.SUPPRESS,
-        help='Path to a readable metadata file containing header fields to be aliased [default: stdin (standard input)]'
     )
 
     # actually parse the arguments from the command line
