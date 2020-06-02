@@ -1,12 +1,12 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Correct spurious arg to method.
 #
 import argparse
 
 
-def add_shared_arguments (parser, tool_name, version, has_input_file=True):
+def add_shared_arguments (parser, tool_name, version):
     """ Add the argument shared by all tools to the given argparse parser object. """
     parser.add_argument(
         '--version', action='version', version="{} version {}".format(tool_name, version),

@@ -4,8 +4,7 @@
 #   Written by: Tom Hicks. 5/30/2020.
 #   Last Modified: Rename module. Use new CLI utils module. Increment version number.
 #
-import os
-import sys
+import os, sys
 import logging as log
 import argparse
 

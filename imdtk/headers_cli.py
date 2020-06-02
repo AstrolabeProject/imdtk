@@ -2,10 +2,9 @@
 #
 # Module to extract image metadata from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 5/21/2020.
-#   Last Modified: Rename module. Use new CLI utils module. Increment version number.
+#   Last Modified: Correct spurious arg to method.
 #
-import os
-import sys
+import os, sys
 import logging as log
 import argparse
 
@@ -44,7 +43,7 @@ def main (argv=None):
         description='Extract image metadata from a FITS file and output it as JSON.'
     )
 
-    cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION, has_input_file=False)
+    cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
 
     # add arguments specific to this module
