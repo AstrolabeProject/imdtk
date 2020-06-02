@@ -22,6 +22,5 @@ COPY $TESTS $TESTS
 # following line runs setup.py to setup CLI scripts:
 RUN pip install .
 
-# ENTRYPOINT [ "python", "/imdtk/imdtk/cli.py" ]
-ENTRYPOINT [ "aliases" ]
+ENTRYPOINT [ "./run.sh" ]
 CMD [ "-v", "-h" ]
