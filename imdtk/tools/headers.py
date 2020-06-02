@@ -1,7 +1,7 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: Remove unused imports. Include tool name in output filename.
+#   Last Modified: Move output methods away. Redo output_results.
 #
 import os
 import sys
@@ -12,7 +12,7 @@ import logging as log
 from astropy.io import fits
 
 import imdtk.core.fits_utils as fits_utils
-from imdtk.tools.i_tool import IImdTool
+from imdtk.tools.i_tool import IImdTool, STDOUT_NAME
 
 
 class HeadersSourceTool (IImdTool):
@@ -61,9 +61,9 @@ class HeadersSourceTool (IImdTool):
 
     def process_and_output (self):
         """ Perform the main work of the tool and output the results in the selected format. """
-        headers = self.process()
-        if (headers):
-            self.output_results(headers)
+        metadata = self.process()
+        if (metadata):
+            self.output_results(metadata)
 
 
     def process (self):
@@ -93,7 +93,8 @@ class HeadersSourceTool (IImdTool):
                 log.error(errMsg)
                 raise RuntimeError(errMsg)
 
-            return hdrs                         # return the results of processing
+            metadata = self.into_context(hdrs)
+            return metadata                 # return the results of processing
 
         except Exception as ex:
             errMsg = "({}.process): Exception while reading metadata from FITS file '{}': {}.".format(self.TOOL_NAME, fits_file, ex)
@@ -101,27 +102,28 @@ class HeadersSourceTool (IImdTool):
             raise RuntimeError(errMsg)
 
 
-    def output_results (self, headers):
-        """ Output the given headers in the selected format. """
-        out_fmt = self._output_format
-
+    def output_results (self, metadata):
+        """ Output the given metadata in the selected format. """
+        file_path = None
         sink = self._output_sink
-        if (sink == 'file'):                # if output file specified
-            if (out_fmt == 'pickle'):
-                self._output_file = open(
-                    self.gen_output_file_path(
-                        self._fits_file, self._output_format, self.TOOL_NAME), 'wb')
-            else:
-                self._output_file = open(
-                    self.gen_output_file_path(
-                        self._fits_file, self._output_format, self.TOOL_NAME), 'w')
-        else:                               # else default to standard output
-            self._output_file = sys.stdout
 
+        out_fmt = self._output_format
         if (out_fmt == 'json'):
-            self.output_JSON(headers)
+            if (sink == 'file'):
+                fname = metadata.get('file_info').get('file_name')
+                file_path = self.gen_output_file_path(fname, self._output_format, self.TOOL_NAME)
+                self.output_JSON(metadata, file_path)
+            else:
+                self.output_JSON(metadata)
+
         elif (out_fmt == 'pickle'):
-            self.output_pickle(headers)
+            if (sink == 'file'):
+                fname = metadata.get('file_info').get('file_name')
+                file_path = self.gen_output_file_path(fname, self._output_format, self.TOOL_NAME)
+                self.output_pickle(metadata, file_path)
+            else:
+                self.output_pickle(metadata)
+
         else:
             errMsg = "({}.process): Invalid output format '{}'.".format(self.TOOL_NAME, out_fmt)
             log.error(errMsg)
@@ -130,13 +132,13 @@ class HeadersSourceTool (IImdTool):
         if (self._VERBOSE):
             out_dest = sink                 # default to current sink value
             if (sink == 'file'):            # reset value if necessary
-                out_dest = self._output_file.name
+                out_dest = file_path if (file_path) else STDOUT_NAME
             print("({}): Results output to '{}'".format(self.TOOL_NAME, out_dest))
 
 
 
     #
-    # Non-interface Methods
+    # Non-interface (tool-specific) Methods
     #
 
     def add_file_info (self, results):
@@ -155,16 +157,3 @@ class HeadersSourceTool (IImdTool):
         self.add_file_info(results)
         results['headers'] = headers
         return results
-
-
-    def output_JSON (self, headers):
-        # embed the headers into a larger structure, including fits_file info
-        results = self.into_context(headers)
-        json.dump(results, self._output_file, indent=2)
-        self._output_file.write('\n')
-
-
-    def output_pickle (self, headers):
-        # embed the headers into a larger structure, including fits_file info
-        results = self.into_context(headers)
-        pickle.dump(results, self._output_file)
