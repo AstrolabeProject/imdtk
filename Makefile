@@ -1,21 +1,23 @@
 ARGS=
 COLLECTION=JWST
 ENVLOC=/etc/trhenv
+EP=/bin/bash
 IMG=imdtk:devel
 IMGS=${PWD}/images
 NAME=imdtk
 NET=vos_net
 WORKDIR=${PWD}/work
 PROG=imdtk
+RUN=${PWD}/run.sh
 STACK=vos
 TARG=/imdtk
 TSTIMG=imdtk:test
-# TSTRES=${PWD}/tests/resources
 
-.PHONY: help bash cleanwork docker dockert down exec run runt runtc stop up watch
+
+.PHONY: help bash cleanwork docker dockert down exec run runt runtc runte stop up watch
 
 help:
-	@echo "Make what? Try: bash, cleanwork, docker, dockert, down, run, runt, runtc, stop, up, watch"
+	@echo "Make what? Try: bash, cleanwork, docker, dockert, down, run, runt, runt1, runtc, runtep, stop, up, watch"
 	@echo '  where:'
 	@echo '     help      - show this help message'
 	@echo '     bash      - run Bash in a ${PROG} container (for development)'
@@ -24,17 +26,17 @@ help:
 	@echo '     dockert   - build a container image with tests (for testing)'
 	@echo '     down      - stop the ${PROG} container, which is running in the VOS stack'
 	@echo '     exec      - exec into running development server (CLI arg: NAME=containerID)'
-	@echo '     run       - start a standalone container (CLI: ARGS=args)'
-	@echo '     runt      - run a standalone container in test mode (CLI: ARGS=args)'
-	@echo '     runt1     - run a test/test-dir in a standalone container (CLI: TARG=testpath)'
-	@echo '     runtc     - run tests and code coverage in a standalone container'
-	@echo '     sql       - generate SQL only for a catalog (do not load it)'
-	@echo '     stop      - stop a running standalone container'
+	@echo '     run       - start a container (CLI: ARGS=args)'
+	@echo '     runt      - run a container in test mode (CLI: ARGS=args)'
+	@echo '     runt1     - run a test/test-dir in a container (CLI: TARG=testpath)'
+	@echo '     runtc     - run all tests and code coverage in a container'
+	@echo '     runtep    - run a test container with alternate entrypoint (CLI: EP=entrypoint, ARGS=args)'
+	@echo '     stop      - stop a running container'
 	@echo '     up        - start a ${PROG} container, running in the VOS stack'
 	@echo '     watch     - show logfile for a running container'
 
 bash:
-	docker run -it --rm --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work --entrypoint /bin/bash ${TSTIMG}
+	docker run -it --rm --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work  -v ${RUN}:/imdtk/run.sh --entrypoint /bin/bash ${TSTIMG}
 
 cleanwork:
 	rm -f ${WORKDIR}/*.json ${WORKDIR}/*.pickle
@@ -53,19 +55,19 @@ exec:
 	docker exec -it ${NAME} bash
 
 run:
-	@docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro ${IMG} ${ARGS}
+	@docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work -v ${RUN}:/imdtk/run.sh ${IMG} ${ARGS}
 
 runt:
-	docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work ${TSTIMG} ${ARGS}
+	@docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work -v ${RUN}:/imdtk/run.sh ${TSTIMG} ${ARGS}
+
+runtep:
+	@docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work --entrypoint=${EP} ${TSTIMG} ${ARGS}
 
 runt1:
 	docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro --entrypoint pytest ${TSTIMG} -vv ${TARG}
 
 runtc:
 	docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro --entrypoint pytest ${TSTIMG} -vv --cov-report term-missing --cov ${TARG}
-
-sql:
-	@docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro ${IMG} load --sql-only --table ${TABLE}
 
 stop:
 	docker stop ${NAME}
