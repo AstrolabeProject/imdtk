@@ -1,7 +1,7 @@
 #
 # Class to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/29/2020.
-#   Last Modified: Implement first working version, cleanup.
+#   Last Modified: Move output methods away. Redo output_results. WIP: pickle reading not working yet.
 #
 import os
 import sys
@@ -12,7 +12,7 @@ import pickle
 import logging as log
 
 from config.settings import CONFIG_DIR
-from imdtk.tools.i_tool import IImdTool
+from imdtk.tools.i_tool import IImdTool, STDIN_NAME, STDOUT_NAME
 
 
 # Default resource file for header keyword aliases.
@@ -39,6 +39,9 @@ class AliasesTool (IImdTool):
 
         # Path to a readable input metadata file. Argument is optional so could be None.
         self._input_file = args.get('input_file')
+
+        # Input format for the metadata to be processed.
+        self._input_format = args.get('input_format') or 'json'
 
         # Output format for the information when output.
         self._output_format = args.get('output_format') or 'json'
@@ -89,12 +92,23 @@ class AliasesTool (IImdTool):
 
         if (self._VERBOSE):
             if (self._input_file == sys.stdin):
-                print("({}): Processing metadata from standard input".format(self.TOOL_NAME))
+                print("({}): Processing metadata from {}".format(self.TOOL_NAME, STDIN_NAME))
             else:
                 print("({}): Processing metadata file '{}'".format(self.TOOL_NAME, self._input_file.name))
 
+        # TODO: IMPLEMENT logic to load pickle files LATER
         try:
-            metadata = json.load(self._input_file)
+            in_fmt = self._input_format
+            if (in_fmt == 'json'):
+                metadata = json.load(self._input_file)
+            elif (in_fmt == 'pickle'):      # TODO: FIX: NOT WORKING  
+                with open(self._input_file, 'rb') as infile:
+                    metadata = pickle.load(infile)
+            else:
+                errMsg = "({}.process): Invalid input format '{}'.".format(self.TOOL_NAME, in_fmt)
+                log.error(errMsg)
+                raise ValueError(errMsg)
+
             self.copy_aliased_headers(aliases, metadata)
             return metadata                 # return the results of processing
 
@@ -106,25 +120,26 @@ class AliasesTool (IImdTool):
 
     def output_results (self, metadata):
         """ Output the given metadata in the selected format. """
-        out_fmt = self._output_format
-
-        fname = metadata.get('file_info').get('file_name')
-
+        file_path = None
         sink = self._output_sink
-        if (sink == 'file'):                # if output file specified
-            if (out_fmt == 'pickle'):
-                self._output_file = open(
-                    self.gen_output_file_path(fname, self._output_format, self.TOOL_NAME), 'wb')
-            else:
-                self._output_file = open(
-                    self.gen_output_file_path(fname, self._output_format, self.TOOL_NAME), 'w')
-        else:                               # else default to standard output
-            self._output_file = sys.stdout
 
+        out_fmt = self._output_format
         if (out_fmt == 'json'):
-            self.output_JSON(metadata)
+            if (sink == 'file'):
+                fname = metadata.get('file_info').get('file_name')
+                file_path = self.gen_output_file_path(fname, self._output_format, self.TOOL_NAME)
+                self.output_JSON(metadata, file_path)
+            else:
+                self.output_JSON(metadata)
+
         elif (out_fmt == 'pickle'):
-            self.output_pickle(metadata)
+            if (sink == 'file'):
+                fname = metadata.get('file_info').get('file_name')
+                file_path = self.gen_output_file_path(fname, self._output_format, self.TOOL_NAME)
+                self.output_pickle(metadata, file_path)
+            else:
+                self.output_pickle(metadata, sink)
+
         else:
             errMsg = "({}.process): Invalid output format '{}'.".format(self.TOOL_NAME, out_fmt)
             log.error(errMsg)
@@ -133,13 +148,13 @@ class AliasesTool (IImdTool):
         if (self._VERBOSE):
             out_dest = sink                 # default to current sink value
             if (sink == 'file'):            # reset value if necessary
-                out_dest = self._output_file.name
+                out_dest = file_path if (file_path) else STDOUT_NAME
             print("({}): Results output to '{}'".format(self.TOOL_NAME, out_dest))
 
 
 
     #
-    # Non-interface Methods
+    # Non-interface (tool-specific) Methods
     #
 
     def copy_aliased_headers (self, aliases, metadata):
@@ -169,12 +184,3 @@ class AliasesTool (IImdTool):
         if (self._VERBOSE):
             print("({}.load_aliases): Read {} field name aliases.".format(self.TOOL_NAME, len(aliases)))
         return dict(aliases)
-
-
-    def output_JSON (self, metadata):
-        json.dump(metadata, self._output_file, indent=2)
-        self._output_file.write('\n')
-
-
-    def output_pickle (self, metadata):
-        pickle.dump(metadata, self._output_file)
