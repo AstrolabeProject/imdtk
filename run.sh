@@ -5,4 +5,8 @@
 # the container and runs within its environment.
 # 
 
-headers -ff /images/DC_191217/F356W.fits | aliases -v -os file
+# echo "ARGS=$*"
+
+# headers -ofmt pickle -ff /images/DC_191217/F356W.fits | aliases -d -ifmt pickle -os file
+# headers -ff /images/DC_191217/F356W.fits
+headers -ff /images/DC_191217/F356W.fits | aliases -d -os file
