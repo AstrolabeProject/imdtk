@@ -1,7 +1,7 @@
 #
 # Class to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/29/2020.
-#   Last Modified: Replace pickling with CSV output stubs.
+#   Last Modified: Remove unused output file instance var.
 #
 import os
 import sys
@@ -48,9 +48,6 @@ class AliasesTool (IImdTool):
         # Where to send the processing results from this tool.
         self._output_sink = args.get('output_sink')
 
-        # An output file to be created within the output directory.
-        self._output_file = None
-
 
     #
     # Concrete methods implementing ITool abstract methods
@@ -60,9 +57,6 @@ class AliasesTool (IImdTool):
         """ Do any cleanup/shutdown tasks necessary for this instance. """
         if (self._DEBUG):
             print("({}.cleanup)".format(self.TOOL_NAME))
-        if (self._output_file is not None):
-            self._output_file.close()
-            self._output_file = None
 
 
     def process_and_output (self):
