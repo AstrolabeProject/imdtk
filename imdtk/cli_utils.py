@@ -1,7 +1,7 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Correct spurious arg to method.
+#   Last Modified: Replace pickling with CSV output.
 #
 import argparse
 
@@ -38,8 +38,8 @@ def add_output_arguments (parser, tool_name, version):
     parser.add_argument(
         '-ofmt', '--output-format', dest='output_format',
         default='json',
-        choices=['json', 'pickle'],
-        help='Output format for results: "json" or "pickle" [default: "json"]'
+        choices=['json', 'csv'],
+        help='Output format for results: "json" or "csv" [default: "json"]'
     )
 
 
@@ -48,8 +48,8 @@ def add_input_arguments (parser, tool_name, version):
     parser.add_argument(
         '-ifmt', '--input-format', dest='input_format',
         default='json',
-        choices=['json', 'pickle', 'text'],
-        help='Format of input data file: "json", "pickle", or "text" [default: "json"]'
+        choices=['json', 'text'],
+        help='Format of input data file: "json" or "text" [default: "json"]'
     )
 
     parser.add_argument(

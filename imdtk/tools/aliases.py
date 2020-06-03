@@ -1,14 +1,13 @@
 #
 # Class to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/29/2020.
-#   Last Modified: Move output methods away. Redo output_results. WIP: pickle reading not working yet.
+#   Last Modified: Replace pickling with CSV output stubs.
 #
 import os
 import sys
 import configparser
 import datetime
 import json
-import pickle
 import logging as log
 
 from config.settings import CONFIG_DIR
@@ -96,14 +95,10 @@ class AliasesTool (IImdTool):
             else:
                 print("({}): Processing metadata file '{}'".format(self.TOOL_NAME, self._input_file.name))
 
-        # TODO: IMPLEMENT logic to load pickle files LATER
         try:
             in_fmt = self._input_format
             if (in_fmt == 'json'):
                 metadata = json.load(self._input_file)
-            elif (in_fmt == 'pickle'):      # TODO: FIX: NOT WORKING  
-                with open(self._input_file, 'rb') as infile:
-                    metadata = pickle.load(infile)
             else:
                 errMsg = "({}.process): Invalid input format '{}'.".format(self.TOOL_NAME, in_fmt)
                 log.error(errMsg)
@@ -132,13 +127,14 @@ class AliasesTool (IImdTool):
             else:
                 self.output_JSON(metadata)
 
-        elif (out_fmt == 'pickle'):
+        elif (out_fmt == 'csv'):
+            csv = self.toCSV(metadata)      # convert metadata to CSV
             if (sink == 'file'):
                 fname = metadata.get('file_info').get('file_name')
                 file_path = self.gen_output_file_path(fname, self._output_format, self.TOOL_NAME)
-                self.output_pickle(metadata, file_path)
+                self.output_csv(csv, file_path)
             else:
-                self.output_pickle(metadata, sink)
+                self.output_csv(csv, sink)
 
         else:
             errMsg = "({}.process): Invalid output format '{}'.".format(self.TOOL_NAME, out_fmt)
@@ -184,3 +180,8 @@ class AliasesTool (IImdTool):
         if (self._VERBOSE):
             print("({}.load_aliases): Read {} field name aliases.".format(self.TOOL_NAME, len(aliases)))
         return dict(aliases)
+
+
+    def toCSV (self, metadata):
+        """ Convert the given metadata to CSV and return a CSV string. """
+        return ''                           # TODO: IMPLEMENT LATER

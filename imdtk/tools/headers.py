@@ -1,12 +1,11 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: Move output methods away. Redo output_results.
+#   Last Modified: Replace pickling with CSV output stubs.
 #
 import os
 import sys
 import json
-import pickle
 import logging as log
 
 from astropy.io import fits
@@ -116,13 +115,14 @@ class HeadersSourceTool (IImdTool):
             else:
                 self.output_JSON(metadata)
 
-        elif (out_fmt == 'pickle'):
+        elif (out_fmt == 'csv'):
+            csv = self.toCSV(metadata)      # convert metadata to CSV
             if (sink == 'file'):
                 fname = metadata.get('file_info').get('file_name')
                 file_path = self.gen_output_file_path(fname, self._output_format, self.TOOL_NAME)
-                self.output_pickle(metadata, file_path)
+                self.output_csv(csv, file_path)
             else:
-                self.output_pickle(metadata)
+                self.output_csv(csv)
 
         else:
             errMsg = "({}.process): Invalid output format '{}'.".format(self.TOOL_NAME, out_fmt)
@@ -157,3 +157,8 @@ class HeadersSourceTool (IImdTool):
         self.add_file_info(results)
         results['headers'] = headers
         return results
+
+
+    def toCSV (self, metadata):
+        """ Convert the given metadata to CSV and return a CSV string. """
+        return ''                           # TODO: IMPLEMENT LATER
