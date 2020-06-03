@@ -7,6 +7,7 @@
 
 # echo "ARGS=$*"
 
-# headers -ofmt pickle -ff /images/DC_191217/F356W.fits | aliases -d -ifmt pickle -os file
 # headers -ff /images/DC_191217/F356W.fits
-headers -ff /images/DC_191217/F356W.fits | aliases -d -os file
+# headers -ff /images/DC_191217/F356W.fits | aliases -v -os file -ofmt csv
+# headers -ff /images/DC_191217/F356W.fits | aliases -v
+headers -ff /images/DC_191217/F356W.fits | aliases -v -os file
