@@ -1,7 +1,7 @@
 #
 # Abstract class defining the interface for tool components.
 #   Written by: Tom Hicks. 5/27/2020.
-#   Last Modified: Replace pickling output with CSV.
+#   Last Modified: Remove CSV-related code.
 #
 import abc
 import datetime
@@ -12,7 +12,7 @@ from config.settings import WORK_DIR
 import imdtk.core.file_utils as file_utils
 
 
-OUTPUT_EXTENTS = [ '.json', '.csv' ]
+OUTPUT_EXTENTS = [ '.json' ]
 
 STDIN_NAME = 'standard input'
 STDERR_NAME = 'standard error'
@@ -56,18 +56,6 @@ class IImdTool (abc.ABC):
         fname = file_utils.filename_core(file_path)
         tname = '_'+tool_name if tool_name else ''
         return "{0}/{1}{2}_{3}.{4}".format(out_dir, fname, tname, now_str, extension)
-
-
-    def output_csv (self, csv, file_path=None):
-        """ Write the given CSV string to the given file path or standard output. """
-        if (file_path is not None):         # if output file specified
-            outfile = open(file_path, 'w')
-            outfile.write(csv)
-            outfile.write('\n')
-            outfile.close()
-        else:                               # else write to standard output
-            outfile.write(csv)
-            outfile.write('\n')
 
 
     def output_JSON (self, data, file_path=None):
