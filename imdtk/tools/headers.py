@@ -1,7 +1,7 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: Remove unused output file instance var.
+#   Last Modified: Use gen_filepath flag. Remove CSV output logic. Reduce instance vars.
 #
 import os
 import sys
@@ -35,12 +35,6 @@ class HeadersSourceTool (IImdTool):
         # Path to a readable FITS image file from which to extract metadata.
         self._fits_file = args.get('fits_file')
 
-        # Output format for the information when output.
-        self._output_format = args.get('output_format') or 'json'
-
-        # Where to send the processing results from this tool.
-        self._output_sink = args.get('output_sink')
-
 
     #
     # Concrete methods implementing ITool abstract methods
@@ -66,7 +60,7 @@ class HeadersSourceTool (IImdTool):
         if (self._DEBUG):
             print("({}.process): ARGS={}".format(self.TOOL_NAME, self.args))
 
-        # process the given, validated FITS file
+        # process the given, already validated FITS file
         fits_file = self.args.get('fits_file')
         if (self._VERBOSE):
             print("({}): Processing FITS file '{}'".format(self.TOOL_NAME, fits_file))
@@ -97,26 +91,19 @@ class HeadersSourceTool (IImdTool):
 
     def output_results (self, metadata):
         """ Output the given metadata in the selected format. """
-        file_path = None
-        sink = self._output_sink
+        genfile = self.args.get('gen_file_path')
+        outfile = self.args.get('output_file')
+        out_fmt = self.args.get('output_format') or 'json'
 
-        out_fmt = self._output_format
         if (out_fmt == 'json'):
-            if (sink == 'file'):
+            if (genfile):                   # if generating the output filename/path
                 fname = metadata.get('file_info').get('file_name')
-                file_path = self.gen_output_file_path(fname, self._output_format, self.TOOL_NAME)
-                self.output_JSON(metadata, file_path)
-            else:
+                outfile = self.gen_output_file_path(fname, out_fmt, self.TOOL_NAME)
+                self.output_JSON(metadata, outfile)
+            elif (outfile is not None):     # else if using the given filepath
+                self.output_JSON(metadata, outfile)
+            else:                           # else using standard output
                 self.output_JSON(metadata)
-
-        elif (out_fmt == 'csv'):
-            csv = self.toCSV(metadata)      # convert metadata to CSV
-            if (sink == 'file'):
-                fname = metadata.get('file_info').get('file_name')
-                file_path = self.gen_output_file_path(fname, self._output_format, self.TOOL_NAME)
-                self.output_csv(csv, file_path)
-            else:
-                self.output_csv(csv)
 
         else:
             errMsg = "({}.process): Invalid output format '{}'.".format(self.TOOL_NAME, out_fmt)
@@ -124,9 +111,7 @@ class HeadersSourceTool (IImdTool):
             raise ValueError(errMsg)
 
         if (self._VERBOSE):
-            out_dest = sink                 # default to current sink value
-            if (sink == 'file'):            # reset value if necessary
-                out_dest = file_path if (file_path) else STDOUT_NAME
+            out_dest = outfile if (outfile) else STDOUT_NAME
             print("({}): Results output to '{}'".format(self.TOOL_NAME, out_dest))
 
 
@@ -151,8 +136,3 @@ class HeadersSourceTool (IImdTool):
         self.add_file_info(results)
         results['headers'] = headers
         return results
-
-
-    def toCSV (self, metadata):
-        """ Convert the given metadata to CSV and return a CSV string. """
-        return ''                           # TODO: IMPLEMENT LATER

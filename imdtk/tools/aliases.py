@@ -1,7 +1,7 @@
 #
 # Class to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/29/2020.
-#   Last Modified: Remove unused output file instance var.
+#   Last Modified: Use gen_filepath flag. Remove CSV output logic. Reduce instance vars.
 #
 import os
 import sys
@@ -22,7 +22,9 @@ class AliasesTool (IImdTool):
     """ Class which adds aliases for the header fields of a metadata structure. """
 
     def __init__(self, args):
-        """ Constructor of the class which adds aliases for the header fields of a metadata structure. """
+        """
+        Constructor for class which adds aliases for the header fields of a metadata structure.
+        """
 
         # Display name of this tool
         self.TOOL_NAME = args.get('TOOL_NAME') or 'aliases'
@@ -35,18 +37,6 @@ class AliasesTool (IImdTool):
 
         # Debug setting: when true, show internal information for debugging.
         self._DEBUG = args.get('debug', False)
-
-        # Path to a readable input metadata file. Argument is optional so could be None.
-        self._input_file = args.get('input_file')
-
-        # Input format for the metadata to be processed.
-        self._input_format = args.get('input_format') or 'json'
-
-        # Output format for the information when output.
-        self._output_format = args.get('output_format') or 'json'
-
-        # Where to send the processing results from this tool.
-        self._output_sink = args.get('output_sink')
 
 
     #
@@ -77,22 +67,23 @@ class AliasesTool (IImdTool):
         alias_file = self.args.get('alias_file') or DEFAULT_ALIASES_FILEPATH
         aliases = self.load_aliases(alias_file)
 
-        # process the given, validated input file
-        if (self._input_file is None):
-            self._input_file = sys.stdin
+        # process the given, already validated input file
+        input_file = self.args.get('input_file')
+        if (input_file is None):
+            infile = sys.stdin
         else:
-            self._input_file = open(self._input_file, 'r')
+            infile = open(infile, 'r')
 
         if (self._VERBOSE):
-            if (self._input_file == sys.stdin):
+            if (infile == sys.stdin):
                 print("({}): Processing metadata from {}".format(self.TOOL_NAME, STDIN_NAME))
             else:
-                print("({}): Processing metadata file '{}'".format(self.TOOL_NAME, self._input_file.name))
+                print("({}): Processing metadata file '{}'".format(self.TOOL_NAME, infile.name))
 
         try:
-            in_fmt = self._input_format
+            in_fmt = self.args.get('input_format') or 'json'
             if (in_fmt == 'json'):
-                metadata = json.load(self._input_file)
+                metadata = json.load(infile)
             else:
                 errMsg = "({}.process): Invalid input format '{}'.".format(self.TOOL_NAME, in_fmt)
                 log.error(errMsg)
@@ -102,33 +93,26 @@ class AliasesTool (IImdTool):
             return metadata                 # return the results of processing
 
         except Exception as ex:
-            errMsg = "({}.process): Exception while reading metadata from file '{}': {}.".format(self.TOOL_NAME, self._input_file, ex)
+            errMsg = "({}.process): Exception while reading metadata from file '{}': {}.".format(self.TOOL_NAME, infile, ex)
             log.error(errMsg)
             raise RuntimeError(errMsg)
 
 
     def output_results (self, metadata):
         """ Output the given metadata in the selected format. """
-        file_path = None
-        sink = self._output_sink
+        genfile = self.args.get('gen_file_path')
+        outfile = self.args.get('output_file')
+        out_fmt = self.args.get('output_format') or 'json'
 
-        out_fmt = self._output_format
         if (out_fmt == 'json'):
-            if (sink == 'file'):
+            if (genfile):                   # if generating the output filename/path
                 fname = metadata.get('file_info').get('file_name')
-                file_path = self.gen_output_file_path(fname, self._output_format, self.TOOL_NAME)
-                self.output_JSON(metadata, file_path)
-            else:
+                outfile = self.gen_output_file_path(fname, out_fmt, self.TOOL_NAME)
+                self.output_JSON(metadata, outfile)
+            elif (outfile is not None):     # else if using the given filepath
+                self.output_JSON(metadata, outfile)
+            else:                           # else using standard output
                 self.output_JSON(metadata)
-
-        elif (out_fmt == 'csv'):
-            csv = self.toCSV(metadata)      # convert metadata to CSV
-            if (sink == 'file'):
-                fname = metadata.get('file_info').get('file_name')
-                file_path = self.gen_output_file_path(fname, self._output_format, self.TOOL_NAME)
-                self.output_csv(csv, file_path)
-            else:
-                self.output_csv(csv, sink)
 
         else:
             errMsg = "({}.process): Invalid output format '{}'.".format(self.TOOL_NAME, out_fmt)
@@ -136,9 +120,7 @@ class AliasesTool (IImdTool):
             raise ValueError(errMsg)
 
         if (self._VERBOSE):
-            out_dest = sink                 # default to current sink value
-            if (sink == 'file'):            # reset value if necessary
-                out_dest = file_path if (file_path) else STDOUT_NAME
+            out_dest = outfile if (outfile) else STDOUT_NAME
             print("({}): Results output to '{}'".format(self.TOOL_NAME, out_dest))
 
 
@@ -174,8 +156,3 @@ class AliasesTool (IImdTool):
         if (self._VERBOSE):
             print("({}.load_aliases): Read {} field name aliases.".format(self.TOOL_NAME, len(aliases)))
         return dict(aliases)
-
-
-    def toCSV (self, metadata):
-        """ Convert the given metadata to CSV and return a CSV string. """
-        return ''                           # TODO: IMPLEMENT LATER
