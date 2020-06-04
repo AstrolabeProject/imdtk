@@ -1,7 +1,7 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Replace pickling with CSV output.
+#   Last Modified: Add generate filename flag and output file argument. Comment out output sink argument.
 #
 import argparse
 
@@ -29,10 +29,22 @@ def add_shared_arguments (parser, tool_name, version):
 def add_output_arguments (parser, tool_name, version):
     """ Add common output arguments to the given argparse parser object. """
     parser.add_argument(
-        '-os', '--output-sink', dest='output_sink', nargs='?',
-        default='stdout',
-        choices=['file', 'other', 'stdout'],
-        help='Where to send the results of processing [default: stdout (standard output)]'
+        '-g', '--generate', dest='gen_file_path', action='store_true',
+        default=False,
+        help='Automatically generate the output filename and path. [default: False].'
+    )
+
+    # parser.add_argument(
+    #     '-os', '--output-sink', dest='output_sink', nargs='?',
+    #     default='stdout',
+    #     choices=['file', 'genfile', 'stdout'],
+    #     help='Where to send the results of processing [default: stdout (standard output)]'
+    # )
+
+    parser.add_argument(
+        '-of', '--output_file', dest='output_file', metavar='path_to_output_file',
+        default=argparse.SUPPRESS,
+        help='File path of file to hold the processing results [default: (standard output)]'
     )
 
     parser.add_argument(
@@ -55,5 +67,5 @@ def add_input_arguments (parser, tool_name, version):
     parser.add_argument(
         '-if', '--input_file', dest='input_file', metavar='path_to_input_file',
         default=argparse.SUPPRESS,
-        help='Path to a readable data file to be processed [default: stdin (standard input)]'
+        help='Path to a readable data file to be processed [default: (standard input)]'
     )
