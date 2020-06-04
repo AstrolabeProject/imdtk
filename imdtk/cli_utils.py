@@ -1,7 +1,7 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Add generate filename flag and output file argument. Comment out output sink argument.
+#   Last Modified: Comment out output format argument as JSON is currently the only output format.
 #
 import argparse
 
@@ -47,12 +47,12 @@ def add_output_arguments (parser, tool_name, version):
         help='File path of file to hold the processing results [default: (standard output)]'
     )
 
-    parser.add_argument(
-        '-ofmt', '--output-format', dest='output_format',
-        default='json',
-        choices=['json', 'csv'],
-        help='Output format for results: "json" or "csv" [default: "json"]'
-    )
+    # parser.add_argument(
+    #     '-ofmt', '--output-format', dest='output_format',
+    #     default='json',
+    #     choices=['json', 'other'],
+    #     help='Output format for results: "json" or "other" [default: "json"]'
+    # )
 
 
 def add_input_arguments (parser, tool_name, version):
