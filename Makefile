@@ -8,7 +8,7 @@ NAME=imdtk
 NET=vos_net
 WORKDIR=${PWD}/work
 PROG=imdtk
-RUN=${PWD}/run.sh
+RUN=${PWD}/runit
 STACK=vos
 TARG=/imdtk
 TSTIMG=imdtk:test
@@ -36,7 +36,7 @@ help:
 	@echo '     watch     - show logfile for a running container'
 
 bash:
-	docker run -it --rm --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work  -v ${RUN}:/imdtk/run.sh --entrypoint /bin/bash ${TSTIMG}
+	docker run -it --rm --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work  -v ${RUN}:/imdtk/runit --entrypoint /bin/bash ${TSTIMG}
 
 cleanwork:
 	rm ${WORKDIR}/*.json
@@ -55,10 +55,10 @@ exec:
 	docker exec -it ${NAME} bash
 
 run:
-	@docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work -v ${RUN}:/imdtk/run.sh ${IMG} ${ARGS}
+	@docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work -v ${RUN}:/imdtk/runit ${IMG} ${ARGS}
 
 runt:
-	@docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work -v ${RUN}:/imdtk/run.sh ${TSTIMG} ${ARGS}
+	@docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work -v ${RUN}:/imdtk/runit ${TSTIMG} ${ARGS}
 
 runtep:
 	@docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work --entrypoint=${EP} ${TSTIMG} ${ARGS}

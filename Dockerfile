@@ -22,5 +22,5 @@ COPY $TESTS $TESTS
 # following line runs setup.py to setup CLI scripts:
 RUN pip install .
 
-ENTRYPOINT [ "./run.sh" ]
+ENTRYPOINT [ "./runit" ]
 CMD [ "-v", "-h" ]

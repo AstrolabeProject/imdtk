@@ -1,7 +1,7 @@
 #
 # Module to provide general file utility functions.
 #   Written by: Tom Hicks. 1/29/2020.
-#   Last Modified: Add method to get filename core string.
+#   Last Modified: Add full path expansion method.
 #
 import os
 
@@ -10,6 +10,11 @@ def filename_core (apath):
     if (apath is None):                     # sanity check
         return ''
     return os.path.basename(os.path.splitext(apath)[0])
+
+
+def full_path (apath):
+    """ Full expand the given path into an absolute path. Supports the home ('~') shortcut. """
+    return os.path.abspath(os.path.normpath(os.path.expanduser(apath)))
 
 
 def gen_file_paths (root_dir):
