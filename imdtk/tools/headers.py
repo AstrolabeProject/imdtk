@@ -1,7 +1,7 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: Use gen_filepath flag. Remove CSV output logic. Reduce instance vars.
+#   Last Modified: Redo information addition to context.
 #
 import os
 import sys
@@ -80,7 +80,8 @@ class HeadersSourceTool (IImdTool):
                 log.error(errMsg)
                 raise RuntimeError(errMsg)
 
-            metadata = self.into_context(hdrs)
+            metadata = self.make_context()  # create larger metadata structure
+            metadata['headers'] = hdrs      # add the headers to the metadata
             return metadata                 # return the results of processing
 
         except Exception as ex:
@@ -117,7 +118,7 @@ class HeadersSourceTool (IImdTool):
 
 
     #
-    # Non-interface (tool-specific) Methods
+    # Non-interface and/or Tool-specific Methods
     #
 
     def add_file_info (self, results):
@@ -130,9 +131,11 @@ class HeadersSourceTool (IImdTool):
         results['file_info'] = file_info
 
 
-    def into_context (self, headers):
-        """ Embed the headers into a larger structure; include fits_file info, if possible. """
+    def make_context (self):
+        """
+        Create the larger structure which holds the various information sections.
+        Start with file information.
+        """
         results = dict()
         self.add_file_info(results)
-        results['headers'] = headers
         return results
