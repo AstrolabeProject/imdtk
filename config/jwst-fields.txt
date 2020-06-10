@@ -1,4 +1,6 @@
-# Information about FITS header fields to be processed.
+# This file defines properties and default values for the ObsCore fields which
+# are to be extracted, mapped, or computed from a FITS files.
+#
 #  Format: obsCoreKey, required, default
 #   where:
 #     obsCoreKey = the ObsCore or custom field name (keyword) to be extracted or created
