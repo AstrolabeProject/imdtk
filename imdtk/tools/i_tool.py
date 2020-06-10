@@ -1,16 +1,20 @@
 #
 # Abstract class defining the interface for tool components.
 #   Written by: Tom Hicks. 5/27/2020.
-#   Last Modified: Remove CSV-related code.
+#   Last Modified: Refactor reading input JSON here.
 #
 import abc
 import datetime
 import json
+import logging as log
 import sys
 
 from config.settings import WORK_DIR
 import imdtk.core.file_utils as file_utils
 
+
+DEFAULT_INPUT_FORMAT = 'json'
+DEFAULT_OUTPUT_FORMAT = 'json'
 
 OUTPUT_EXTENTS = [ '.json' ]
 
@@ -56,6 +60,31 @@ class IImdTool (abc.ABC):
         fname = file_utils.filename_core(file_path)
         tname = '_'+tool_name if tool_name else ''
         return "{0}/{1}{2}_{3}.{4}".format(out_dir, fname, tname, now_str, extension)
+
+
+    def input_JSON (self, input_file=None, input_format=DEFAULT_INPUT_FORMAT, tool_name=''):
+        """
+        Process the given input file, assumed to be already validated! If the input file
+        is not given, read from standard input.
+        """
+        try:
+            if (input_format == 'json'):
+                if (input_file is None):
+                    metadata = json.load(sys.stdin)
+                else:
+                    with open(input_file) as infile:
+                        metadata = json.load(infile)
+            else:
+                errMsg = "({}.process): Invalid input format '{}'.".format(tool_name, input_format)
+                log.error(errMsg)
+                raise ValueError(errMsg)
+
+        except Exception as ex:
+            errMsg = "({}.process): Exception while reading metadata from file '{}': {}.".format(tool_name, input_file, ex)
+            log.error(errMsg)
+            raise RuntimeError(errMsg)
+
+        return metadata                     # return the results of processing
 
 
     def output_JSON (self, data, file_path=None):

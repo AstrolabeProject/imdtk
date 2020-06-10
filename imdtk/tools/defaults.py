@@ -1,7 +1,7 @@
 #
 # Class to add defaults (fields) for the fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/2020.
-#   Last Modified: Initial working version: uses textual fields reader.
+#   Last Modified: Refactor reading input JSON to parent class.
 #
 import os
 import sys
@@ -70,33 +70,19 @@ class DefaultsTool (IImdTool):
 
         # process the given, already validated input file
         input_file = self.args.get('input_file')
-        if (input_file is None):
-            infile = sys.stdin
-        else:
-            infile = open(infile, 'r')
-
         if (self._VERBOSE):
-            if (infile == sys.stdin):
+            if (input_file is None):
                 print("({}): Processing metadata from {}".format(self.TOOL_NAME, STDIN_NAME))
             else:
-                print("({}): Processing metadata file '{}'".format(self.TOOL_NAME, infile.name))
+                print("({}): Processing metadata file '{}'".format(self.TOOL_NAME, input_file))
 
-        try:
-            in_fmt = self.args.get('input_format') or 'json'
-            if (in_fmt == 'json'):
-                metadata = json.load(infile)
-            else:
-                errMsg = "({}.process): Invalid input format '{}'.".format(self.TOOL_NAME, in_fmt)
-                log.error(errMsg)
-                raise ValueError(errMsg)
+        # read metadata from the input file in the specified input format
+        input_format = self.args.get('input_format') or DEFAULT_INPUT_FORMAT
+        metadata = self.input_JSON(input_file, input_format, self.TOOL_NAME)
 
-            metadata['defaults'] = defaults # add defaults dictionary to metadata
-            return metadata                 # return the results of processing
+        metadata['defaults'] = defaults # add defaults dictionary to metadata
 
-        except Exception as ex:
-            errMsg = "({}.process): Exception while reading metadata from file '{}': {}.".format(self.TOOL_NAME, infile, ex)
-            log.error(errMsg)
-            raise RuntimeError(errMsg)
+        return metadata                 # return the results of processing
 
 
     def output_results (self, metadata):

@@ -1,7 +1,7 @@
 #
 # Class to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/29/2020.
-#   Last Modified: Use gen_filepath flag. Remove CSV output logic. Reduce instance vars.
+#   Last Modified: Refactor reading input JSON to parent class.
 #
 import os
 import sys
@@ -69,33 +69,19 @@ class AliasesTool (IImdTool):
 
         # process the given, already validated input file
         input_file = self.args.get('input_file')
-        if (input_file is None):
-            infile = sys.stdin
-        else:
-            infile = open(infile, 'r')
-
         if (self._VERBOSE):
-            if (infile == sys.stdin):
+            if (input_file is None):
                 print("({}): Processing metadata from {}".format(self.TOOL_NAME, STDIN_NAME))
             else:
-                print("({}): Processing metadata file '{}'".format(self.TOOL_NAME, infile.name))
+                print("({}): Processing metadata file '{}'".format(self.TOOL_NAME, input_file))
 
-        try:
-            in_fmt = self.args.get('input_format') or 'json'
-            if (in_fmt == 'json'):
-                metadata = json.load(infile)
-            else:
-                errMsg = "({}.process): Invalid input format '{}'.".format(self.TOOL_NAME, in_fmt)
-                log.error(errMsg)
-                raise ValueError(errMsg)
+        # read metadata from the input file in the specified input format
+        input_format = self.args.get('input_format') or DEFAULT_INPUT_FORMAT
+        metadata = self.input_JSON(input_file, input_format, self.TOOL_NAME)
 
-            self.copy_aliased_headers(aliases, metadata)
-            return metadata                 # return the results of processing
+        self.copy_aliased_headers(aliases, metadata) # add aliased fields
 
-        except Exception as ex:
-            errMsg = "({}.process): Exception while reading metadata from file '{}': {}.".format(self.TOOL_NAME, infile, ex)
-            log.error(errMsg)
-            raise RuntimeError(errMsg)
+        return metadata                     # return the results of processing
 
 
     def output_results (self, metadata):
