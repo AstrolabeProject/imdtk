@@ -9,8 +9,9 @@ setup(
     install_requires=[],
     entry_points={
         'console_scripts': [
-            'headers = imdtk.headers_cli:main',
-            'aliases = imdtk.aliases_cli:main'
+            'aliases = imdtk.aliases_cli:main',
+            'defaults = imdtk.defaults_cli:main',
+            'headers = imdtk.headers_cli:main'
         ]
     },
 )

@@ -25,4 +25,5 @@
 
 # headers -ff /images/DC_191217/F356W.fits | aliases -v
 # headers -ff /images/DC_191217/F356W.fits | aliases -d -g
-headers -ff /images/DC_191217/F356W.fits | aliases -v -g
+# headers -ff /images/DC_191217/F356W.fits | aliases | defaults -v
+headers -ff /images/DC_191217/F356W.fits | aliases | defaults -v -g
