@@ -14,10 +14,10 @@ TARG=/imdtk
 TSTIMG=imdtk:test
 
 
-.PHONY: help bash cleanwork docker dockert down exec run runt runtc runte stop up watch
+.PHONY: help bash cleanwork docker dockert down exec run runit runtc runte stop up watch
 
 help:
-	@echo "Make what? Try: bash, cleanwork, docker, dockert, down, run, runt, runt1, runtc, runtep, stop, up, watch"
+	@echo "Make what? Try: bash, cleanwork, docker, dockert, down, run, runit, runt1, runtc, runtep, stop, up, watch"
 	@echo '  where:'
 	@echo '     help      - show this help message'
 	@echo '     bash      - run Bash in a ${PROG} container (for development)'
@@ -27,7 +27,7 @@ help:
 	@echo '     down      - stop the ${PROG} container, which is running in the VOS stack'
 	@echo '     exec      - exec into running development server (CLI arg: NAME=containerID)'
 	@echo '     run       - start a container (CLI: ARGS=args)'
-	@echo '     runt      - run a container in test mode (CLI: ARGS=args)'
+	@echo '     runit     - run the runit program in a test container'
 	@echo '     runt1     - run a test/test-dir in a container (CLI: TARG=testpath)'
 	@echo '     runtc     - run all tests and code coverage in a container'
 	@echo '     runtep    - run a test container with alternate entrypoint (CLI: EP=entrypoint, ARGS=args)'
@@ -57,7 +57,7 @@ exec:
 run:
 	@docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work -v ${RUN}:/imdtk/runit ${IMG} ${ARGS}
 
-runt:
+runit:
 	@docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work -v ${RUN}:/imdtk/runit ${TSTIMG} ${ARGS}
 
 runtep:
