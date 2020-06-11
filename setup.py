@@ -10,7 +10,7 @@ setup(
     entry_points={
         'console_scripts': [
             'aliases = imdtk.aliases_cli:main',
-            'defaults = imdtk.defaults_cli:main',
+            'field_info = imdtk.field_info_cli:main',
             'headers = imdtk.headers_cli:main',
             'oc_calc = imdtk.oc_calc_cli:main'
         ]

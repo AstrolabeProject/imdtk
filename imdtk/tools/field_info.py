@@ -1,7 +1,7 @@
 #
-# Class to add defaults (fields) for the fields in a FITS-derived metadata structure.
+# Class to add information about desired fields to the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/2020.
-#   Last Modified: Add all field info to metadata.
+#   Last Modified: Update for tool rename.
 #
 import os, sys
 import configparser
@@ -17,16 +17,14 @@ from imdtk.tools.i_tool import IImdTool, STDIN_NAME, STDOUT_NAME
 DEFAULT_FIELDS_FILEPATH = "{}/jwst-fields.toml".format(CONFIG_DIR)
 
 
-class DefaultsTool (IImdTool):
-    """ Class which adds defaults for the fields of a metadata structure. """
+class FieldInfoTask (IImdTool):
+    """ Class which adds field information to a metadata structure. """
 
     def __init__(self, args):
-        """
-        Constructor for class which adds defaults for the fields of a metadata structure.
-        """
+        """ Constructor for class which adds field information to a metadata structure. """
 
         # Display name of this tool
-        self.TOOL_NAME = args.get('TOOL_NAME') or 'defaults'
+        self.TOOL_NAME = args.get('TOOL_NAME') or 'field_info'
 
         # Configuration parameters given to this class.
         self.args = args

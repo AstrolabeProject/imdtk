@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 #
-# Module to add defaults (fields) for the fields in a FITS-derived metadata structure.
+# Module to add information about desired fields to the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/20.
-#   Last Modified: Allow input file path without specific extent.
+#   Last Modified: Update for tool rename.
 #
 import os, sys
 import logging as log
@@ -11,15 +11,15 @@ import argparse
 import imdtk.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
 from imdtk.core.file_utils import good_file_path
-from imdtk.tools.defaults import DEFAULT_FIELDS_FILEPATH, DefaultsTool
+from imdtk.tools.field_info import DEFAULT_FIELDS_FILEPATH, FieldInfoTask
 from imdtk.tools.i_tool import OUTPUT_EXTENTS
 
 
 # Program name for this tool.
-TOOL_NAME = 'defaults'
+TOOL_NAME = 'field_info'
 
 # Version of this tool.
-VERSION = '0.0.1'
+VERSION = '0.2.0'
 
 
 def main (argv=None):
@@ -40,7 +40,7 @@ def main (argv=None):
     parser = argparse.ArgumentParser(
         prog=TOOL_NAME,
         formatter_class=argparse.RawTextHelpFormatter,
-        description='Add defaults for the fields of a metadata structure and output it.'
+        description='Add information about desired fields to a metadata structure and output it.'
     )
 
     cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
@@ -75,7 +75,7 @@ def main (argv=None):
     args['VERSION'] = VERSION
 
     # call the tool layer to process the given, validated input file
-    tool = DefaultsTool(args)
+    tool = FieldInfoTask(args)
     tool.process_and_output()
     tool.cleanup()
 
