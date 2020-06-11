@@ -1,7 +1,7 @@
 #
 # Class to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/11/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Add calc_corners and calc_spatial limits.
 #
 import os, sys
 import json
@@ -89,7 +89,8 @@ class ObsCoreCalcTask (IImdTool):
         # perform the various calculations and accumulate them
         calculations = dict()
 
-        self.calc_scale(metadata, wcs_info, calculations)
+        self.calc_scale(wcs_info, calculations)
+        self.calc_corners(wcs_info, calculations)
         # TODO: IMPLEMENT more calculations LATER
 
         metadata['calculated'] = calculations # add calculations to metadata
@@ -127,10 +128,28 @@ class ObsCoreCalcTask (IImdTool):
     # Non-interface and/or Tool-specific Methods
     #
 
-    def calc_scale (self, metadata, wcs_info, calculations):
+    def calc_corners (self, wcs_info, calculations):
+        """
+        Calculate the corner points and spatial limits for the current image,
+        given the FITS file WCS information.
+
+        The calculated corners and limits are stored in the given calculations dictionary.
+        """
+        corners = fits_utils.get_image_corners(wcs_info)
+        if (len(corners) == 4):
+            self.set_corner_field(calculations, 'im_ra1', 'im_dec1', corners[0]) # LowerLeft
+            self.set_corner_field(calculations, 'im_ra2', 'im_dec2', corners[1]) # UpperLeft
+            self.set_corner_field(calculations, 'im_ra3', 'im_dec3', corners[2]) # UpperRight
+            self.set_corner_field(calculations, 'im_ra4', 'im_dec4', corners[3]) # LowerRight
+
+        # now use the corners to calculate the min/max spatial limits of the image
+        self.calc_spatial_limits(corners, calculations)
+
+
+    def calc_scale (self, wcs_info, calculations):
         """
         Calculate the scale for the current image using the given
-        given the FITS file WCS information and the field metadata.
+        given the FITS file WCS information.
 
         Since only the first scale value is used, this method assumes square pixels.
 
@@ -138,8 +157,32 @@ class ObsCoreCalcTask (IImdTool):
         crval, and cd for the celestial WCS and can be obtained by inquiring the
         value of cunit property of the input WCS object.
 
-        The calculated scale is stored in given calculations dictionary.
+        The calculated scale is stored in the given calculations dictionary.
         """
         scale = fits_utils.get_image_scale(wcs_info)
         if (len(scale) > 0):
             calculations['im_scale'] = scale[0]
+
+
+    def calc_spatial_limits (self, corners, calculations):
+        """
+        Calculate the min/max of the RA and DEC axes from the given list of four
+        image corners, each of which is a list of RA, DEC.
+        """
+        ras = list(map(lambda c: c[0], corners))
+        decs = list(map(lambda c: c[1], corners))
+
+        calculations['spat_lolimit1'] = min(ras)
+        calculations['spat_hilimit1'] = max(ras)
+        calculations['spat_lolimit2'] = min(decs)
+        calculations['spat_hilimit2'] = max(decs)
+
+
+    def set_corner_field (self, calculations, ra_field_key, dec_field_key, corner):
+        """
+        Store the given corner coordinates [RA, DEC] into fields of the calculations
+        dictionary, keyed by the given RA field keyword and DEC field keyword, respectively.
+        """
+        if (len(corner) > 1):               # each corner is a list of RA, DEC
+            calculations[ra_field_key] = corner[0]
+            calculations[dec_field_key] = corner[1]
