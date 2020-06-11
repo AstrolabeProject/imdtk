@@ -2,7 +2,7 @@
 # are to be extracted, mapped, or computed from a FITS files.
 #
 #  Format: dictionary of dictionaries with format:
-#          key => { key, required, default }
+#          key => { required, default }
 #   where:
 #     key      = the ObsCore or custom keyword for the field to be extracted or created
 #     required = true if field is required, false if optional
@@ -14,115 +14,115 @@
 
 # Observation Information (section B.1)
 #
-dataproduct_type = { key = "dataproduct_type", required = true, default = "image" }
-calib_level = { key = "calib_level", required = true, default = 3 }
+dataproduct_type = { required = true, default = "image" }
+calib_level = { required = true, default = 3 }
 
 # Target Information (section B.2)
 #
-target_name = { key = "target_name", required = true }
+target_name = { required = true }
 
 # Data Descriptions (section B.3)
 #
-obs_id = { key = "obs_id", required = true, default = "FAKE_OBS_ID_1" }
-obs_collection = { key = "obs_collection", required = true, default = "JWST" }
+obs_id = { required = true, default = "FAKE_OBS_ID_1" }
+obs_collection = { required = true, default = "JWST" }
 
 # Curation Information (section B.4)
 #
-obs_publisher_did = { key = "obs_publisher_did", required = true, default = "ivo://astrolabe.arizona.edu/jwst" }
+obs_publisher_did = { required = true, default = "ivo://astrolabe.arizona.edu/jwst" }
 
 # Access Information (section B.5)
 #
-access_url = { key = "access_url", required = true }
-access_format = { key = "access_format", required = true, default = "application/fits" }
-access_estsize = { key = "access_estsize", required = true }
+access_url = { required = true }
+access_format = { required = true, default = "application/fits" }
+access_estsize = { required = true }
 
 # Spatial Characterisation (section B.6.1)
 #
-s_ra = { key = "s_ra", required = true }
-s_dec = { key = "s_dec", required = true }
-s_fov = { key = "s_fov", required = true }
-s_region = { key = "s_region", required = true }
-s_resolution = { key = "s_resolution", required = true }
-s_xel1 = { key = "s_xel1", required = true }
-s_xel2 = { key = "s_xel2", required = true }
+s_ra = { required = true }
+s_dec = { required = true }
+s_fov = { required = true }
+s_region = { required = true }
+s_resolution = { required = true }
+s_xel1 = { required = true }
+s_xel2 = { required = true }
 
 # Spectral Characterisation (section B.6.2)
 #
-# em_xel = { key = "em_xel", required = true }
-# em_min = { key = "em_min", required = true }
-# em_max = { key = "em_max", required = true }
-# em_res_power = { key = "em_res_power", required = true }
+# em_xel = { required = true }
+# em_min = { required = true }
+# em_max = { required = true }
+# em_res_power = { required = true }
 
 # Time Characterisation (section B.6.3)
 #
-t_xel = { key = "t_xel", required = true }
-t_min = { key = "t_min", required = true }
-t_max = { key = "t_max", required = true }
-t_exptime = { key = "t_exptime", required = true }
-t_resolution = { key = "t_resolution", required = true }
+t_xel = { required = true }
+t_min = { required = true }
+t_max = { required = true }
+t_exptime = { required = true }
+t_resolution = { required = true }
 
 # Observable Axis (section B.6.4)
 #
-o_ucd = { key = "o_ucd", required = true, default = "phot.count" }
+o_ucd = { required = true, default = "phot.count" }
 
 # Polarization Characterisation (section B.6.5)
 #
-# pol_xel = { key = "pol_xel", required = true }
-# pol_states = { key = "pol_states", required = true }
+# pol_xel = { required = true }
+# pol_states = { required = true }
 
 # Provenance (section B.7)
 #
-facility_name = { key = "facility_name", required = true, default = "JWST" }
-instrument_name = { key = "instrument_name", required = true }
+facility_name = { required = true, default = "JWST" }
+instrument_name = { required = true }
 
 
 #
 # Non-Mandatory ObsCore Data Model fields
 #
-obs_creator_name = { key = "obs_creator_name", required = false, default = "JWST" }
+obs_creator_name = { required = false, default = "JWST" }
 
 
 #
 # DALserver Mandatory fields
 #
-spat_lolimit1 = { key = "spat_lolimit1", required = true }
-spat_hilimit1 = { key = "spat_hilimit1", required = true }
-spat_lolimit2 = { key = "spat_lolimit2", required = true }
-spat_hilimit2 = { key = "spat_hilimit2", required = true }
-im_scale = { key = "im_scale", required = true }
-im_ra1 = { key = "im_ra1", required = true }
-im_dec1 = { key = "im_dec1", required = true }
-im_ra2 = { key = "im_ra2", required = true }
-im_dec2 = { key = "im_dec2", required = true }
-im_ra3 = { key = "im_ra3", required = true }
-im_dec3 = { key = "im_dec3", required = true }
-im_ra4 = { key = "im_ra4", required = true }
-im_dec4 = { key = "im_dec4", required = true }
-im_naxes = { key = "im_naxes", required = true, default = 2 }
-im_naxis1 = { key = "im_naxis1", required = true }
-im_naxis2 = { key = "im_naxis2", required = true }
-im_nsubarrays = { key = "im_nsubarrays", required = true, default = 1 }
-im_pixtype = { key = "im_pixtype", required = true }
-im_wcsaxes1 = { key = "im_wcsaxes1", required = true }
-im_wcsaxes2 = { key = "im_wcsaxes2", required = true }
+spat_lolimit1 = { required = true }
+spat_hilimit1 = { required = true }
+spat_lolimit2 = { required = true }
+spat_hilimit2 = { required = true }
+im_scale = { required = true }
+im_ra1 = { required = true }
+im_dec1 = { required = true }
+im_ra2 = { required = true }
+im_dec2 = { required = true }
+im_ra3 = { required = true }
+im_dec3 = { required = true }
+im_ra4 = { required = true }
+im_dec4 = { required = true }
+im_naxes = { required = true, default = 2 }
+im_naxis1 = { required = true }
+im_naxis2 = { required = true }
+im_nsubarrays = { required = true, default = 1 }
+im_pixtype = { required = true }
+im_wcsaxes1 = { required = true }
+im_wcsaxes2 = { required = true }
 
 #
 # DALserver needed
 #
-file_name = { key = "file_name", required = true }
-file_path = { key = "file_path", required = true }
+file_name = { required = true }
+file_path = { required = true }
 
 #
 # JWST-specific fieldnames
 #
-is_public = { key = "is_public", required = true, default = 0 }
-equinox = { key = "equinox", required = false, default = 2000.0 }
-radesys = { key = "radesys", required = false, default = "ICRS" }
+is_public = { required = true, default = 0 }
+equinox = { required = false, default = 2000.0 }
+radesys = { required = false, default = "ICRS" }
 
-nircam_channel = { key = "nircam_channel", required = false, default = "LONG" }
-nircam_module = { key = "nircam_module", required = false, default = "A" }
-filter = { key = "filter", required = false }
-pupil = { key = "pupil", required = false, default = "CLEAR" }
+nircam_channel = { required = false, default = "LONG" }
+nircam_module = { required = false, default = "A" }
+filter = { required = false }
+pupil = { required = false, default = "CLEAR" }
 
 # for JWST, DATE is the FITS timestamp (GMT):
-gmt_date = { key = "gmt_date", required = false }
+gmt_date = { required = false }
