@@ -1,7 +1,7 @@
 #
 # Class to add defaults (fields) for the fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/2020.
-#   Last Modified: Refactor reading input JSON to parent class.
+#   Last Modified: Redo to use TOML for the fields info file.
 #
 import os
 import sys
@@ -9,14 +9,14 @@ import configparser
 # import datetime     # REMOVE: unused?
 import json
 import logging as log
+import toml
 
 from config.settings import CONFIG_DIR
 from imdtk.tools.i_tool import IImdTool, STDIN_NAME, STDOUT_NAME
-import imdtk.core.fields_file_reader as fields_file_reader
 
 
 # Default resource file for default field values.
-DEFAULT_FIELDS_FILEPATH = "{}/jwst-fields.txt".format(CONFIG_DIR)
+DEFAULT_FIELDS_FILEPATH = "{}/jwst-fields.toml".format(CONFIG_DIR)
 
 
 class DefaultsTool (IImdTool):
@@ -117,11 +117,16 @@ class DefaultsTool (IImdTool):
     #
 
     def load_defaults (self, fields_file):
-        """ Load field defaults from the given fields information filepath. """
+        """
+        Load the fields info dictionary from the given filepath and then return
+        a dictionary of field defaults of the form: "field_name => default_value".
+        The fields info file is assumed to define a single dictionary in TOML format.
+        """
         if (self._VERBOSE):
             print("({}.load_defaults): Loading from fields info file '{}'".format(self.TOOL_NAME, fields_file))
 
-        defaults = fields_file_reader.load(fields_file)
+        fields = toml.load(fields_file)     # load entire fields dictionary
+        defaults = { k:v.get('default') for (k, v) in fields.items() if 'default' in v }
 
         if (self._VERBOSE):
             print("({}.load_defaults): Read {} field defaults.".format(self.TOOL_NAME, len(defaults)))
