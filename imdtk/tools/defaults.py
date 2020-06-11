@@ -1,7 +1,7 @@
 #
 # Class to add defaults (fields) for the fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/2020.
-#   Last Modified: All printing to standard error.
+#   Last Modified: Add all field info to metadata.
 #
 import os, sys
 import configparser
@@ -64,7 +64,13 @@ class DefaultsTool (IImdTool):
 
         # load the field information from a given file path or a default resource path
         fields_file = self.args.get('fields_file') or DEFAULT_FIELDS_FILEPATH
-        defaults = self.load_defaults(fields_file)
+        if (self._VERBOSE):
+            print("({}): Loading from fields info file '{}'".format(self.TOOL_NAME, fields_file), file=sys.stderr)
+
+        fields_info = self.load_fields_info(fields_file)
+
+        if (self._VERBOSE):
+            print("({}): Read {} fields.".format(self.TOOL_NAME, len(fields_info)), file=sys.stderr)
 
         # process the given, already validated input file
         input_file = self.args.get('input_file')
@@ -78,7 +84,10 @@ class DefaultsTool (IImdTool):
         input_format = self.args.get('input_format') or DEFAULT_INPUT_FORMAT
         metadata = self.input_JSON(input_file, input_format, self.TOOL_NAME)
 
-        metadata['defaults'] = defaults # add defaults dictionary to metadata
+        metadata['fields_info'] = fields_info # add field information to metadata
+
+        defaults = self.extract_defaults(fields_info)
+        metadata['defaults'] = defaults     # add defaults dictionary to metadata
 
         return metadata                 # return the results of processing
 
@@ -114,19 +123,17 @@ class DefaultsTool (IImdTool):
     # Non-interface (tool-specific) Methods
     #
 
-    def load_defaults (self, fields_file):
+    def load_fields_info (self, fields_file):
         """
-        Load the fields info dictionary from the given filepath and then return
-        a dictionary of field defaults of the form: "field_name => default_value".
+        Load the fields info dictionary from the given filepath and return it.
         The fields info file is assumed to define a single dictionary in TOML format.
         """
-        if (self._VERBOSE):
-            print("({}): Loading from fields info file '{}'".format(self.TOOL_NAME, fields_file), file=sys.stderr)
+        return toml.load(fields_file)       # load fields info file as a dictionary
 
-        fields = toml.load(fields_file)     # load entire fields dictionary
-        defaults = { k:v.get('default') for (k, v) in fields.items() if 'default' in v }
 
-        if (self._VERBOSE):
-            print("({}): Read {} field defaults.".format(self.TOOL_NAME, len(defaults)), file=sys.stderr)
-
-        return defaults
+    def extract_defaults (self, fields_info):
+        """
+        Given a dictionary of fields information, extract the fields with default values and
+        return a dictionary of field defaults of the form: "field_name => default_value".
+        """
+        return { k:v.get('default') for (k, v) in fields_info.items() if 'default' in v }
