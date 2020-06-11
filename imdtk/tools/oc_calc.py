@@ -1,7 +1,7 @@
 #
-# Class for extracting header information from FITS files.
-#   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: All printing to standard error.
+# Class to calculate values for the ObsCore fields in a FITS-derived metadata structure.
+#   Written by: Tom Hicks. 6/11/2020.
+#   Last Modified: Initial creation.
 #
 import os, sys
 import json
@@ -10,17 +10,17 @@ import logging as log
 from astropy.io import fits
 
 import imdtk.core.fits_utils as fits_utils
-from imdtk.tools.i_tool import IImdTool, STDOUT_NAME
+from imdtk.tools.i_tool import IImdTool, STDIN_NAME, STDOUT_NAME
 
 
-class HeadersSourceTool (IImdTool):
-    """ Class for extracting header information from FITS files. """
+class ObsCoreCalcTask (IImdTool):
+    """ Class to calculate values for ObsCore fields in a metadata structure. """
 
     def __init__(self, args):
-        """ Constructor for the class extracting header information from FITS files. """
+        """ Constructor for class which calculates values for ObsCore fields in a metadata structure. """
 
         # Display name of this tool
-        self.TOOL_NAME = args.get('TOOL_NAME') or 'headers'
+        self.TOOL_NAME = args.get('TOOL_NAME') or 'obscore_calc'
 
         # Configuration parameters given to this class.
         self.args = args
@@ -62,31 +62,39 @@ class HeadersSourceTool (IImdTool):
         # process the given, already validated FITS file
         fits_file = self.args.get('fits_file')
         if (self._VERBOSE):
-            print("({}): Processing FITS file '{}'".format(self.TOOL_NAME, fits_file), file=sys.stderr)
+            print("({}): Reading FITS file '{}'".format(self.TOOL_NAME, fits_file), file=sys.stderr)
 
-        ignore_list = self.args.get('ignore_list')
+        # compute the WCS information from the specified HDU of the FITS file
         which_hdu = self.args.get('which_hdu', 0)
+        with fits.open(fits_file) as hdus_list:
+            wcs_info = fits_utils.get_WCS(hdus_list, which_hdu)
 
-        try:
-            with fits.open(fits_file) as hdus_list:
-                if (ignore_list):
-                    hdrs = fits_utils.get_header_fields(hdus_list, which_hdu, ignore_list)
-                else:
-                    hdrs = fits_utils.get_header_fields(hdus_list, which_hdu)
-
-            if (hdrs is None):
-                errMsg = "({}.process): Unable to read metadata from FITS file '{}'.".format(self.TOOL_NAME, fits_file)
-                log.error(errMsg)
-                raise RuntimeError(errMsg)
-
-            metadata = self.make_context()  # create larger metadata structure
-            metadata['headers'] = hdrs      # add the headers to the metadata
-            return metadata                 # return the results of processing
-
-        except Exception as ex:
-            errMsg = "({}.process): Exception while reading metadata from FITS file '{}': {}.".format(self.TOOL_NAME, fits_file, ex)
+        if (wcs_info is None):
+            errMsg = "({}.process): Unable to read WCS info from FITS file '{}'.".format(self.TOOL_NAME, fits_file)
             log.error(errMsg)
             raise RuntimeError(errMsg)
+
+        # process the given, already validated input file
+        input_file = self.args.get('input_file')
+        if (self._VERBOSE):
+            if (input_file is None):
+                print("({}): Processing metadata from {}".format(self.TOOL_NAME, STDIN_NAME), file=sys.stderr)
+            else:
+                print("({}): Processing metadata file '{}'".format(self.TOOL_NAME, input_file), file=sys.stderr)
+
+        # read metadata from the input file in the specified input format
+        input_format = self.args.get('input_format') or DEFAULT_INPUT_FORMAT
+        metadata = self.input_JSON(input_file, input_format, self.TOOL_NAME)
+
+        # perform the various calculations and accumulate them
+        calculations = dict()
+
+        self.calc_scale(metadata, wcs_info, calculations)
+        # TODO: IMPLEMENT more calculations LATER
+
+        metadata['calculated'] = calculations # add calculations to metadata
+
+        return metadata                 # return the results of processing
 
 
     def output_results (self, metadata):
@@ -119,21 +127,19 @@ class HeadersSourceTool (IImdTool):
     # Non-interface and/or Tool-specific Methods
     #
 
-    def add_file_info (self, results):
-        """ Add information about the input file to the given results map. """
-        file_info = dict()
-        fits_file = self.args.get('fits_file')
-        file_info['file_name'] = os.path.basename(fits_file)
-        file_info['file_path'] = os.path.abspath(fits_file)
-        file_info['file_size'] = os.path.getsize(fits_file)
-        results['file_info'] = file_info
-
-
-    def make_context (self):
+    def calc_scale (self, metadata, wcs_info, calculations):
         """
-        Create the larger structure which holds the various information sections.
-        Start with file information.
+        Calculate the scale for the current image using the given
+        given the FITS file WCS information and the field metadata.
+
+        Since only the first scale value is used, this method assumes square pixels.
+
+        The units of the scale are the same as the units of cdelt,
+        crval, and cd for the celestial WCS and can be obtained by inquiring the
+        value of cunit property of the input WCS object.
+
+        The calculated scale is stored in given calculations dictionary.
         """
-        results = dict()
-        self.add_file_info(results)
-        return results
+        scale = fits_utils.get_image_scale(wcs_info)
+        if (len(scale) > 0):
+            calculations['im_scale'] = scale[0]
