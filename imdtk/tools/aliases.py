@@ -1,10 +1,9 @@
 #
 # Class to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/29/2020.
-#   Last Modified: Refactor reading input JSON to parent class.
+#   Last Modified: All printing to standard error.
 #
-import os
-import sys
+import os, sys
 import configparser
 import datetime
 import json
@@ -46,7 +45,7 @@ class AliasesTool (IImdTool):
     def cleanup (self):
         """ Do any cleanup/shutdown tasks necessary for this instance. """
         if (self._DEBUG):
-            print("({}.cleanup)".format(self.TOOL_NAME))
+            print("({}.cleanup)".format(self.TOOL_NAME), file=sys.stderr)
 
 
     def process_and_output (self):
@@ -61,7 +60,7 @@ class AliasesTool (IImdTool):
         Perform the main work of the tool and return the results as a Python structure.
         """
         if (self._DEBUG):
-            print("({}.process): ARGS={}".format(self.TOOL_NAME, self.args))
+            print("({}.process): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
 
         # load the FITS field name aliases from a given file path or a default resource path
         alias_file = self.args.get('alias_file') or DEFAULT_ALIASES_FILEPATH
@@ -71,9 +70,9 @@ class AliasesTool (IImdTool):
         input_file = self.args.get('input_file')
         if (self._VERBOSE):
             if (input_file is None):
-                print("({}): Processing metadata from {}".format(self.TOOL_NAME, STDIN_NAME))
+                print("({}): Processing metadata from {}".format(self.TOOL_NAME, STDIN_NAME), file=sys.stderr)
             else:
-                print("({}): Processing metadata file '{}'".format(self.TOOL_NAME, input_file))
+                print("({}): Processing metadata file '{}'".format(self.TOOL_NAME, input_file), file=sys.stderr)
 
         # read metadata from the input file in the specified input format
         input_format = self.args.get('input_format') or DEFAULT_INPUT_FORMAT
@@ -107,7 +106,7 @@ class AliasesTool (IImdTool):
 
         if (self._VERBOSE):
             out_dest = outfile if (outfile) else STDOUT_NAME
-            print("({}): Results output to '{}'".format(self.TOOL_NAME, out_dest))
+            print("({}): Results output to '{}'".format(self.TOOL_NAME, out_dest), file=sys.stderr)
 
 
 
@@ -132,7 +131,7 @@ class AliasesTool (IImdTool):
     def load_aliases (self, alias_file):
         """ Load field name aliases from the given alias filepath. """
         if (self._VERBOSE):
-            print("({}.load_aliases): Loading from aliases file '{}'".format(self.TOOL_NAME, alias_file))
+            print("({}): Loading from aliases file '{}'".format(self.TOOL_NAME, alias_file), file=sys.stderr)
 
         config = configparser.ConfigParser(strict=False, empty_lines_in_values=False)
         config.optionxform = lambda option: option
@@ -140,5 +139,5 @@ class AliasesTool (IImdTool):
         aliases = config['aliases']
 
         if (self._VERBOSE):
-            print("({}.load_aliases): Read {} field name aliases.".format(self.TOOL_NAME, len(aliases)))
+            print("({}): Read {} field name aliases.".format(self.TOOL_NAME, len(aliases)), file=sys.stderr)
         return dict(aliases)

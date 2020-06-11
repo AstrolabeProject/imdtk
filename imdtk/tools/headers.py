@@ -1,10 +1,9 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: Redo information addition to context.
+#   Last Modified: All printing to standard error.
 #
-import os
-import sys
+import os, sys
 import json
 import logging as log
 
@@ -43,7 +42,7 @@ class HeadersSourceTool (IImdTool):
     def cleanup (self):
         """ Do any cleanup/shutdown tasks necessary for this instance. """
         if (self._DEBUG):
-            print("({}.cleanup)".format(self.TOOL_NAME))
+            print("({}.cleanup)".format(self.TOOL_NAME), file=sys.stderr)
 
 
     def process_and_output (self):
@@ -58,12 +57,12 @@ class HeadersSourceTool (IImdTool):
         Perform the main work of the tool and return the results as a Python structure.
         """
         if (self._DEBUG):
-            print("({}.process): ARGS={}".format(self.TOOL_NAME, self.args))
+            print("({}.process): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
 
         # process the given, already validated FITS file
         fits_file = self.args.get('fits_file')
         if (self._VERBOSE):
-            print("({}): Processing FITS file '{}'".format(self.TOOL_NAME, fits_file))
+            print("({}): Processing FITS file '{}'".format(self.TOOL_NAME, fits_file), file=sys.stderr)
 
         ignore_list = self.args.get('ignore_list')
         which_hdu = self.args.get('which_hdu', 0)
@@ -113,7 +112,7 @@ class HeadersSourceTool (IImdTool):
 
         if (self._VERBOSE):
             out_dest = outfile if (outfile) else STDOUT_NAME
-            print("({}): Results output to '{}'".format(self.TOOL_NAME, out_dest))
+            print("({}): Results output to '{}'".format(self.TOOL_NAME, out_dest), file=sys.stderr)
 
 
 

@@ -2,7 +2,7 @@
 #
 # Module to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/30/2020.
-#   Last Modified: Rename module. Use new CLI utils module. Increment version number.
+#   Last Modified: All printing to standard error.
 #
 import os, sys
 import logging as log
@@ -60,7 +60,7 @@ def main (argv=None):
     # if debugging, set verbose and echo input arguments
     if (args.get('debug')):
         args['verbose'] = True              # if debug turn on verbose too
-        print("({}.main): ARGS={}".format(TOOL_NAME, args))
+        print("({}.main): ARGS={}".format(TOOL_NAME, args), file=sys.stderr)
 
     # filter the given input file path for validity
     input_file = args.get('input_file')

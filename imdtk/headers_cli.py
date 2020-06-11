@@ -2,7 +2,7 @@
 #
 # Module to extract image metadata from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 5/21/2020.
-#   Last Modified: Correct spurious arg to method.
+#   Last Modified: All printing to standard error.
 #
 import os, sys
 import logging as log
@@ -70,7 +70,7 @@ def main (argv=None):
     # if debugging, set verbose and echo input arguments
     if (args.get('debug')):
         args['verbose'] = True              # if debug turn on verbose too
-        print("({}.main): ARGS={}".format(TOOL_NAME, args))
+        print("({}.main): ARGS={}".format(TOOL_NAME, args), file=sys.stderr)
 
     # filter the given FITS file path for validity
     fits_file = args.get('fits_file')

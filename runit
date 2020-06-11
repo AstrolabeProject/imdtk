@@ -19,11 +19,28 @@
 # Good pipes:
 #############
 
-# headers -ff /images/DC_191217/F356W.fits
-# headers -ff /images/DC_191217/F356W.fits -g
-# headers -ff /images/DC_191217/F356W.fits -of /work/F356W_headers.json
+# Headers only:
+# headers -v -ff /images/DC_191217/F356W.fits
 
-# headers -ff /images/DC_191217/F356W.fits | aliases -v
+# Headers only, generate filename:
+# headers -v -ff /images/DC_191217/F356W.fits -g
+
+# Headers only, named filename:
+# headers -v -ff /images/DC_191217/F356W.fits -of /work/F356W_headers.json
+
+# Headers to aliases:
+# headers -v -ff /images/DC_191217/F356W.fits | aliases -v -g
+
+# Last tool debug and generate filename:
 # headers -ff /images/DC_191217/F356W.fits | aliases -d -g
+
+# Last tool verbose:
 # headers -ff /images/DC_191217/F356W.fits | aliases | defaults -v
-headers -ff /images/DC_191217/F356W.fits | aliases | defaults -v -g
+
+# All tools verbose:
+# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | defaults -v -g
+
+# Explicit intermediate file pipeline:
+headers -d -ff /images/DC_191217/F356W.fits -of /work/h.json
+aliases -d -if /work/h.json -of /work/ha.json
+defaults -d -if /work/ha.json -of /work/had.json

@@ -1,12 +1,10 @@
 #
 # Class to add defaults (fields) for the fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/2020.
-#   Last Modified: Redo to use TOML for the fields info file.
+#   Last Modified: All printing to standard error.
 #
-import os
-import sys
+import os, sys
 import configparser
-# import datetime     # REMOVE: unused?
 import json
 import logging as log
 import toml
@@ -47,7 +45,7 @@ class DefaultsTool (IImdTool):
     def cleanup (self):
         """ Do any cleanup/shutdown tasks necessary for this instance. """
         if (self._DEBUG):
-            print("({}.cleanup)".format(self.TOOL_NAME))
+            print("({}.cleanup)".format(self.TOOL_NAME), file=sys.stderr)
 
 
     def process_and_output (self):
@@ -62,7 +60,7 @@ class DefaultsTool (IImdTool):
         Perform the main work of the tool and return the results as a Python structure.
         """
         if (self._DEBUG):
-            print("({}.process): ARGS={}".format(self.TOOL_NAME, self.args))
+            print("({}.process): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
 
         # load the field information from a given file path or a default resource path
         fields_file = self.args.get('fields_file') or DEFAULT_FIELDS_FILEPATH
@@ -72,9 +70,9 @@ class DefaultsTool (IImdTool):
         input_file = self.args.get('input_file')
         if (self._VERBOSE):
             if (input_file is None):
-                print("({}): Processing metadata from {}".format(self.TOOL_NAME, STDIN_NAME))
+                print("({}): Processing metadata from {}".format(self.TOOL_NAME, STDIN_NAME), file=sys.stderr)
             else:
-                print("({}): Processing metadata file '{}'".format(self.TOOL_NAME, input_file))
+                print("({}): Processing metadata file '{}'".format(self.TOOL_NAME, input_file), file=sys.stderr)
 
         # read metadata from the input file in the specified input format
         input_format = self.args.get('input_format') or DEFAULT_INPUT_FORMAT
@@ -108,7 +106,7 @@ class DefaultsTool (IImdTool):
 
         if (self._VERBOSE):
             out_dest = outfile if (outfile) else STDOUT_NAME
-            print("({}): Results output to '{}'".format(self.TOOL_NAME, out_dest))
+            print("({}): Results output to '{}'".format(self.TOOL_NAME, out_dest), file=sys.stderr)
 
 
 
@@ -123,12 +121,12 @@ class DefaultsTool (IImdTool):
         The fields info file is assumed to define a single dictionary in TOML format.
         """
         if (self._VERBOSE):
-            print("({}.load_defaults): Loading from fields info file '{}'".format(self.TOOL_NAME, fields_file))
+            print("({}): Loading from fields info file '{}'".format(self.TOOL_NAME, fields_file), file=sys.stderr)
 
         fields = toml.load(fields_file)     # load entire fields dictionary
         defaults = { k:v.get('default') for (k, v) in fields.items() if 'default' in v }
 
         if (self._VERBOSE):
-            print("({}.load_defaults): Read {} field defaults.".format(self.TOOL_NAME, len(defaults)))
+            print("({}): Read {} field defaults.".format(self.TOOL_NAME, len(defaults)), file=sys.stderr)
 
         return defaults
