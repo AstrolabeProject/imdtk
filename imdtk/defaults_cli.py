@@ -2,7 +2,7 @@
 #
 # Module to add defaults (fields) for the fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/20.
-#   Last Modified: All printing to standard error.
+#   Last Modified: Allow input file path without specific extent.
 #
 import os, sys
 import logging as log
@@ -10,7 +10,7 @@ import argparse
 
 import imdtk.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
-from imdtk.core.file_utils import validate_file_path
+from imdtk.core.file_utils import good_file_path
 from imdtk.tools.defaults import DEFAULT_FIELDS_FILEPATH, DefaultsTool
 from imdtk.tools.i_tool import OUTPUT_EXTENTS
 
@@ -65,7 +65,7 @@ def main (argv=None):
     # filter the given input file path for validity
     input_file = args.get('input_file')
     if (input_file):                        # if input file given, check it
-        if (not validate_file_path(input_file, OUTPUT_EXTENTS)):
+        if (not good_file_path(input_file)):
             print("({}): A readable, valid input file must be given. Exiting...".format(TOOL_NAME),
                   file=sys.stderr)
             sys.exit(20)

@@ -41,6 +41,11 @@
 # headers -v -ff /images/DC_191217/F356W.fits | aliases -v | defaults -v -g
 
 # Explicit intermediate file pipeline:
-headers -d -ff /images/DC_191217/F356W.fits -of /work/h.json
-aliases -d -if /work/h.json -of /work/ha.json
-defaults -d -if /work/ha.json -of /work/had.json
+# headers -d -ff /images/DC_191217/F356W.fits -of /work/h.json
+# aliases -d -if /work/h.json -of /work/ha.json
+# defaults -d -if /work/ha.json -of /work/had.json
+
+# Explicit intermediate file pipeline with non-json names:
+headers -d -ff /images/DC_191217/F356W.fits -of /work/h1
+aliases -d -if /work/h1 -of /work/ha1
+defaults -d -if /work/ha1 -of /work/had1
