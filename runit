@@ -37,15 +37,15 @@
 # Explicit intermediate file pipeline:
 # headers -d -ff /images/DC_191217/F356W.fits -of /work/h.json
 # aliases -d -if /work/h.json -of /work/ha.json
-# field_info -d -if /work/ha.json -of /work/had.json
+# fields_info -d -if /work/ha.json -of /work/had.json
 
 # Explicit intermediate file pipeline with non-json names:
 # headers -d -ff /images/DC_191217/F356W.fits -of /work/h1
 # aliases -d -if /work/h1 -of /work/ha1
-# field_info -d -if /work/ha1 -of /work/had1
+# fields_info -d -if /work/ha1 -of /work/had1
 
 # Last tool verbose:
-# headers -ff /images/DC_191217/F356W.fits | aliases | field_info -v
+# headers -ff /images/DC_191217/F356W.fits | aliases | fields_info -v
 
 # All tools verbose:
-headers -v -ff /images/DC_191217/F356W.fits | aliases -v | field_info -v | oc_calc -v -ff /images/DC_191217/F356W.fits -g
+headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | oc_calc -v -ff /images/DC_191217/F356W.fits -g

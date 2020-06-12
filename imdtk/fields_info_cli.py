@@ -11,7 +11,7 @@ import argparse
 import imdtk.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
 from imdtk.core.file_utils import good_file_path
-from imdtk.tools.field_info import DEFAULT_FIELDS_FILEPATH, FieldsInfoTask
+from imdtk.tools.fields_info import DEFAULT_FIELDS_FILEPATH, FieldsInfoTask
 from imdtk.tools.i_tool import OUTPUT_EXTENTS
 
 
