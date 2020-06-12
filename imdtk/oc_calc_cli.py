@@ -2,7 +2,7 @@
 #
 # Module to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/11/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Refactor/use FITS file arguments to/from CLI utils.
 #
 import os, sys
 import logging as log
@@ -19,7 +19,7 @@ from imdtk.tools.oc_calc import ObsCoreCalcTask
 TOOL_NAME = 'oc_calc'
 
 # Version of this tool.
-VERSION = '0.0.1'
+VERSION = '0.2.0'
 
 
 def main (argv=None):
@@ -46,18 +46,7 @@ def main (argv=None):
     cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_input_arguments(parser, TOOL_NAME, VERSION)
-
-    # add arguments specific to this module
-    parser.add_argument(
-        '-hdu', '--hdu', dest='which_hdu', metavar='HDU_index',
-        default=0,
-        help='Index of HDU containing the metadata [default: 0 (the first)]'
-    )
-
-    parser.add_argument(
-        '-ff', '--fits_file', dest='fits_file', required=True, metavar='path_to_image_file',
-        help='Path to a readable FITS image file from which to extract metadata [required]'
-    )
+    cli_utils.add_fits_file_arguments(parser, TOOL_NAME, VERSION)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))

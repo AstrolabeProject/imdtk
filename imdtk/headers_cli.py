@@ -2,7 +2,7 @@
 #
 # Module to extract image metadata from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 5/21/2020.
-#   Last Modified: All printing to standard error.
+#   Last Modified: Refactor/use FITS file arguments to/from CLI utils.
 #
 import os, sys
 import logging as log
@@ -19,7 +19,7 @@ from imdtk.tools.headers import HeadersSourceTool
 TOOL_NAME = 'headers'
 
 # Version of this tool.
-VERSION = '0.0.3'
+VERSION = '0.2.0'
 
 
 def main (argv=None):
@@ -45,23 +45,13 @@ def main (argv=None):
 
     cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
+    cli_utils.add_fits_file_arguments(parser, TOOL_NAME, VERSION)
 
     # add arguments specific to this module
-    parser.add_argument(
-        '-hdu', '--hdu', dest='which_hdu', metavar='HDU_index',
-        default=0,
-        help='Index of HDU containing the metadata [default: 0 (the first)]'
-    )
-
     parser.add_argument(
         '-ig', '--ignore', dest='ignore_list', action="append", metavar='header_key_to_ignore',
         default=argparse.SUPPRESS,
         help="Single header key to ignore (may repeat). [default: {} ]".format(FITS_IGNORE_KEYS)
-    )
-
-    parser.add_argument(
-        '-ff', '--fits_file', dest='fits_file', required=True, metavar='path_to_image_file',
-        help='Path to a readable FITS image file from which to extract metadata [required]'
     )
 
     # actually parse the arguments from the command line

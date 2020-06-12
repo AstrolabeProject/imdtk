@@ -2,7 +2,7 @@
 #
 # Module to add information about desired fields to the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/20.
-#   Last Modified: Update for tool rename.
+#   Last Modified: Refactor/use field info file argument to/from CLI utils. Update for task rename.
 #
 import os, sys
 import logging as log
@@ -11,15 +11,15 @@ import argparse
 import imdtk.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
 from imdtk.core.file_utils import good_file_path
-from imdtk.tools.field_info import DEFAULT_FIELDS_FILEPATH, FieldInfoTask
+from imdtk.tools.field_info import DEFAULT_FIELDS_FILEPATH, FieldsInfoTask
 from imdtk.tools.i_tool import OUTPUT_EXTENTS
 
 
 # Program name for this tool.
-TOOL_NAME = 'field_info'
+TOOL_NAME = 'fields_info'
 
 # Version of this tool.
-VERSION = '0.2.0'
+VERSION = '0.2.1'
 
 
 def main (argv=None):
@@ -46,13 +46,7 @@ def main (argv=None):
     cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_input_arguments(parser, TOOL_NAME, VERSION)
-
-    # add arguments specific to this module
-    parser.add_argument(
-        '-fi', '--field-info', dest='fields_file', metavar='filepath',
-        default=argparse.SUPPRESS,
-        help='Field information file for fields to be processed [default: "/imdtk/config/jwst-fields"]'
-    )
+    cli_utils.add_fields_info_arguments(parser, TOOL_NAME, VERSION, DEFAULT_FIELDS_FILEPATH)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))
@@ -75,7 +69,7 @@ def main (argv=None):
     args['VERSION'] = VERSION
 
     # call the tool layer to process the given, validated input file
-    tool = FieldInfoTask(args)
+    tool = FieldsInfoTask(args)
     tool.process_and_output()
     tool.cleanup()
 

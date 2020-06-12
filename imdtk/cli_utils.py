@@ -1,28 +1,59 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Comment out output format argument as JSON is currently the only output format.
+#   Last Modified: Refactor other argument collections here. Reorder methods.
 #
 import argparse
 
 
-def add_shared_arguments (parser, tool_name, version):
-    """ Add the argument shared by all tools to the given argparse parser object. """
+def add_collection_arguments (parser, tool_name, version, default_msg='no default'):
+    """ Add the argument(s) related to collection specification
+        to the given argparse parser object. """
     parser.add_argument(
-        '--version', action='version', version="{} version {}".format(tool_name, version),
-        help='Show version information and exit.'
+        '-c', '--collection', dest='collection', metavar='collection-name',
+        default=argparse.SUPPRESS,
+        help="Collection name for ingested images [default: {}]".format(default_msg)
+    )
+
+
+def add_fields_info_arguments (parser, tool_name, version, default_msg='no default'):
+    """ Add the argument(s) related to parsing information from fields information files
+        to the given argparse parser object. """
+    parser.add_argument(
+        '-fi', '--fields-info', dest='fields_file', metavar='filepath',
+        default=argparse.SUPPRESS,
+        help="Field information file for fields to be processed [default: {}]".format(default_msg)
+    )
+
+
+def add_fits_file_arguments (parser, tool_name, version):
+    """ Add the argument(s) related to parsing information from FITS files
+        to the given argparse parser object. """
+    parser.add_argument(
+        '-hdu', '--hdu', dest='which_hdu', metavar='HDU_index',
+        default=0,
+        help='Index of HDU containing the metadata [default: 0 (the first)]'
     )
 
     parser.add_argument(
-        '-d', '--debug', dest='debug', action='store_true',
-        default=False,
-        help='Print debugging output during processing [default: False (non-debug mode)]'
+        '-ff', '--fits_file', dest='fits_file', required=True, metavar='path_to_image_file',
+        help='Path to a readable FITS image file from which to extract metadata [required]'
+    )
+
+
+def add_input_arguments (parser, tool_name, version):
+    """ Add common input arguments to the given argparse parser object. """
+    parser.add_argument(
+        '-ifmt', '--input-format', dest='input_format',
+        default='json',
+        choices=['json', 'text'],
+        help='Format of input data file: "json" or "text" [default: "json"]'
     )
 
     parser.add_argument(
-        '-v', '--verbose', dest='verbose', action='store_true',
-        default=False,
-        help='Print informational messages during processing [default: False (non-verbose mode)].'
+        '-if', '--input_file', dest='input_file', metavar='path_to_input_file',
+        default=argparse.SUPPRESS,
+        help='Path to a readable data file to be processed [default: (standard input)]'
     )
 
 
@@ -55,17 +86,21 @@ def add_output_arguments (parser, tool_name, version):
     # )
 
 
-def add_input_arguments (parser, tool_name, version):
-    """ Add common input arguments to the given argparse parser object. """
+def add_shared_arguments (parser, tool_name, version):
+    """ Add the arguments shared by all tools to the given argparse parser object. """
     parser.add_argument(
-        '-ifmt', '--input-format', dest='input_format',
-        default='json',
-        choices=['json', 'text'],
-        help='Format of input data file: "json" or "text" [default: "json"]'
+        '--version', action='version', version="{} version {}".format(tool_name, version),
+        help='Show version information and exit.'
     )
 
     parser.add_argument(
-        '-if', '--input_file', dest='input_file', metavar='path_to_input_file',
-        default=argparse.SUPPRESS,
-        help='Path to a readable data file to be processed [default: (standard input)]'
+        '-d', '--debug', dest='debug', action='store_true',
+        default=False,
+        help='Print debugging output during processing [default: False (non-debug mode)]'
+    )
+
+    parser.add_argument(
+        '-v', '--verbose', dest='verbose', action='store_true',
+        default=False,
+        help='Print informational messages during processing [default: False (non-verbose mode)].'
     )
