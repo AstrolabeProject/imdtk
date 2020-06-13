@@ -1,21 +1,21 @@
 #
 # Class to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/2020.
-#   Last Modified: Refactored from oc_calc to create JWST-specific task.
+#   Last Modified: Refactor to inherit from ObsCore calculation interface.
 #
 import os, sys
-import json
 import logging as log
 
 from astropy.io import fits
 
 from config.settings import IMAGE_FETCH_PREFIX, IMAGES_DIR
-from imdtk.tasks.i_task import IImdTask, STDIN_NAME, STDOUT_NAME
+from imdtk.tasks.i_task import STDIN_NAME, STDOUT_NAME
+from imdtk.tasks.i_oc_calc import IObsCoreCalcTask
 import imdtk.core.fits_utils as fits_utils
 import imdtk.tasks.oc_calc_utils as occ_utils
 
 
-class JWST_ObsCoreCalcTask (IImdTask):
+class JWST_ObsCoreCalcTask (IObsCoreCalcTask):
     """ Class to calculate values for ObsCore fields in a metadata structure. """
 
     # Spatial resolutions for NIRCam filters, keyed by filter name.
@@ -33,6 +33,7 @@ class JWST_ObsCoreCalcTask (IImdTask):
         """
         Constructor for class which calculates values for ObsCore fields in a metadata structure.
         """
+        super().__init__(args)
 
         # Display name of this task
         self.TOOL_NAME = args.get('TOOL_NAME') or 'jwst_oc_calc'
@@ -51,7 +52,7 @@ class JWST_ObsCoreCalcTask (IImdTask):
 
 
     #
-    # Concrete methods implementing ITask abstract methods
+    # Concrete methods implementing ITask and IObsCoreCalcTask abstract methods
     #
 
     def cleanup (self):
@@ -135,98 +136,52 @@ class JWST_ObsCoreCalcTask (IImdTask):
             print("({}): Results output to '{}'".format(self.TOOL_NAME, out_dest), file=sys.stderr)
 
 
+    def calc_access_url (self, metadata, calculations):
+        """ Use the given metadata to create the URL to fetch the file from the server. """
+        file_info = occ_utils.get_file_info(metadata)
+        file_path = file_info.get('file_path') if file_info else None
+        if (file_path is not None):
+            image_path = "{0}{1}{2}".format(IMAGE_FETCH_PREFIX, IMAGES_DIR, file_path)
+            calculations['access_url'] = image_path
+
+
+    def calc_instrument_name (self, metadata, calculations):
+        """
+        Use the given metadata to create re/create an instrument name.
+        This version creates the instrument name from NIRCam + MODULE value
+        """
+        module = calculations.get('nircam_module')
+        inst_name = "NIRCam-{}".format(module) if (module is not None) else "NIRCam"
+        calculations['instrument_name'] = inst_name
+
+
+    def calc_spatial_resolution (self, calculations, filter_resolutions=JWST_FILTER_RESOLUTIONS):
+        """
+        Use the filter value to determine the spatial resolution based on the
+        default NIRCam filter-resolution table.
+        """
+        occ_utils.calc_spatial_resolution(calculations, filter_resolutions)
+
+
+    def calc_target_name (self, metadata, calculations):
+        """
+        Use the given metadata to create re/create a target name.
+        This version is a crude heuristic based on early JWST filenames.
+        """
+        file_info = occ_utils.get_file_info(metadata)
+        filename = file_info.get('file_name') if file_info else None
+        if (filename is not None):
+            if (filename.lower().startswith("goods_s")):
+                calculations['target_name'] = "goods_south"
+            elif (filename.lower().startswith("goods_n")):
+                calculations['target_name'] = "goods_north"
+            else:
+                calculations['target_name'] = "UNKNOWN"
+
+
     #
     # Non-interface and/or Task-specific Methods
     #
-
-    def calculate_results (self, wcs_info, metadata):
-        """
-        Try to produce a value for each of the fields desired in the results.
-        Values are extracted, calculated, or defaulted from existing metadata.
-        Return a dictionary of fields and values for all fields for which
-        a value was able to be produced.
-        """
-        calculations = dict()               # structure for calculated results
-
-        # calculate some initial values from the FITS file WCS information
-        occ_utils.calc_scale(wcs_info, calculations)
-        occ_utils.calc_corners(wcs_info, calculations)
-
-        # copy any FITS header fields that were aliased to desired result fields
-        occ_utils.copy_aliased(metadata, calculations)
-
-        # calculate any values which require special casing
-        self.calc_special_case_fields(wcs_info, metadata, calculations)
-
-        # try to produce a value for each desired field
-        self.calc_field_values(wcs_info, metadata, calculations)
-
-        return calculations
-
-
-    def calc_field_values (self, wcs_info, metadata, calculations):
-        """
-        For all desired fields, compute (or recompute) a value for each field.
-        Values are extracted, calculated, or defaulted from existing metadata.
-        If a value is produced for a field, store the field and its value into
-        the given calculations structure.
-        """
-        defaults = occ_utils.get_defaults(metadata)
-        fields_info = occ_utils.get_fields_info(metadata)
-
-        # make list of desired fields
-        desired = fields_info.keys() if fields_info else []
-        for fieldname in desired:
-            self.calc_field_value(fieldname, wcs_info, metadata, calculations)
-            if (fieldname not in calculations): # if field still has no value
-                occ_utils.set_default(fieldname, defaults, calculations)
-
-
-    def calc_field_value (self, field_name, wcs_info, metadata, calculations):
-        """
-        Provide the opportunity to calculate (or recalculate) a value for the named field.
-        """
-        if (field_name in ['s_ra', 's_dec']):
-            occ_utils.calc_wcs_coordinates(wcs_info, calculations)
-
-        elif (field_name in ['im_naxis1', 'im_naxis2']):
-            if (calculations.get('s_xel1') is not None):
-                calculations['im_naxis1'] = calculations.get('s_xel1')
-            if (calculations.get('s_xel2') is not None):
-                calculations['im_naxis2'] = calculations.get('s_xel2')
-
-        elif (field_name == 's_resolution'):
-            occ_utils.calc_spatial_resolution(calculations,
-                                              filter_resolutions=self.JWST_FILTER_RESOLUTIONS)
-
-        elif (field_name == 'im_pixtype'):
-            occ_utils.calc_pixtype(metadata, calculations)
-
-        elif (field_name == 'access_url'):
-            # create URL to fetch the file from the server
-            file_info = occ_utils.get_file_info(metadata)
-            file_path = file_info.get('file_path') if file_info else None
-            if (file_path is not None):
-                image_path = "{0}{1}{2}".format(IMAGE_FETCH_PREFIX, IMAGES_DIR, file_path)
-                calculations['access_url'] = image_path
-
-        elif (field_name == 'instrument_name'):
-            # (re)create instrument name from NIRCam + MODULE value
-            module = calculations.get('nircam_module')
-            inst_name = "NIRCam-{}".format(module) if (module is not None) else "NIRCam"
-            calculations['instrument_name'] = inst_name
-
-        elif (field_name == 'target_name'):
-            file_info = occ_utils.get_file_info(metadata)
-            filename = file_info.get('file_name') if file_info else None
-            if (filename is not None):
-                if (filename.lower().startswith("goods_s")):
-                    calculations['target_name'] = "goods_south"
-                elif (filename.lower().startswith("goods_n")):
-                    calculations['target_name'] = "goods_north"
-                else:
-                    calculations['target_name'] = "UNKNOWN"
-
 
     def calc_special_case_fields (self, wcs_info, metadata, calculations):
         """ Perform special case calculations. """

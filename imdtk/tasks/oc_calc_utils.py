@@ -1,7 +1,7 @@
 #
 # Utilities to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/11/2020.
-#   Last Modified: Convert class to module of utilities.
+#   Last Modified: Minor doc string correction.
 #
 import os, sys
 import logging as log
@@ -73,7 +73,7 @@ def calc_spatial_limits (corners, calculations):
 
 def calc_spatial_resolution (calculations, filter_resolutions=None):
     """
-    Use the filter value to determine the spatial resolution based on a NIRCam
+    Use the filter value to determine the spatial resolution based on the given
     filter-resolution table.
     """
     filt = calculations.get('filter')       # may not have filter field
