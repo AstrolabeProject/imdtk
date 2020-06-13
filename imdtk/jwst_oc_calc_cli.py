@@ -2,7 +2,7 @@
 #
 # Module to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/11/2020.
-#   Last Modified: Update for file rename to i_task.py.
+#   Last Modified: Convert to JWST-specific version. Increment version number.
 #
 import os, sys
 import logging as log
@@ -12,14 +12,14 @@ import imdtk.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
 from imdtk.core.file_utils import good_file_path, validate_file_path
 from imdtk.core.fits_utils import FITS_EXTENTS
-from imdtk.tasks.oc_calc import ObsCoreCalcTask
+from imdtk.tasks.jwst_oc_calc import JWST_ObsCoreCalcTask
 
 
 # Program name for this tool.
-TOOL_NAME = 'oc_calc'
+TOOL_NAME = 'jwst_oc_calc'
 
 # Version of this tool.
-VERSION = '0.3.0'
+VERSION = '0.4.0'
 
 
 def main (argv=None):
@@ -77,7 +77,7 @@ def main (argv=None):
     args['VERSION'] = VERSION
 
     # call the task layer to process the given, validated files
-    tool = ObsCoreCalcTask(args)
+    tool = JWST_ObsCoreCalcTask(args)
     tool.process_and_output()
     tool.cleanup()
 
