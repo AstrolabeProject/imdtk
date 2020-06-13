@@ -1,7 +1,7 @@
 #
 # Class to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/29/2020.
-#   Last Modified: All printing to standard error.
+#   Last Modified: Rename this as task.
 #
 import os, sys
 import configparser
@@ -10,14 +10,14 @@ import json
 import logging as log
 
 from config.settings import CONFIG_DIR
-from imdtk.tools.i_tool import IImdTool, STDIN_NAME, STDOUT_NAME
+from imdtk.tools.i_tool import IImdTask, STDIN_NAME, STDOUT_NAME
 
 
 # Default resource file for header keyword aliases.
 DEFAULT_ALIASES_FILEPATH = "{}/jwst-aliases.ini".format(CONFIG_DIR)
 
 
-class AliasesTool (IImdTool):
+class AliasesTask (IImdTask):
     """ Class which adds aliases for the header fields of a metadata structure. """
 
     def __init__(self, args):
@@ -39,7 +39,7 @@ class AliasesTool (IImdTool):
 
 
     #
-    # Concrete methods implementing ITool abstract methods
+    # Concrete methods implementing ITask abstract methods
     #
 
     def cleanup (self):
@@ -111,7 +111,7 @@ class AliasesTool (IImdTool):
 
 
     #
-    # Non-interface (tool-specific) Methods
+    # Non-interface and/or Task-specific Methods
     #
 
     def copy_aliased_headers (self, aliases, metadata):

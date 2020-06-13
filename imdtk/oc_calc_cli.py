@@ -2,7 +2,7 @@
 #
 # Module to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/11/2020.
-#   Last Modified: Fix: add call to add collection arguments.
+#   Last Modified: Update for rename to task.
 #
 import os, sys
 import logging as log
@@ -19,7 +19,7 @@ from imdtk.tools.oc_calc import ObsCoreCalcTask
 TOOL_NAME = 'oc_calc'
 
 # Version of this tool.
-VERSION = '0.2.1'
+VERSION = '0.2.2'
 
 
 def main (argv=None):

@@ -1,7 +1,7 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: All printing to standard error.
+#   Last Modified: Rename this as task.
 #
 import os, sys
 import json
@@ -10,10 +10,10 @@ import logging as log
 from astropy.io import fits
 
 import imdtk.core.fits_utils as fits_utils
-from imdtk.tools.i_tool import IImdTool, STDOUT_NAME
+from imdtk.tools.i_tool import IImdTask, STDOUT_NAME
 
 
-class HeadersSourceTool (IImdTool):
+class HeadersSourceTask (IImdTask):
     """ Class for extracting header information from FITS files. """
 
     def __init__(self, args):
@@ -36,7 +36,7 @@ class HeadersSourceTool (IImdTool):
 
 
     #
-    # Concrete methods implementing ITool abstract methods
+    # Concrete methods implementing ITask abstract methods
     #
 
     def cleanup (self):
@@ -116,7 +116,7 @@ class HeadersSourceTool (IImdTool):
 
 
     #
-    # Non-interface and/or Tool-specific Methods
+    # Non-interface and/or Task-specific Methods
     #
 
     def add_file_info (self, results):

@@ -1,7 +1,7 @@
 #
 # Class to add information about desired fields to the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/2020.
-#   Last Modified: Rename this task.
+#   Last Modified: Rename this as task.
 #
 import os, sys
 import configparser
@@ -10,14 +10,14 @@ import logging as log
 import toml
 
 from config.settings import CONFIG_DIR
-from imdtk.tools.i_tool import IImdTool, STDIN_NAME, STDOUT_NAME
+from imdtk.tools.i_tool import IImdTask, STDIN_NAME, STDOUT_NAME
 
 
 # Default resource file for default field values.
 DEFAULT_FIELDS_FILEPATH = "{}/jwst-fields.toml".format(CONFIG_DIR)
 
 
-class FieldsInfoTask (IImdTool):
+class FieldsInfoTask (IImdTask):
     """ Class which adds field information to a metadata structure. """
 
     def __init__(self, args):
@@ -37,7 +37,7 @@ class FieldsInfoTask (IImdTool):
 
 
     #
-    # Concrete methods implementing ITool abstract methods
+    # Concrete methods implementing ITask abstract methods
     #
 
     def cleanup (self):
@@ -118,7 +118,7 @@ class FieldsInfoTask (IImdTool):
 
 
     #
-    # Non-interface (tool-specific) Methods
+    # Non-interface and/or Task-specific Methods
     #
 
     def load_fields_info (self, fields_file):

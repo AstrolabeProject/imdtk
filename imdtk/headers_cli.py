@@ -2,7 +2,7 @@
 #
 # Module to extract image metadata from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 5/21/2020.
-#   Last Modified: Refactor/use FITS file arguments to/from CLI utils.
+#   Last Modified: Update for rename to task.
 #
 import os, sys
 import logging as log
@@ -12,14 +12,14 @@ import imdtk.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
 from imdtk.core.file_utils import validate_file_path
 from imdtk.core.fits_utils import FITS_EXTENTS, FITS_IGNORE_KEYS
-from imdtk.tools.headers import HeadersSourceTool
+from imdtk.tools.headers import HeadersSourceTask
 
 
 # Program name for this tool.
 TOOL_NAME = 'headers'
 
 # Version of this tool.
-VERSION = '0.2.0'
+VERSION = '0.2.1'
 
 
 def main (argv=None):
@@ -74,7 +74,7 @@ def main (argv=None):
     args['VERSION'] = VERSION
 
     # call the tool layer to process the given, validated FITS file
-    tool = HeadersSourceTool(args)
+    tool = HeadersSourceTask(args)
     tool.process_and_output()
     tool.cleanup()
 

@@ -1,7 +1,7 @@
 #
 # Abstract class defining the interface for tool components.
 #   Written by: Tom Hicks. 5/27/2020.
-#   Last Modified: Refactor reading input JSON here.
+#   Last Modified: Rename this as task.
 #
 import abc
 import datetime
@@ -23,7 +23,7 @@ STDERR_NAME = 'standard error'
 STDOUT_NAME = 'standard output'
 
 
-class IImdTool (abc.ABC):
+class IImdTask (abc.ABC):
 
     @abc.abstractmethod
     def cleanup (self):

@@ -2,7 +2,7 @@
 #
 # Module to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/30/2020.
-#   Last Modified: Allow input file path without specific extent.
+#   Last Modified: Update for rename to task.
 #
 import os, sys
 import logging as log
@@ -11,7 +11,7 @@ import argparse
 import imdtk.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
 from imdtk.core.file_utils import good_file_path
-from imdtk.tools.aliases import DEFAULT_ALIASES_FILEPATH, AliasesTool
+from imdtk.tools.aliases import DEFAULT_ALIASES_FILEPATH, AliasesTask
 from imdtk.tools.i_tool import OUTPUT_EXTENTS
 
 
@@ -19,7 +19,7 @@ from imdtk.tools.i_tool import OUTPUT_EXTENTS
 TOOL_NAME = 'aliases'
 
 # Version of this tool.
-VERSION = '0.0.3'
+VERSION = '0.2.0'
 
 
 def main (argv=None):
@@ -75,7 +75,7 @@ def main (argv=None):
     args['VERSION'] = VERSION
 
     # call the tool layer to process the given, validated input file
-    tool = AliasesTool(args)
+    tool = AliasesTask(args)
     tool.process_and_output()
     tool.cleanup()
 

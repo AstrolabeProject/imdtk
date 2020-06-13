@@ -1,7 +1,7 @@
 #
 # Class to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/11/2020.
-#   Last Modified: Implement calculation logic sequence.
+#   Last Modified: Rename this as task.
 #
 import os, sys
 import json
@@ -10,11 +10,11 @@ import logging as log
 from astropy.io import fits
 
 from config.settings import IMAGE_FETCH_PREFIX, IMAGES_DIR
-from imdtk.tools.i_tool import IImdTool, STDIN_NAME, STDOUT_NAME
+from imdtk.tools.i_tool import IImdTask, STDIN_NAME, STDOUT_NAME
 import imdtk.core.fits_utils as fits_utils
 
 
-class ObsCoreCalcTask (IImdTool):
+class ObsCoreCalcTask (IImdTask):
     """ Class to calculate values for ObsCore fields in a metadata structure. """
 
     # Spatial resolutions for NIRCam filters, keyed by filter name.
@@ -48,7 +48,7 @@ class ObsCoreCalcTask (IImdTool):
 
 
     #
-    # Concrete methods implementing ITool abstract methods
+    # Concrete methods implementing ITask abstract methods
     #
 
     def cleanup (self):
@@ -132,7 +132,7 @@ class ObsCoreCalcTask (IImdTool):
 
 
     #
-    # Non-interface and/or Tool-specific Methods
+    # Non-interface and/or Task-specific Methods
     #
 
     def calculate_results (self, wcs_info, metadata):
