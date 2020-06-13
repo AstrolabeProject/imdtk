@@ -1,7 +1,7 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: Rename this as task.
+#   Last Modified: Update for rename to i_task.
 #
 import os, sys
 import json
@@ -10,7 +10,7 @@ import logging as log
 from astropy.io import fits
 
 import imdtk.core.fits_utils as fits_utils
-from imdtk.tools.i_tool import IImdTask, STDOUT_NAME
+from imdtk.tools.i_task import IImdTask, STDOUT_NAME
 
 
 class HeadersSourceTask (IImdTask):
