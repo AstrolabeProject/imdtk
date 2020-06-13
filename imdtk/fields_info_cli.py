@@ -2,7 +2,7 @@
 #
 # Module to add information about desired fields to the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/20.
-#   Last Modified: Update for rename to i_task.
+#   Last Modified: Update for file rename to i_task.py.
 #
 import os, sys
 import logging as log
@@ -11,15 +11,15 @@ import argparse
 import imdtk.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
 from imdtk.core.file_utils import good_file_path
-from imdtk.tools.fields_info import DEFAULT_FIELDS_FILEPATH, FieldsInfoTask
-from imdtk.tools.i_task import OUTPUT_EXTENTS
+from imdtk.tasks.fields_info import DEFAULT_FIELDS_FILEPATH, FieldsInfoTask
+from imdtk.tasks.i_task import OUTPUT_EXTENTS
 
 
 # Program name for this tool.
 TOOL_NAME = 'fields_info'
 
 # Version of this tool.
-VERSION = '0.2.1'
+VERSION = '0.3.0'
 
 
 def main (argv=None):
