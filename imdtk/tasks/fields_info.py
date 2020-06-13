@@ -1,7 +1,7 @@
 #
 # Class to add information about desired fields to the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/2020.
-#   Last Modified: Update for file rename to i_task.py.
+#   Last Modified: Update for metadata utils.
 #
 import os, sys
 import configparser
@@ -11,6 +11,7 @@ import toml
 
 from config.settings import CONFIG_DIR
 from imdtk.tasks.i_task import IImdTask, STDIN_NAME, STDOUT_NAME
+import imdtk.tasks.metadata_utils as md_utils
 
 
 # Default resource file for default field values.
@@ -98,7 +99,8 @@ class FieldsInfoTask (IImdTask):
 
         if (out_fmt == 'json'):
             if (genfile):                   # if generating the output filename/path
-                fname = metadata.get('file_info').get('file_name')
+                file_info = md_utils.get_file_info(metadata)
+                fname = file_info.get('file_name') if file_info else "NO_FILENAME"
                 outfile = self.gen_output_file_path(fname, out_fmt, self.TOOL_NAME)
                 self.output_JSON(metadata, outfile)
             elif (outfile is not None):     # else if using the given filepath
