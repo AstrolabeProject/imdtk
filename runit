@@ -48,7 +48,7 @@
 # headers -ff /images/DC_191217/F356W.fits | aliases | fields_info -v
 
 # All tools verbose, specify collection:
-# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | oc_calc -v -c TEST_COLL -ff /images/DC_191217/F356W.fits -g
+# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -c TEST_COLL -ff /images/DC_191217/F356W.fits -g
 
 # All tools verbose:
-headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | oc_calc -v -ff /images/DC_191217/F356W.fits -g
+headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits -g
