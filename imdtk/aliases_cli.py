@@ -74,7 +74,7 @@ def main (argv=None):
     args['TOOL_NAME'] = TOOL_NAME
     args['VERSION'] = VERSION
 
-    # call the tool layer to process the given, validated input file
+    # call the task layer to process the given, validated input file
     tool = AliasesTask(args)
     tool.process_and_output()
     tool.cleanup()

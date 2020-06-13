@@ -1,7 +1,7 @@
 #
-# Abstract class defining the interface for tool components.
+# Abstract class defining the interface for task components.
 #   Written by: Tom Hicks. 5/27/2020.
-#   Last Modified: Rename this as task.
+#   Last Modified: Rename argument to task_name.
 #
 import abc
 import datetime
@@ -39,18 +39,18 @@ class IImdTask (abc.ABC):
 
     @abc.abstractmethod
     def process_and_output (self):
-        """ Perform the main work of the tool and output the results in the selected format. """
+        """ Perform the main work of the task and output the results in the selected format. """
         pass
 
 
     @abc.abstractmethod
     def process (self):
-        """ Perform the main work of the tool and return the results as a Python structure. """
+        """ Perform the main work of the task and return the results as a Python structure. """
         pass
 
 
 
-    def gen_output_file_path (self, file_path, extension, tool_name='', out_dir=WORK_DIR):
+    def gen_output_file_path (self, file_path, extension, task_name='', out_dir=WORK_DIR):
         """
         Return a unique output filepath, within the specified output directory,
         for the result file. Use the given file_path string and extension to create the name.
@@ -58,11 +58,11 @@ class IImdTask (abc.ABC):
         time_now = datetime.datetime.now()
         now_str = time_now.strftime("%Y%m%d_%H%M%S-%f")
         fname = file_utils.filename_core(file_path)
-        tname = '_'+tool_name if tool_name else ''
+        tname = '_'+task_name if task_name else ''
         return "{0}/{1}{2}_{3}.{4}".format(out_dir, fname, tname, now_str, extension)
 
 
-    def input_JSON (self, input_file=None, input_format=DEFAULT_INPUT_FORMAT, tool_name=''):
+    def input_JSON (self, input_file=None, input_format=DEFAULT_INPUT_FORMAT, task_name=''):
         """
         Process the given input file, assumed to be already validated! If the input file
         is not given, read from standard input.
@@ -75,12 +75,12 @@ class IImdTask (abc.ABC):
                     with open(input_file) as infile:
                         metadata = json.load(infile)
             else:
-                errMsg = "({}.process): Invalid input format '{}'.".format(tool_name, input_format)
+                errMsg = "({}.process): Invalid input format '{}'.".format(task_name, input_format)
                 log.error(errMsg)
                 raise ValueError(errMsg)
 
         except Exception as ex:
-            errMsg = "({}.process): Exception while reading metadata from file '{}': {}.".format(tool_name, input_file, ex)
+            errMsg = "({}.process): Exception while reading metadata from file '{}': {}.".format(task_name, input_file, ex)
             log.error(errMsg)
             raise RuntimeError(errMsg)
 

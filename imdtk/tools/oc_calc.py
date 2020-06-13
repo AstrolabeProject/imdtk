@@ -31,7 +31,7 @@ class ObsCoreCalcTask (IImdTask):
     def __init__(self, args):
         """ Constructor for class which calculates values for ObsCore fields in a metadata structure. """
 
-        # Display name of this tool
+        # Display name of this task
         self.TOOL_NAME = args.get('TOOL_NAME') or 'obscore_calc'
 
         # Configuration parameters given to this class.
@@ -58,7 +58,7 @@ class ObsCoreCalcTask (IImdTask):
 
 
     def process_and_output (self):
-        """ Perform the main work of the tool and output the results in the selected format. """
+        """ Perform the main work of the task and output the results in the selected format. """
         metadata = self.process()
         if (metadata):
             self.output_results(metadata)
@@ -66,7 +66,7 @@ class ObsCoreCalcTask (IImdTask):
 
     def process (self):
         """
-        Perform the main work of the tool and return the results as a Python structure.
+        Perform the main work of the task and return the results as a Python structure.
         """
         if (self._DEBUG):
             print("({}.process): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)

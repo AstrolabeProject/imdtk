@@ -19,7 +19,7 @@ class HeadersSourceTask (IImdTask):
     def __init__(self, args):
         """ Constructor for the class extracting header information from FITS files. """
 
-        # Display name of this tool
+        # Display name of this task
         self.TOOL_NAME = args.get('TOOL_NAME') or 'headers'
 
         # Configuration parameters given to this class.
@@ -46,7 +46,7 @@ class HeadersSourceTask (IImdTask):
 
 
     def process_and_output (self):
-        """ Perform the main work of the tool and output the results in the selected format. """
+        """ Perform the main work of the task and output the results in the selected format. """
         metadata = self.process()
         if (metadata):
             self.output_results(metadata)
@@ -54,7 +54,7 @@ class HeadersSourceTask (IImdTask):
 
     def process (self):
         """
-        Perform the main work of the tool and return the results as a Python structure.
+        Perform the main work of the task and return the results as a Python structure.
         """
         if (self._DEBUG):
             print("({}.process): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)

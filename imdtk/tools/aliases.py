@@ -25,7 +25,7 @@ class AliasesTask (IImdTask):
         Constructor for class which adds aliases for the header fields of a metadata structure.
         """
 
-        # Display name of this tool
+        # Display name of this task
         self.TOOL_NAME = args.get('TOOL_NAME') or 'aliases'
 
         # Configuration parameters given to this class.
@@ -49,7 +49,7 @@ class AliasesTask (IImdTask):
 
 
     def process_and_output (self):
-        """ Perform the main work of the tool and output the results in the selected format. """
+        """ Perform the main work of the task and output the results in the selected format. """
         metadata = self.process()
         if (metadata):
             self.output_results(metadata)
@@ -57,7 +57,7 @@ class AliasesTask (IImdTask):
 
     def process (self):
         """
-        Perform the main work of the tool and return the results as a Python structure.
+        Perform the main work of the task and return the results as a Python structure.
         """
         if (self._DEBUG):
             print("({}.process): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)

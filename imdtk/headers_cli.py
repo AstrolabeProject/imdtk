@@ -73,7 +73,7 @@ def main (argv=None):
     args['TOOL_NAME'] = TOOL_NAME
     args['VERSION'] = VERSION
 
-    # call the tool layer to process the given, validated FITS file
+    # call the task layer to process the given, validated FITS file
     tool = HeadersSourceTask(args)
     tool.process_and_output()
     tool.cleanup()
