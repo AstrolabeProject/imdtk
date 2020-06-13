@@ -1,12 +1,13 @@
 #
 # Utilities to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/11/2020.
-#   Last Modified: Minor doc string correction.
+#   Last Modified: Move metadata manipulation methods to separate utilities file.
 #
 import os, sys
 import logging as log
 
 import imdtk.core.fits_utils as fits_utils
+import imdtk.tasks.metadata_utils as md_utils
 
 
 def calc_corners (wcs_info, calculations):
@@ -50,7 +51,7 @@ def calc_pixtype (metadata, calculations):
     Calculate the value string for the ObsCore im_pixeltype field based on the value
     of the FITS header BITPIX keyword.
     """
-    hdrs = get_headers(metadata)
+    hdrs = md_utils.get_headers(metadata)
     if (hdrs):
         bitpix = hdrs.get('BITPIX')
         if (bitpix):
@@ -111,34 +112,9 @@ def calc_wcs_coordinates (wcs_info, calculations, tool_name=''):
 
 def copy_aliased (metadata, calculations):
     """ Copy all aliased fields to the calculations structure. """
-    aliased = get_aliased(metadata)
+    aliased = md_utils.get_aliased(metadata)
     if (aliased):
         calculations.update(aliased)
-
-
-def get_aliased (metadata):
-    """ Accessor for the aliased dictionary embedded in the given metadata structure. """
-    return metadata.get('aliased')
-
-
-def get_defaults (metadata):
-    """ Accessor for the defaults dictionary embedded in the given metadata structure. """
-    return metadata.get('defaults')
-
-
-def get_fields_info (metadata):
-    """ Accessor for the fields_info dictionary embedded in the given metadata structure. """
-    return metadata.get('fields_info')
-
-
-def get_file_info (metadata):
-    """ Accessor for the file_info dictionary embedded in the given metadata structure. """
-    return metadata.get('file_info')
-
-
-def get_headers (metadata):
-    """ Accessor for the headers dictionary embedded in the given metadata structure. """
-    return metadata.get('headers')
 
 
 def set_corner_field (calculations, ra_field_key, dec_field_key, corner):

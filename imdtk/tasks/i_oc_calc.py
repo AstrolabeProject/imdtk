@@ -1,12 +1,13 @@
 #
 # Class to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/14/2020.
-#   Last Modified: Split from JWST-specific class to create abstract parent interface.
+#   Last Modified: Update for metadata utils.
 #
 import os, sys
 import abc
 
 from imdtk.tasks.i_task import IImdTask
+import imdtk.tasks.metadata_utils as md_utils
 import imdtk.tasks.oc_calc_utils as occ_utils
 
 
@@ -84,8 +85,8 @@ class IObsCoreCalcTask (IImdTask):
         If a value is produced for a field, store the field and its value into
         the given calculations structure.
         """
-        defaults = occ_utils.get_defaults(metadata)
-        fields_info = occ_utils.get_fields_info(metadata)
+        defaults = md_utils.get_defaults(metadata)
+        fields_info = md_utils.get_fields_info(metadata)
 
         # make list of desired fields
         desired = fields_info.keys() if fields_info else []

@@ -1,7 +1,7 @@
 #
 # Class to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/2020.
-#   Last Modified: Refactor to inherit from ObsCore calculation interface.
+#   Last Modified: Update for metadata utils.
 #
 import os, sys
 import logging as log
@@ -12,6 +12,7 @@ from config.settings import IMAGE_FETCH_PREFIX, IMAGES_DIR
 from imdtk.tasks.i_task import STDIN_NAME, STDOUT_NAME
 from imdtk.tasks.i_oc_calc import IObsCoreCalcTask
 import imdtk.core.fits_utils as fits_utils
+import imdtk.tasks.metadata_utils as md_utils
 import imdtk.tasks.oc_calc_utils as occ_utils
 
 
@@ -117,7 +118,7 @@ class JWST_ObsCoreCalcTask (IObsCoreCalcTask):
 
         if (out_fmt == 'json'):
             if (genfile):                   # if generating the output filename/path
-                file_info = occ_utils.get_file_info(metadata)
+                file_info = md_utils.get_file_info(metadata)
                 fname = file_info.get('file_name') if file_info else "NO_FILENAME"
                 outfile = self.gen_output_file_path(fname, out_fmt, self.TOOL_NAME)
                 self.output_JSON(metadata, outfile)
@@ -138,7 +139,7 @@ class JWST_ObsCoreCalcTask (IObsCoreCalcTask):
 
     def calc_access_url (self, metadata, calculations):
         """ Use the given metadata to create the URL to fetch the file from the server. """
-        file_info = occ_utils.get_file_info(metadata)
+        file_info = md_utils.get_file_info(metadata)
         file_path = file_info.get('file_path') if file_info else None
         if (file_path is not None):
             image_path = "{0}{1}{2}".format(IMAGE_FETCH_PREFIX, IMAGES_DIR, file_path)
@@ -168,7 +169,7 @@ class JWST_ObsCoreCalcTask (IObsCoreCalcTask):
         Use the given metadata to create re/create a target name.
         This version is a crude heuristic based on early JWST filenames.
         """
-        file_info = occ_utils.get_file_info(metadata)
+        file_info = md_utils.get_file_info(metadata)
         filename = file_info.get('file_name') if file_info else None
         if (filename is not None):
             if (filename.lower().startswith("goods_s")):
