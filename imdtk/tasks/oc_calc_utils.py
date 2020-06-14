@@ -1,13 +1,22 @@
 #
 # Utilities to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/11/2020.
-#   Last Modified: Move metadata manipulation methods to separate utilities file.
+#   Last Modified: Add methods to copy file_info to calculations and to estimate image file size.
 #
 import os, sys
 import logging as log
 
 import imdtk.core.fits_utils as fits_utils
 import imdtk.tasks.metadata_utils as md_utils
+
+
+def calc_access_estsize (metadata, calculations):
+    """
+    Calculate the estimated size of the FITS image file to be accessed.
+    """
+    file_info = md_utils.get_file_info(metadata)
+    file_size = file_info.get('file_size') if file_info else 0
+    calculations['access_estsize'] = file_size
 
 
 def calc_corners (wcs_info, calculations):
@@ -115,6 +124,13 @@ def copy_aliased (metadata, calculations):
     aliased = md_utils.get_aliased(metadata)
     if (aliased):
         calculations.update(aliased)
+
+
+def copy_file_info (metadata, calculations):
+    """ Copy all file informations fields to the calculations structure. """
+    file_info = md_utils.get_file_info(metadata)
+    if (file_info):
+        calculations.update(file_info)
 
 
 def set_corner_field (calculations, ra_field_key, dec_field_key, corner):
