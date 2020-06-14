@@ -34,6 +34,9 @@
 # Headers to aliases to fields_info:
 # headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v -g
 
+# Headers to aliases to fields_info to jwst_oc_calc:
+# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -g
+
 # Last tool debug and generate filename:
 # headers -ff /images/DC_191217/F356W.fits | aliases -d -g
 
@@ -53,5 +56,8 @@
 # All tools verbose, specify collection:
 # headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -c TEST_COLL -ff /images/DC_191217/F356W.fits -g
 
+# All tools silent:
+# headers -ff /images/DC_191217/F356W.fits | aliases | fields_info | jwst_oc_calc -ff /images/DC_191217/F356W.fits | miss_report -g
+
 # All tools verbose:
-headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits -g
+headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v -g
