@@ -1,7 +1,7 @@
 #
 # Class to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/14/2020.
-#   Last Modified: Update for super init.
+#   Last Modified: Copy file information to calculations.
 #
 import os, sys
 import abc
@@ -48,6 +48,7 @@ class IObsCoreCalcTask (IImdTask):
         super().__init__(args)
 
 
+
     #
     # Non-interface and/or task-specific Methods
     #
@@ -64,6 +65,9 @@ class IObsCoreCalcTask (IImdTask):
         # calculate some initial values from the FITS file WCS information
         occ_utils.calc_scale(wcs_info, calculations)
         occ_utils.calc_corners(wcs_info, calculations)
+
+        # copy any file information fields to results
+        occ_utils.copy_file_info(metadata, calculations)
 
         # copy any FITS header fields that were aliased to desired result fields
         occ_utils.copy_aliased(metadata, calculations)
@@ -114,6 +118,9 @@ class IObsCoreCalcTask (IImdTask):
 
         elif (field_name == 'im_pixtype'):
             occ_utils.calc_pixtype(metadata, calculations)
+
+        elif (field_name == 'access_estsize'):
+            occ_utils.calc_access_estsize(metadata, calculations)
 
         elif (field_name == 'access_url'):
             self.calc_access_url(metadata, calculations)
