@@ -1,7 +1,7 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Refactor other argument collections here. Reorder methods.
+#   Last Modified: Add report arguments group.
 #
 import argparse
 
@@ -84,6 +84,21 @@ def add_output_arguments (parser, tool_name, version):
     #     choices=['json', 'other'],
     #     help='Output format for results: "json" or "other" [default: "json"]'
     # )
+
+
+def add_report_arguments (parser, tool_name, version):
+    # parser.add_argument(
+    #     '-rf', '--report_file', dest='report_file', metavar='path_to_report_file',
+    #     default=argparse.SUPPRESS,
+    #     help='File path of file to hold the output report [default: (standard error)]'
+    # )
+
+    parser.add_argument(
+        '-rfmt', '--report-format', dest='report_format',
+        default='text',
+        choices=['json', 'text'],
+        help='Output format for reports: "json" or "text" [default: "text"]'
+    )
 
 
 def add_shared_arguments (parser, tool_name, version):
