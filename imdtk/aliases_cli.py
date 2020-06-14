@@ -2,7 +2,7 @@
 #
 # Module to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/30/2020.
-#   Last Modified: Update for file rename to i_task.py.
+#   Last Modified: Remove unused output extents.
 #
 import os, sys
 import logging as log
@@ -12,7 +12,6 @@ import imdtk.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
 from imdtk.core.file_utils import good_file_path
 from imdtk.tasks.aliases import DEFAULT_ALIASES_FILEPATH, AliasesTask
-from imdtk.tasks.i_task import OUTPUT_EXTENTS
 
 
 # Program name for this tool.

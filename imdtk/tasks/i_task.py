@@ -1,7 +1,7 @@
 #
 # Abstract class defining the interface for task components.
 #   Written by: Tom Hicks. 5/27/2020.
-#   Last Modified: Rename argument to task_name.
+#   Last Modified: Redo output JSON to take std files. Remove unused output extents.
 #
 import abc
 import datetime
@@ -15,8 +15,6 @@ import imdtk.core.file_utils as file_utils
 
 DEFAULT_INPUT_FORMAT = 'json'
 DEFAULT_OUTPUT_FORMAT = 'json'
-
-OUTPUT_EXTENTS = [ '.json' ]
 
 STDIN_NAME = 'standard input'
 STDERR_NAME = 'standard error'
@@ -88,12 +86,20 @@ class IImdTask (abc.ABC):
 
 
     def output_JSON (self, data, file_path=None):
-        """ Jsonify and write the given data structure to the given file path or standard output. """
-        if (file_path is not None):         # if output file specified
+        """
+        Jsonify and write the given data structure to the given file path,
+        standard output, or standard error.
+        """
+        if ((file_path is None) or (file_path == sys.stdout)): # if writing to standard output
+            json.dump(data, sys.stdout, indent=2)
+            sys.stdout.write('\n')
+
+        elif (file_path == sys.stderr):     # else if writing to standard error
+            json.dump(data, sys.stderr, indent=2)
+            sys.stderr.write('\n')
+
+        else:                               # else file path was given
             outfile = open(file_path, 'w')
             json.dump(data, outfile, indent=2)
             outfile.write('\n')
             outfile.close()
-        else:                               # else write to standard output
-            json.dump(data, sys.stdout, indent=2)
-            sys.stdout.write('\n')
