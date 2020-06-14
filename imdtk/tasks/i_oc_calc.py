@@ -50,7 +50,7 @@ class IObsCoreCalcTask (IImdTask):
 
 
     #
-    # Non-interface and/or Task-specific Methods
+    # Non-interface and/or task-specific Methods
     #
 
     def calculate_results (self, wcs_info, metadata):

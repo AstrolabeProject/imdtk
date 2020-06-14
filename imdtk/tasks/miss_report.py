@@ -1,7 +1,7 @@
 #
 # Class to report on the presence of missing fields in the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Update for abstract method reduction.
 #
 import os, sys
 import configparser
@@ -38,19 +38,6 @@ class MissingFieldsTask (IImdTask):
     #
     # Concrete methods implementing ITask abstract methods
     #
-
-    def cleanup (self):
-        """ Do any cleanup/shutdown tasks necessary for this instance. """
-        if (self._DEBUG):
-            print("({}.cleanup)".format(self.TOOL_NAME), file=sys.stderr)
-
-
-    def process_and_output (self):
-        """ Perform the main work of the task and output the results in the selected format. """
-        metadata = self.process()
-        if (metadata):
-            self.output_results(metadata)
-
 
     def process (self):
         """
@@ -107,7 +94,7 @@ class MissingFieldsTask (IImdTask):
 
 
     #
-    # Non-interface and/or Task-specific Methods
+    # Non-interface and/or task-specific Methods
     #
 
     def check_missing (self, metadata):

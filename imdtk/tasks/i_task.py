@@ -1,7 +1,7 @@
 #
 # Abstract class defining the interface for task components.
 #   Written by: Tom Hicks. 5/27/2020.
-#   Last Modified: Redo output JSON to take std files. Remove unused output extents.
+#   Last Modified: Reduce abstract methods: make cleanup and p_and_o concrete overridable.
 #
 import abc
 import datetime
@@ -23,9 +23,13 @@ STDOUT_NAME = 'standard output'
 
 class IImdTask (abc.ABC):
 
+    #
+    # Abstract Methods - must be implemented by every child task
+    #
+
     @abc.abstractmethod
-    def cleanup (self):
-        """ Do any cleanup/shutdown tasks necessary for the instance. """
+    def process (self):
+        """ Perform the main work of the task and return the results as a Python structure. """
         pass
 
 
@@ -35,16 +39,28 @@ class IImdTask (abc.ABC):
         pass
 
 
-    @abc.abstractmethod
+    def __init__(self, args):
+        """
+        Constructor to initialize this parent of every child task.
+        """
+        pass                                # currently no initialization needed
+
+
+    #
+    # Concrete Methods - may be overridden by any child task, as needed
+    #
+
+    def cleanup (self):
+        """ Do any cleanup/shutdown tasks necessary for the task instance. """
+        if (self._DEBUG):
+            print("({}.cleanup)".format(self.TOOL_NAME), file=sys.stderr)
+
+
     def process_and_output (self):
         """ Perform the main work of the task and output the results in the selected format. """
-        pass
-
-
-    @abc.abstractmethod
-    def process (self):
-        """ Perform the main work of the task and return the results as a Python structure. """
-        pass
+        metadata = self.process()
+        if (metadata):
+            self.output_results(metadata)
 
 
 

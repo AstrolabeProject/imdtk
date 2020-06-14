@@ -1,7 +1,7 @@
 #
 # Class to add information about desired fields to the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/2020.
-#   Last Modified: Update for metadata utils.
+#   Last Modified: Update for abstract method reduction.
 #
 import os, sys
 import configparser
@@ -40,19 +40,6 @@ class FieldsInfoTask (IImdTask):
     #
     # Concrete methods implementing ITask abstract methods
     #
-
-    def cleanup (self):
-        """ Do any cleanup/shutdown tasks necessary for this instance. """
-        if (self._DEBUG):
-            print("({}.cleanup)".format(self.TOOL_NAME), file=sys.stderr)
-
-
-    def process_and_output (self):
-        """ Perform the main work of the task and output the results in the selected format. """
-        metadata = self.process()
-        if (metadata):
-            self.output_results(metadata)
-
 
     def process (self):
         """
@@ -120,7 +107,7 @@ class FieldsInfoTask (IImdTask):
 
 
     #
-    # Non-interface and/or Task-specific Methods
+    # Non-interface and/or task-specific Methods
     #
 
     def load_fields_info (self, fields_file):
