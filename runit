@@ -35,7 +35,7 @@
 # headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v -g
 
 # Headers to aliases to fields_info to jwst_oc_calc:
-# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -g
+# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits -g
 
 # Last tool debug and generate filename:
 # headers -ff /images/DC_191217/F356W.fits | aliases -d -g
