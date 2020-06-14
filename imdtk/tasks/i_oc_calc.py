@@ -1,7 +1,7 @@
 #
 # Class to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/14/2020.
-#   Last Modified: Update for metadata utils.
+#   Last Modified: Update for super init.
 #
 import os, sys
 import abc
@@ -45,8 +45,7 @@ class IObsCoreCalcTask (IImdTask):
         """
         Constructor for class which calculates values for ObsCore fields in a metadata structure.
         """
-        pass                                # currently no initialization needed
-
+        super().__init__(args)
 
 
     #

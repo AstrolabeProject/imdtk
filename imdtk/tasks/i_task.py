@@ -1,7 +1,7 @@
 #
 # Abstract class defining the interface for task components.
 #   Written by: Tom Hicks. 5/27/2020.
-#   Last Modified: Reduce abstract methods: make cleanup and p_and_o concrete overridable.
+#   Last Modified: Add initialization for core task variables.
 #
 import abc
 import datetime
@@ -43,7 +43,19 @@ class IImdTask (abc.ABC):
         """
         Constructor to initialize this parent of every child task.
         """
-        pass                                # currently no initialization needed
+
+        # Display name of this task
+        self.TOOL_NAME = args.get('TOOL_NAME') or 'unnamed_tool'
+
+        # Configuration parameters given to this class.
+        self.args = args
+
+        # Verbose setting: when true, show extra information about program operation.
+        self._VERBOSE = args.get('verbose', False)
+
+        # Debug setting: when true, show internal information for debugging.
+        self._DEBUG = args.get('debug', False)
+
 
 
     #

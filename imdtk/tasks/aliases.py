@@ -1,7 +1,7 @@
 #
 # Class to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/29/2020.
-#   Last Modified: Update for abstract method reduction.
+#   Last Modified: Update for super init.
 #
 import os, sys
 import configparser
@@ -25,18 +25,7 @@ class AliasesTask (IImdTask):
         """
         Constructor for class which adds aliases for the header fields of a metadata structure.
         """
-
-        # Display name of this task
-        self.TOOL_NAME = args.get('TOOL_NAME') or 'aliases'
-
-        # Configuration parameters given to this class.
-        self.args = args
-
-        # Verbose setting: when true, show extra information about program operation.
-        self._VERBOSE = args.get('verbose', False)
-
-        # Debug setting: when true, show internal information for debugging.
-        self._DEBUG = args.get('debug', False)
+        super().__init__(args)
 
 
     #

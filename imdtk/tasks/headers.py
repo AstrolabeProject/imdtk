@@ -1,7 +1,7 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: Update for abstract method reduction.
+#   Last Modified: Update for super init.
 #
 import os, sys
 import json
@@ -18,19 +18,10 @@ class HeadersSourceTask (IImdTask):
     """ Class for extracting header information from FITS files. """
 
     def __init__(self, args):
-        """ Constructor for the class extracting header information from FITS files. """
-
-        # Display name of this task
-        self.TOOL_NAME = args.get('TOOL_NAME') or 'headers'
-
-        # Configuration parameters given to this class.
-        self.args = args
-
-        # Verbose setting: when true, show extra information about program operation.
-        self._VERBOSE = args.get('verbose', False)
-
-        # Debug setting: when true, show internal information for debugging.
-        self._DEBUG = args.get('debug', False)
+        """
+        Constructor for the class extracting header information from FITS files.
+        """
+        super().__init__(args)
 
         # Path to a readable FITS image file from which to extract metadata.
         self._fits_file = args.get('fits_file')
