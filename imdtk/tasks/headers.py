@@ -1,7 +1,7 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: Update for new i_p_o parent methods.
+#   Last Modified: Refactor default output writing to parent.
 #
 import os, sys
 import logging as log
@@ -65,33 +65,6 @@ class HeadersSourceTask (IImdTask):
             errMsg = "({}.process): Exception while reading metadata from FITS file '{}': {}.".format(self.TOOL_NAME, fits_file, ex)
             log.error(errMsg)
             raise RuntimeError(errMsg)
-
-
-    def output_results (self, metadata):
-        """ Output the given metadata in the configured output format. """
-        genfile = self.args.get('gen_file_path')
-        outfile = self.args.get('output_file')
-        out_fmt = self.args.get('output_format') or 'json'
-
-        if (out_fmt == 'json'):
-            if (genfile):                   # if generating the output filename/path
-                file_info = md_utils.get_file_info(metadata)
-                fname = file_info.get('file_name') if file_info else "NO_FILENAME"
-                outfile = self.gen_output_file_path(fname, out_fmt, self.TOOL_NAME)
-                self.output_JSON(metadata, outfile)
-            elif (outfile is not None):     # else if using the given filepath
-                self.output_JSON(metadata, outfile)
-            else:                           # else using standard output
-                self.output_JSON(metadata)
-
-        else:
-            errMsg = "({}.process): Invalid output format '{}'.".format(self.TOOL_NAME, out_fmt)
-            log.error(errMsg)
-            raise ValueError(errMsg)
-
-        if (self._VERBOSE):
-            out_dest = outfile if (outfile) else STDOUT_NAME
-            print("({}): Results output to '{}'".format(self.TOOL_NAME, out_dest), file=sys.stderr)
 
 
     #
