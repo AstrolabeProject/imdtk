@@ -1,9 +1,8 @@
 #
 # Abstract class defining the interface for task components.
 #   Written by: Tom Hicks. 5/27/2020.
-#   Last Modified: Redo default input reading methods.
+#   Last Modified: Redo to remove last abstract task method.
 #
-import abc
 import datetime
 import json
 import logging as log
@@ -22,20 +21,7 @@ STDERR_NAME = 'standard error'
 STDOUT_NAME = 'standard output'
 
 
-class IImdTask (abc.ABC):
-
-    #
-    # Abstract Methods - must be implemented by every child task
-    #
-
-    @abc.abstractmethod
-    def process (self, data=None):
-        """
-        Perform the main work of the task, on any given data, and return the results
-        as a Python data structure.
-        """
-        pass
-
+class IImdTask ():
 
     def __init__(self, args):
         """
@@ -55,53 +41,14 @@ class IImdTask (abc.ABC):
         self._DEBUG = args.get('debug', False)
 
 
-
     #
-    # Concrete Methods - may be overridden by any child task, as needed
+    # Top-level IPO methods - can be overridden by any child task, as needed
     #
-
-    def input_and_process (self):
-        """
-        Read input data, perform the main work of the task, and return the results
-        as a Python data structure.
-        """
-        return self.process(self.input_data())
-
-
-    def input_process_output (self):
-        """
-        Read input data, perform the main work of the task, and output the results
-        in the configured output format.
-        """
-        self.process_and_output(self.input_data())
-
-
-    def process_and_output (self, data=None):
-        """
-        Perform the main work of the task, on any given data, and output the results
-        in the configured output format.
-        """
-        data = self.process(data)
-        if (data):
-            self.output_results(data)
-
 
     def cleanup (self):
         """ Do any cleanup/shutdown tasks necessary for the task instance. """
         if (self._DEBUG):
             print("({}.cleanup)".format(self.TOOL_NAME), file=sys.stderr)
-
-
-    def gen_output_file_path (self, file_path, extension, task_name='', out_dir=WORK_DIR):
-        """
-        Return a unique output filepath, within the specified output directory,
-        for the result file. Use the given file_path string and extension to create the name.
-        """
-        time_now = datetime.datetime.now()
-        now_str = time_now.strftime("%Y%m%d_%H%M%S-%f")
-        fname = file_utils.filename_core(file_path)
-        tname = '_'+task_name if task_name else ''
-        return "{0}/{1}{2}_{3}.{4}".format(out_dir, fname, tname, now_str, extension)
 
 
     def input_data (self):
@@ -128,6 +75,90 @@ class IImdTask (abc.ABC):
             raise ValueError(errMsg)
 
         return data                         # return the input data
+
+
+    def input_and_process (self):
+        """
+        Read input data, perform the main work of the task, and return the results
+        as a Python data structure.
+        """
+        return self.process(self.input_data())
+
+
+    def input_process_output (self):
+        """
+        Read input data, perform the main work of the task, and output the results
+        in the configured output format.
+        """
+        self.process_and_output(self.input_data())
+
+
+    def process (self, data=None):
+        """
+        Perform the main work of the task, on any given data, and return the results
+        as a Python data structure.
+
+        NOTE: this default implementation is a NO-OP: it merely passes the input data
+              to the output. It must be overridden to do anything useful.
+        """
+        if (self._DEBUG):
+            print("({}.process): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
+
+        if (data):
+            self.output_results(data)
+
+
+    def process_and_output (self, data=None):
+        """
+        Perform the main work of the task, on any given data, and output the results
+        in the configured output format.
+        """
+        data = self.process(data)
+        if (data):
+            self.output_results(data)
+
+
+    def output_results (self, metadata):
+        """ Output the given metadata in the configured output format. """
+        genfile = self.args.get('gen_file_path')
+        outfile = self.args.get('output_file')
+        out_fmt = self.args.get('output_format') or 'json'
+
+        if (out_fmt == 'json'):
+            if (genfile):                   # if generating the output filename/path
+                file_info = md_utils.get_file_info(metadata)
+                fname = file_info.get('file_name') if file_info else "NO_FILENAME"
+                outfile = self.gen_output_file_path(fname, out_fmt, self.TOOL_NAME)
+                self.output_JSON(metadata, outfile)
+            elif (outfile is not None):     # else if using the given filepath
+                self.output_JSON(metadata, outfile)
+            else:                           # else using standard output
+                self.output_JSON(metadata)
+
+        else:
+            errMsg = "({}.process): Invalid output format '{}'.".format(self.TOOL_NAME, out_fmt)
+            log.error(errMsg)
+            raise ValueError(errMsg)
+
+        if (self._VERBOSE):
+            out_dest = outfile if (outfile) else STDOUT_NAME
+            print("({}): Results output to '{}'".format(self.TOOL_NAME, out_dest), file=sys.stderr)
+
+
+    #
+    # Support methods - less likely to be overridden by a child task, but possible.
+    #
+
+    def gen_output_file_path (self, file_path, extension, task_name='', out_dir=WORK_DIR):
+        """
+        Return a unique output filepath, within the specified output directory,
+        for the result file. Use the given file_path string and extension to create the name.
+        """
+        time_now = datetime.datetime.now()
+        now_str = time_now.strftime("%Y%m%d_%H%M%S-%f")
+        fname = file_utils.filename_core(file_path)
+        tname = '_'+task_name if task_name else ''
+        return "{0}/{1}{2}_{3}.{4}".format(out_dir, fname, tname, now_str, extension)
 
 
     def input_JSON (self, input_file=None):
@@ -162,30 +193,3 @@ class IImdTask (abc.ABC):
             json.dump(data, outfile, indent=2)
             outfile.write('\n')
             outfile.close()
-
-
-    def output_results (self, metadata):
-        """ Output the given metadata in the configured output format. """
-        genfile = self.args.get('gen_file_path')
-        outfile = self.args.get('output_file')
-        out_fmt = self.args.get('output_format') or 'json'
-
-        if (out_fmt == 'json'):
-            if (genfile):                   # if generating the output filename/path
-                file_info = md_utils.get_file_info(metadata)
-                fname = file_info.get('file_name') if file_info else "NO_FILENAME"
-                outfile = self.gen_output_file_path(fname, out_fmt, self.TOOL_NAME)
-                self.output_JSON(metadata, outfile)
-            elif (outfile is not None):     # else if using the given filepath
-                self.output_JSON(metadata, outfile)
-            else:                           # else using standard output
-                self.output_JSON(metadata)
-
-        else:
-            errMsg = "({}.process): Invalid output format '{}'.".format(self.TOOL_NAME, out_fmt)
-            log.error(errMsg)
-            raise ValueError(errMsg)
-
-        if (self._VERBOSE):
-            out_dest = outfile if (outfile) else STDOUT_NAME
-            print("({}): Results output to '{}'".format(self.TOOL_NAME, out_dest), file=sys.stderr)
