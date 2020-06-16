@@ -19,14 +19,14 @@
 # Good pipes:
 #############
 
-# Headers only:
-# headers -v -ff /images/DC_191217/F356W.fits
+# Headers only, to standard output:
+# headers -v -ff /images/JADES/goods_s_F356W_2018_08_30.fits
 
 # Headers only, named filename:
-# headers -v -ff /images/DC_191217/F356W.fits -of /work/F356W_headers.json
+# headers -v -ff /images/JADES/goods_s_F356W_2018_08_30.fits -of /work/JADES_F356W_headers.json
 
-# Headers only:
-# headers -v -ff /images/DC_191217/F356W.fits -g
+# Headers only, generated filename:
+# headers -v -ff /images/JADES/goods_s_F356W_2018_08_30.fits -g
 
 # Headers to aliases:
 # headers -v -ff /images/DC_191217/F356W.fits | aliases -v -g
