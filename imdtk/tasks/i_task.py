@@ -1,7 +1,7 @@
 #
 # Abstract class defining the interface for task components.
 #   Written by: Tom Hicks. 5/27/2020.
-#   Last Modified: Add initialization for core task variables.
+#   Last Modified: Separate input & processing w/ new i_p_o chain methods. Move default input reading here.
 #
 import abc
 import datetime
@@ -28,14 +28,17 @@ class IImdTask (abc.ABC):
     #
 
     @abc.abstractmethod
-    def process (self):
-        """ Perform the main work of the task and return the results as a Python structure. """
+    def process (self, data=None):
+        """
+        Perform the main work of the task, on any given data, and return the results
+        as a Python data structure.
+        """
         pass
 
 
     @abc.abstractmethod
     def output_results (self, results):
-        """ Output the given results in the selected format. """
+        """ Output the given results in the configured output format. """
         pass
 
 
@@ -62,18 +65,36 @@ class IImdTask (abc.ABC):
     # Concrete Methods - may be overridden by any child task, as needed
     #
 
+    def input_and_process (self):
+        """
+        Read input data, perform the main work of the task, and return the results
+        as a Python data structure.
+        """
+        return self.process(self.read_input())
+
+
+    def input_process_output (self):
+        """
+        Read input data, perform the main work of the task, and output the results
+        in the configured output format.
+        """
+        self.process_and_output(self.read_input())
+
+
+    def process_and_output (self, data=None):
+        """
+        Perform the main work of the task, on any given data, and output the results
+        in the configured output format.
+        """
+        data = self.process(data)
+        if (data):
+            self.output_results(data)
+
+
     def cleanup (self):
         """ Do any cleanup/shutdown tasks necessary for the task instance. """
         if (self._DEBUG):
             print("({}.cleanup)".format(self.TOOL_NAME), file=sys.stderr)
-
-
-    def process_and_output (self):
-        """ Perform the main work of the task and output the results in the selected format. """
-        metadata = self.process()
-        if (metadata):
-            self.output_results(metadata)
-
 
 
     def gen_output_file_path (self, file_path, extension, task_name='', out_dir=WORK_DIR):
@@ -131,3 +152,23 @@ class IImdTask (abc.ABC):
             json.dump(data, outfile, indent=2)
             outfile.write('\n')
             outfile.close()
+
+
+    def read_input (self):
+        """ Read data from a file or stream and return it as a Python data structure. """
+        if (self._DEBUG):
+            print("({}.read_input): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
+
+        # process the given, already validated input file
+        input_file = self.args.get('input_file')
+        if (self._VERBOSE):
+            if (input_file is None):
+                print("({}): Processing metadata from {}".format(self.TOOL_NAME, STDIN_NAME), file=sys.stderr)
+            else:
+                print("({}): Processing metadata file '{}'".format(self.TOOL_NAME, input_file), file=sys.stderr)
+
+        # read metadata from the input file in the specified input format
+        input_format = self.args.get('input_format') or DEFAULT_INPUT_FORMAT
+        metadata = self.input_JSON(input_file, input_format, self.TOOL_NAME)
+
+        return metadata                     # return the input metadata
