@@ -1,21 +1,15 @@
 #
 # Class to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/29/2020.
-#   Last Modified: Update for new i_p_o parent methods.
+#   Last Modified: Move default file paths to config/settings.
 #
 import os, sys
 import configparser
-import datetime
-import json
 import logging as log
 
-from config.settings import CONFIG_DIR
+from config.settings import DEFAULT_ALIASES_FILEPATH
 from imdtk.tasks.i_task import IImdTask, STDIN_NAME, STDOUT_NAME
 import imdtk.tasks.metadata_utils as md_utils
-
-
-# Default resource file for header keyword aliases.
-DEFAULT_ALIASES_FILEPATH = "{}/jwst-aliases.ini".format(CONFIG_DIR)
 
 
 class AliasesTask (IImdTask):

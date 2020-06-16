@@ -1,21 +1,16 @@
 #
 # Class to add information about desired fields to the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/2020.
-#   Last Modified: Update for super init.
+#   Last Modified: Move default file paths to config/settings.
 #
 import os, sys
 import configparser
-import json
 import logging as log
 import toml
 
-from config.settings import CONFIG_DIR
+from config.settings import DEFAULT_FIELDS_FILEPATH
 from imdtk.tasks.i_task import IImdTask, STDIN_NAME, STDOUT_NAME
 import imdtk.tasks.metadata_utils as md_utils
-
-
-# Default resource file for default field values.
-DEFAULT_FIELDS_FILEPATH = "{}/jwst-fields.toml".format(CONFIG_DIR)
 
 
 class FieldsInfoTask (IImdTask):

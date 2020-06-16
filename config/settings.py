@@ -1,6 +1,12 @@
 # Configuration information
 CONFIG_DIR = '/imdtk/config'
 
+# Default resource file for header keyword aliases.
+DEFAULT_ALIASES_FILEPATH = "{}/jwst-aliases.ini".format(CONFIG_DIR)
+
+# Default resource file for default field values.
+DEFAULT_FIELDS_FILEPATH = "{}/jwst-fields.toml".format(CONFIG_DIR)
+
 # Logging level
 LOG_LEVEL = 'INFO'  # CRITICAL / ERROR / WARNING / INFO / DEBUG
 

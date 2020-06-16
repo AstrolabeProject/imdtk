@@ -4,7 +4,6 @@
 #   Last Modified: Update for new i_p_o parent methods.
 #
 import os, sys
-import json
 import logging as log
 
 from astropy.io import fits

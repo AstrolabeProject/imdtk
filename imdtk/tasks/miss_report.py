@@ -5,7 +5,6 @@
 #
 import os, sys
 import configparser
-import json
 import logging as log
 
 from config.settings import CONFIG_DIR
@@ -57,7 +56,7 @@ class MissingFieldsTask (IImdTask):
             elif (outfile is not None):     # else if using the given filepath
                 self.output_JSON(metadata, outfile)
             else:                           # else using standard output
-                self.output_JSON(metadata, sys.stdout)
+                self.output_JSON(metadata)
 
         else:
             errMsg = "({}.process): Invalid output format '{}'.".format(self.TOOL_NAME, out_fmt)
