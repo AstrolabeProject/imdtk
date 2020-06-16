@@ -1,7 +1,7 @@
 #
 # Abstract class defining the interface for task components.
 #   Written by: Tom Hicks. 5/27/2020.
-#   Last Modified: Refactor default output writing to here.
+#   Last Modified: Redo default input reading methods.
 #
 import abc
 import datetime
@@ -65,7 +65,7 @@ class IImdTask (abc.ABC):
         Read input data, perform the main work of the task, and return the results
         as a Python data structure.
         """
-        return self.process(self.read_input())
+        return self.process(self.input_data())
 
 
     def input_process_output (self):
@@ -73,7 +73,7 @@ class IImdTask (abc.ABC):
         Read input data, perform the main work of the task, and output the results
         in the configured output format.
         """
-        self.process_and_output(self.read_input())
+        self.process_and_output(self.input_data())
 
 
     def process_and_output (self, data=None):
@@ -104,27 +104,42 @@ class IImdTask (abc.ABC):
         return "{0}/{1}{2}_{3}.{4}".format(out_dir, fname, tname, now_str, extension)
 
 
-    def input_JSON (self, input_file=None, input_format=DEFAULT_INPUT_FORMAT, task_name=''):
+    def input_data (self):
+        """
+        Read data from a file or stream and return it as a Python data structure.
+        """
+        if (self._DEBUG):
+            print("({}.input_data): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
+
+        # process the given, already validated input file
+        input_file = self.args.get('input_file')
+        if (self._VERBOSE):
+            if (input_file is None):
+                print("({}): Reading data from {}".format(self.TOOL_NAME, STDIN_NAME), file=sys.stderr)
+            else:
+                print("({}): Reading data file '{}'".format(self.TOOL_NAME, input_file), file=sys.stderr)
+
+        input_format = self.args.get('input_format') or DEFAULT_INPUT_FORMAT
+        if (input_format == 'json'):
+            data = self.input_JSON(input_file)
+        else:                               # currently, no other input formats
+            errMsg = "({}.process): Invalid input format '{}'.".format(self.TOOL_NAME, input_format)
+            log.error(errMsg)
+            raise ValueError(errMsg)
+
+        return data                         # return the input data
+
+
+    def input_JSON (self, input_file=None):
         """
         Process the given input file, assumed to be already validated! If the input file
         is not given, read from standard input.
         """
-        try:
-            if (input_format == 'json'):
-                if (input_file is None):
-                    metadata = json.load(sys.stdin)
-                else:
-                    with open(input_file) as infile:
-                        metadata = json.load(infile)
-            else:
-                errMsg = "({}.process): Invalid input format '{}'.".format(task_name, input_format)
-                log.error(errMsg)
-                raise ValueError(errMsg)
-
-        except Exception as ex:
-            errMsg = "({}.process): Exception while reading metadata from file '{}': {}.".format(task_name, input_file, ex)
-            log.error(errMsg)
-            raise RuntimeError(errMsg)
+        if (input_file is None):
+            metadata = json.load(sys.stdin)
+        else:
+            with open(input_file) as infile:
+                metadata = json.load(infile)
 
         return metadata                     # return the results of processing
 
@@ -174,23 +189,3 @@ class IImdTask (abc.ABC):
         if (self._VERBOSE):
             out_dest = outfile if (outfile) else STDOUT_NAME
             print("({}): Results output to '{}'".format(self.TOOL_NAME, out_dest), file=sys.stderr)
-
-
-    def read_input (self):
-        """ Read data from a file or stream and return it as a Python data structure. """
-        if (self._DEBUG):
-            print("({}.read_input): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
-
-        # process the given, already validated input file
-        input_file = self.args.get('input_file')
-        if (self._VERBOSE):
-            if (input_file is None):
-                print("({}): Processing metadata from {}".format(self.TOOL_NAME, STDIN_NAME), file=sys.stderr)
-            else:
-                print("({}): Processing metadata file '{}'".format(self.TOOL_NAME, input_file), file=sys.stderr)
-
-        # read metadata from the input file in the specified input format
-        input_format = self.args.get('input_format') or DEFAULT_INPUT_FORMAT
-        metadata = self.input_JSON(input_file, input_format, self.TOOL_NAME)
-
-        return metadata                     # return the input metadata
