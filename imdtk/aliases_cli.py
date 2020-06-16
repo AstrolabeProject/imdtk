@@ -2,7 +2,7 @@
 #
 # Module to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/30/2020.
-#   Last Modified: Remove unused output extents.
+#   Last Modified: Update for new i_p_o parent methods.
 #
 import os, sys
 import logging as log
@@ -75,7 +75,7 @@ def main (argv=None):
 
     # call the task layer to process the given, validated input file
     tool = AliasesTask(args)
-    tool.process_and_output()
+    tool.input_process_output()
     tool.cleanup()
 
 

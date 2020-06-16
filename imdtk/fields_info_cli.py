@@ -2,7 +2,7 @@
 #
 # Module to add information about desired fields to the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/20.
-#   Last Modified: Remove unused output extents.
+#   Last Modified: Update for new i_p_o parent methods.
 #
 import os, sys
 import logging as log
@@ -69,7 +69,7 @@ def main (argv=None):
 
     # call the task layer to process the given, validated input file
     tool = FieldsInfoTask(args)
-    tool.process_and_output()
+    tool.input_process_output()
     tool.cleanup()
 
 
