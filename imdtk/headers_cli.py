@@ -2,7 +2,7 @@
 #
 # Module to extract image metadata from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 5/21/2020.
-#   Last Modified: Synch all tool versions at 0.5.1.
+#   Last Modified: Use new filepath check methods.
 #
 import os, sys
 import logging as log
@@ -10,8 +10,7 @@ import argparse
 
 import imdtk.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
-from imdtk.core.file_utils import validate_file_path
-from imdtk.core.fits_utils import FITS_EXTENTS, FITS_IGNORE_KEYS
+from imdtk.core.fits_utils import FITS_IGNORE_KEYS
 from imdtk.tasks.headers import HeadersSourceTask
 
 
@@ -62,12 +61,9 @@ def main (argv=None):
         args['verbose'] = True              # if debug turn on verbose too
         print("({}.main): ARGS={}".format(TOOL_NAME, args), file=sys.stderr)
 
-    # filter the given FITS file path for validity
+    # check the required FITS file path for validity
     fits_file = args.get('fits_file')
-    if (not validate_file_path(fits_file, FITS_EXTENTS)):
-        print("({}): A readable, valid FITS image file must be given. Exiting...".format(TOOL_NAME),
-              file=sys.stderr)
-        sys.exit(20)
+    cli_utils.check_fits_file(fits_file, TOOL_NAME) # may system exit here and not return!
 
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME

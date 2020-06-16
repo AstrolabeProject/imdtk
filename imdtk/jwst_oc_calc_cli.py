@@ -2,7 +2,7 @@
 #
 # Module to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/11/2020.
-#   Last Modified: Synch all tool versions at 0.5.1.
+#   Last Modified: Use new filepath check methods.
 #
 import os, sys
 import logging as log
@@ -10,8 +10,6 @@ import argparse
 
 import imdtk.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
-from imdtk.core.file_utils import good_file_path, validate_file_path
-from imdtk.core.fits_utils import FITS_EXTENTS
 from imdtk.tasks.jwst_oc_calc import JWST_ObsCoreCalcTask
 
 
@@ -57,20 +55,13 @@ def main (argv=None):
         args['verbose'] = True              # if debug turn on verbose too
         print("({}.main): ARGS={}".format(TOOL_NAME, args), file=sys.stderr)
 
-    # filter the given input file path for validity
+    # if input file path given, check the file path for validity
     input_file = args.get('input_file')
-    if (input_file):                        # if input file given, check it
-        if (not good_file_path(input_file)):
-            print("({}): A readable, valid input file must be given. Exiting...".format(TOOL_NAME),
-                  file=sys.stderr)
-            sys.exit(20)
+    cli_utils.check_input_file(input_file, TOOL_NAME) # may system exit here and not return!
 
-    # filter the given FITS file path for validity
+    # check the required FITS file path for validity
     fits_file = args.get('fits_file')
-    if (not validate_file_path(fits_file, FITS_EXTENTS)):
-        print("({}): A readable, valid FITS image file must be given. Exiting...".format(TOOL_NAME),
-              file=sys.stderr)
-        sys.exit(21)
+    cli_utils.check_fits_file(fits_file, TOOL_NAME) # may system exit here and not return!
 
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME

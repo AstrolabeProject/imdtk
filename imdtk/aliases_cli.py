@@ -2,15 +2,14 @@
 #
 # Module to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/30/2020.
-#   Last Modified: Synch all tool versions at 0.5.1.
+#   Last Modified: Update for default aliases filepath in CLU utils. Use new filepath check methods.
 #
 import os, sys
 import logging as log
 import argparse
 
 import imdtk.cli_utils as cli_utils
-from config.settings import LOG_LEVEL, DEFAULT_ALIASES_FILEPATH
-from imdtk.core.file_utils import good_file_path
+from config.settings import LOG_LEVEL
 from imdtk.tasks.aliases import AliasesTask
 
 
@@ -45,13 +44,7 @@ def main (argv=None):
     cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_input_arguments(parser, TOOL_NAME, VERSION)
-
-    # add arguments specific to this module
-    parser.add_argument(
-        '-a', '--aliases', dest='alias_file', metavar='filepath',
-        default=argparse.SUPPRESS,
-        help="File of aliases for metadata header fields [default: {}]".format(DEFAULT_ALIASES_FILEPATH)
-    )
+    cli_utils.add_aliases_arguments(parser, TOOL_NAME, VERSION)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))
@@ -61,13 +54,13 @@ def main (argv=None):
         args['verbose'] = True              # if debug turn on verbose too
         print("({}.main): ARGS={}".format(TOOL_NAME, args), file=sys.stderr)
 
-    # filter the given input file path for validity
+    # if input file path given, check the file path for validity
     input_file = args.get('input_file')
-    if (input_file):                        # if input file given, check it
-        if (not good_file_path(input_file)):
-            print("({}): A readable, valid input file must be given. Exiting...".format(TOOL_NAME),
-                  file=sys.stderr)
-            sys.exit(20)
+    cli_utils.check_input_file(input_file, TOOL_NAME) # may exit here and not return!
+
+    # if aliases file path given, check the file path for validity
+    alias_file = args.get('alias_file')
+    cli_utils.check_alias_file(alias_file, TOOL_NAME) # may exit here and not return!
 
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME

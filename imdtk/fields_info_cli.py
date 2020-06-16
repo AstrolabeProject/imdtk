@@ -2,15 +2,14 @@
 #
 # Module to add information about desired fields to the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/20.
-#   Last Modified: Synch all tool versions at 0.5.1.
+#   Last Modified: Update for default fields information filepath in CLU utils. Use new filepath check methods.
 #
 import os, sys
 import logging as log
 import argparse
 
 import imdtk.cli_utils as cli_utils
-from config.settings import LOG_LEVEL, DEFAULT_FIELDS_FILEPATH
-from imdtk.core.file_utils import good_file_path
+from config.settings import LOG_LEVEL
 from imdtk.tasks.fields_info import FieldsInfoTask
 
 
@@ -45,7 +44,7 @@ def main (argv=None):
     cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_input_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_fields_info_arguments(parser, TOOL_NAME, VERSION, DEFAULT_FIELDS_FILEPATH)
+    cli_utils.add_fields_info_arguments(parser, TOOL_NAME, VERSION)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))
@@ -55,13 +54,13 @@ def main (argv=None):
         args['verbose'] = True              # if debug turn on verbose too
         print("({}.main): ARGS={}".format(TOOL_NAME, args), file=sys.stderr)
 
-    # filter the given input file path for validity
+    # if input file path given, check the file path for validity
     input_file = args.get('input_file')
-    if (input_file):                        # if input file given, check it
-        if (not good_file_path(input_file)):
-            print("({}): A readable, valid input file must be given. Exiting...".format(TOOL_NAME),
-                  file=sys.stderr)
-            sys.exit(20)
+    cli_utils.check_input_file(input_file, TOOL_NAME) # may system exit here and not return!
+
+    # if fields info file path given, check the file path for validity
+    fields_file = args.get('fields_file')
+    cli_utils.check_fields_file(fields_file, TOOL_NAME) # may exit here and not return!
 
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME

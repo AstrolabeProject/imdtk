@@ -1,9 +1,25 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Add report arguments group.
+#   Last Modified: Add input and support filepath validation methods.
+#                  Import default aliases and fields info filepaths as default argparse messages.
 #
+import os, sys
 import argparse
+
+from config.settings import DEFAULT_ALIASES_FILEPATH, DEFAULT_FIELDS_FILEPATH
+from imdtk.core.file_utils import good_file_path, validate_file_path
+from imdtk.core.fits_utils import FITS_EXTENTS
+
+
+def add_aliases_arguments (parser, tool_name, version, default_msg=DEFAULT_ALIASES_FILEPATH):
+    """ Add the argument(s) related to parsing information from aliases files
+        to the given argparse parser object. """
+    parser.add_argument(
+        '-a', '--aliases', dest='alias_file', metavar='filepath',
+        default=argparse.SUPPRESS,
+        help="File of aliases for metadata header fields [default: {}]".format(default_msg)
+    )
 
 
 def add_collection_arguments (parser, tool_name, version, default_msg='no default'):
@@ -16,7 +32,7 @@ def add_collection_arguments (parser, tool_name, version, default_msg='no defaul
     )
 
 
-def add_fields_info_arguments (parser, tool_name, version, default_msg='no default'):
+def add_fields_info_arguments (parser, tool_name, version, default_msg=DEFAULT_FIELDS_FILEPATH):
     """ Add the argument(s) related to parsing information from fields information files
         to the given argparse parser object. """
     parser.add_argument(
@@ -119,3 +135,54 @@ def add_shared_arguments (parser, tool_name, version):
         default=False,
         help='Print informational messages during processing [default: False (non-verbose mode)].'
     )
+
+
+def check_alias_file (alias_file, tool_name, exit_code=22):
+    """
+    If a path to an aliases file is given, check that it is a good path. If not, then exit
+    the entire program here with the specified (or default) system exit code.
+    """
+    if (alias_file):                        # if aliases file given, check it
+        if (not good_file_path(alias_file)):
+            errMsg = "({}): A readable aliases file must be specified. Exiting...".format(TOOL_NAME)
+            log.error(errMsg)
+            print(errMsg, file=sys.stderr)
+            sys.exit(exit_code)
+
+
+def check_fields_file (fields_file, tool_name, exit_code=23):
+    """
+    If a path to an aliases file is given, check that it is a good path. If not, then exit
+    the entire program here with the specified (or default) system exit code.
+    """
+    if (fields_file):                       # if fields info file given, check it
+        if (not good_file_path(fields_file)):
+            errMsg = "({}): A readable fields information file must be specified. Exiting...".format(TOOL_NAME)
+            log.error(errMsg)
+            print(errMsg, file=sys.stderr)
+            sys.exit(exit_code)
+
+
+def check_fits_file (fits_file, tool_name, exit_code=21):
+    """
+    Check that the required FITS file path is a valid path. If not, then exit
+    the entire program here with the specified (or default) system exit code.
+    """
+    if (not validate_file_path(fits_file, FITS_EXTENTS)):
+        errMsg = "({}): A readable, valid FITS image file must be specified. Exiting...".format(TOOL_NAME)
+        log.error(errMsg)
+        print(errMsg, file=sys.stderr)
+        sys.exit(exit_code)
+
+
+def check_input_file (input_file, tool_name, exit_code=20):
+    """
+    If an input file path is given, check that it is a good path. If not, then exit
+    the entire program here with the specified (or default) system exit code.
+    """
+    if (input_file):                        # if input file given, check it
+        if (not good_file_path(input_file)):
+            errMsg = "({}): A readable, valid input data file must be specified. Exiting...".format(TOOL_NAME)
+            log.error(errMsg)
+            print(errMsg, file=sys.stderr)
+            sys.exit(exit_code)
