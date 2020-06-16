@@ -37,12 +37,6 @@ class IImdTask (abc.ABC):
         pass
 
 
-    @abc.abstractmethod
-    def output_results (self, results):
-        """ Output the given results in the configured output format. """
-        pass
-
-
     def __init__(self, args):
         """
         Constructor to initialize this parent of every child task.

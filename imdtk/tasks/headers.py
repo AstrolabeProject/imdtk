@@ -10,7 +10,7 @@ from astropy.io import fits
 
 import imdtk.core.fits_utils as fits_utils
 from imdtk.tasks.i_task import IImdTask, STDOUT_NAME
-import imdtk.tasks.metadata_utils as md_utils
+# import imdtk.tasks.metadata_utils as md_utils
 
 
 class HeadersSourceTask (IImdTask):

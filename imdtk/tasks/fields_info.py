@@ -10,7 +10,7 @@ import toml
 
 from config.settings import DEFAULT_FIELDS_FILEPATH
 from imdtk.tasks.i_task import IImdTask, STDIN_NAME, STDOUT_NAME
-import imdtk.tasks.metadata_utils as md_utils
+# import imdtk.tasks.metadata_utils as md_utils
 
 
 class FieldsInfoTask (IImdTask):
