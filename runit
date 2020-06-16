@@ -19,6 +19,13 @@
 # Good pipes:
 #############
 
+# All tools: show versions
+# headers -d --version
+# aliases -d --version
+# fields_info -d --version
+# jwst_oc_calc -d --version
+# miss_report -d --version
+
 # Headers only, to standard output:
 # headers -v -ff /images/JADES/goods_s_F356W_2018_08_30.fits
 
@@ -39,13 +46,6 @@
 
 # Last tool debug and generate filename:
 # headers -ff /images/DC_191217/F356W.fits | aliases -d -g
-
-# All tools: show versions
-# headers -d --version
-# aliases -d --version
-# fields_info -d --version
-# jwst_oc_calc -d --version
-# miss_report -d --version
 
 # Explicit intermediate file pipeline:
 # headers -d -ff /images/DC_191217/F356W.fits -of /work/h.json

@@ -2,7 +2,7 @@
 #
 # Module to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/11/2020.
-#   Last Modified: Update for new i_p_o parent methods.
+#   Last Modified: Synch all tool versions at 0.5.0.
 #
 import os, sys
 import logging as log
@@ -19,7 +19,7 @@ from imdtk.tasks.jwst_oc_calc import JWST_ObsCoreCalcTask
 TOOL_NAME = 'jwst_oc_calc'
 
 # Version of this tool.
-VERSION = '0.4.0'
+VERSION = '0.5.0'
 
 
 def main (argv=None):
