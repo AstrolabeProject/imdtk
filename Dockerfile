@@ -1,6 +1,6 @@
 FROM python:3.7.5
 
-MAINTAINER Tom Hicks <hickst@email.arizona.edu>
+LABEL maintainer="Tom Hicks hickst@email.arizona.edu"
 
 ARG TESTS=notests
 
