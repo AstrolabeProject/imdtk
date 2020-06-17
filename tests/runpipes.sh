@@ -25,6 +25,7 @@ aliases -d --version
 fields_info -d --version
 jwst_oc_calc -d --version
 miss_report -d --version
+no_op -d --version
 
 # Headers only, to standard output:
 # headers -v -ff /images/JADES/goods_s_F356W_2018_08_30.fits
