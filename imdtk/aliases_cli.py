@@ -2,7 +2,7 @@
 #
 # Module to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/30/2020.
-#   Last Modified: Update for default aliases filepath in CLU utils. Use new filepath check methods.
+#   Last Modified: Increment version to 0.7.0.
 #
 import os, sys
 import logging as log
@@ -17,7 +17,7 @@ from imdtk.tasks.aliases import AliasesTask
 TOOL_NAME = 'aliases'
 
 # Version of this tool.
-VERSION = '0.5.1'
+VERSION = '0.7.0'
 
 
 def main (argv=None):
