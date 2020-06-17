@@ -12,3 +12,5 @@ docker-compose-prod.yml
 /images
 /out
 /work
+/.vscode
+imdtk.code-workspace

@@ -111,6 +111,10 @@ ENV/
 RCS
 .DS_Store
 
+# IDEs
+/.vscode
+imdtk.code-workspace
+
 # Application specific directories
 /images
 /catalogs
