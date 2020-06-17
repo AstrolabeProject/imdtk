@@ -1,15 +1,15 @@
 #
 # Class to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/29/2020.
-#   Last Modified: Refactor default output writing to parent.
+#   Last Modified: Remove unused imports.
 #
 import os, sys
 import configparser
 import logging as log
 
 from config.settings import DEFAULT_ALIASES_FILEPATH
-from imdtk.tasks.i_task import IImdTask, STDIN_NAME, STDOUT_NAME
 import imdtk.tasks.metadata_utils as md_utils
+from imdtk.tasks.i_task import IImdTask
 
 
 class AliasesTask (IImdTask):

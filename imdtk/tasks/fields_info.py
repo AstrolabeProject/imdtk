@@ -1,7 +1,7 @@
 #
 # Class to add information about desired fields to the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/2020.
-#   Last Modified: Refactor default output writing to parent.
+#   Last Modified: Remove unused imports.
 #
 import os, sys
 import configparser
@@ -9,8 +9,7 @@ import logging as log
 import toml
 
 from config.settings import DEFAULT_FIELDS_FILEPATH
-from imdtk.tasks.i_task import IImdTask, STDIN_NAME, STDOUT_NAME
-# import imdtk.tasks.metadata_utils as md_utils
+from imdtk.tasks.i_task import IImdTask
 
 
 class FieldsInfoTask (IImdTask):

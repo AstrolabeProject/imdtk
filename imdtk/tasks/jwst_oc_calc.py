@@ -1,7 +1,7 @@
 #
 # Class to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/2020.
-#   Last Modified: Refactor default output writing to parent.
+#   Last Modified: Remove unused imports.
 #
 import os, sys
 import logging as log
@@ -9,7 +9,6 @@ import logging as log
 from astropy.io import fits
 
 from config.settings import IMAGE_FETCH_PREFIX, IMAGES_DIR
-from imdtk.tasks.i_task import STDIN_NAME, STDOUT_NAME
 from imdtk.tasks.i_oc_calc import IObsCoreCalcTask
 import imdtk.core.fits_utils as fits_utils
 import imdtk.tasks.metadata_utils as md_utils

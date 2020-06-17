@@ -1,15 +1,14 @@
 #
 # Class to report on the presence of missing fields in the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/2020.
-#   Last Modified: Refactor default output writing to parent.
+#   Last Modified: Remove unused imports.
 #
 import os, sys
 import configparser
 import logging as log
 
-from config.settings import CONFIG_DIR
-from imdtk.tasks.i_task import IImdTask, STDIN_NAME, STDOUT_NAME
 import imdtk.tasks.metadata_utils as md_utils
+from imdtk.tasks.i_task import IImdTask
 
 
 class MissingFieldsTask (IImdTask):
