@@ -44,6 +44,9 @@ headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v -g
 # Headers to aliases to fields_info to jwst_oc_calc:
 headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits -g
 
+# Headers to aliases to fields_info to jwst_oc_calc to miss_report:
+headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v -g
+
 # Last tool debug and generate filename:
 headers -ff /images/DC_191217/F356W.fits | aliases -d -g
 
@@ -61,6 +64,12 @@ fields_info -d -if /work/ha1 -of /work/hafi1
 jwst_oc_calc -d -ff /images/DC_191217/F356W.fits -if /work/hafi1 -of /work/hafijoc1
 miss_report -d -if /work/hafijoc1 -of /work/hafijocmr1
 
+# NO-OP: do nothing, verbose:
+headers -v -ff /images/DC_191217/F356W.fits | aliases -v | no_op -v -g
+headers -v -ff /images/DC_191217/F356W.fits | no_op -v | aliases -v -g
+headers -d -ff /images/DC_191217/F356W.fits | no_op -d | aliases -d -g
+headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | no_op -v -g
+
 # Last tool verbose, to standard output:
 # headers -ff /images/DC_191217/F356W.fits | aliases | fields_info -v
 
@@ -74,4 +83,4 @@ headers -ff /images/DC_191217/F356W.fits | aliases | fields_info | jwst_oc_calc 
 headers -d -ff /images/DC_191217/F356W.fits | aliases -d | fields_info -d | jwst_oc_calc -d -ff /images/DC_191217/F356W.fits | miss_report -d -g
 
 # All tools verbose:
-headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v -g
+headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | no_op -v -g
