@@ -2,7 +2,7 @@
 #
 # Module to add information about desired fields to the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/20.
-#   Last Modified: Increment version to 0.7.0.
+#   Last Modified: Remove unused cleanup call.
 #
 import os, sys
 import logging as log
@@ -17,7 +17,7 @@ from imdtk.tasks.fields_info import FieldsInfoTask
 TOOL_NAME = 'fields_info'
 
 # Version of this tool.
-VERSION = '0.7.0'
+VERSION = '0.7.1'
 
 
 def main (argv=None):
@@ -69,7 +69,6 @@ def main (argv=None):
     # call the task layer to process the given, validated input file
     tool = FieldsInfoTask(args)
     tool.input_process_output()
-    tool.cleanup()
 
 
 

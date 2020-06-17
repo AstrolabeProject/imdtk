@@ -2,7 +2,7 @@
 #
 # Module to pass through the input to the output unchanged.
 #   Written by: Tom Hicks. 6/17/20.
-#   Last Modified: Increment version to 0.7.0.
+#   Last Modified: Remove unused cleanup call.
 #
 import os, sys
 import logging as log
@@ -17,7 +17,7 @@ from imdtk.tasks.nop import NopTask
 TOOL_NAME = 'no_op'
 
 # Version of this tool.
-VERSION = '0.7.0'
+VERSION = '0.7.1'
 
 
 def main (argv=None):
@@ -64,7 +64,6 @@ def main (argv=None):
     # call the task layer to process the given, validated input file
     tool = NopTask(args)
     tool.input_process_output()
-    tool.cleanup()
 
 
 
