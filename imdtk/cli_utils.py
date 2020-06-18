@@ -1,10 +1,10 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Add input and support filepath validation methods.
-#                  Import default aliases and fields info filepaths as default argparse messages.
+#   Last Modified: Fix: tool_name should be lowercase, missing logging import.
 #
 import os, sys
+import logging as log
 import argparse
 
 from config.settings import DEFAULT_ALIASES_FILEPATH, DEFAULT_FIELDS_FILEPATH
@@ -144,7 +144,7 @@ def check_alias_file (alias_file, tool_name, exit_code=22):
     """
     if (alias_file):                        # if aliases file given, check it
         if (not good_file_path(alias_file)):
-            errMsg = "({}): A readable aliases file must be specified. Exiting...".format(TOOL_NAME)
+            errMsg = "({}): A readable aliases file must be specified. Exiting...".format(tool_name)
             log.error(errMsg)
             print(errMsg, file=sys.stderr)
             sys.exit(exit_code)
@@ -157,7 +157,7 @@ def check_fields_file (fields_file, tool_name, exit_code=23):
     """
     if (fields_file):                       # if fields info file given, check it
         if (not good_file_path(fields_file)):
-            errMsg = "({}): A readable fields information file must be specified. Exiting...".format(TOOL_NAME)
+            errMsg = "({}): A readable fields information file must be specified. Exiting...".format(tool_name)
             log.error(errMsg)
             print(errMsg, file=sys.stderr)
             sys.exit(exit_code)
@@ -169,7 +169,7 @@ def check_fits_file (fits_file, tool_name, exit_code=21):
     the entire program here with the specified (or default) system exit code.
     """
     if (not validate_file_path(fits_file, FITS_EXTENTS)):
-        errMsg = "({}): A readable, valid FITS image file must be specified. Exiting...".format(TOOL_NAME)
+        errMsg = "({}): A readable, valid FITS image file must be specified. Exiting...".format(tool_name)
         log.error(errMsg)
         print(errMsg, file=sys.stderr)
         sys.exit(exit_code)
@@ -182,7 +182,7 @@ def check_input_file (input_file, tool_name, exit_code=20):
     """
     if (input_file):                        # if input file given, check it
         if (not good_file_path(input_file)):
-            errMsg = "({}): A readable, valid input data file must be specified. Exiting...".format(TOOL_NAME)
+            errMsg = "({}): A readable, valid input data file must be specified. Exiting...".format(tool_name)
             log.error(errMsg)
             print(errMsg, file=sys.stderr)
             sys.exit(exit_code)
