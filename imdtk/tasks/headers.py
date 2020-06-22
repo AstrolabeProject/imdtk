@@ -3,7 +3,8 @@
 #   Written by: Tom Hicks. 5/23/2020.
 #   Last Modified: Refactor default output writing to parent.
 #
-import os, sys
+import os
+import sys
 import logging as log
 
 from astropy.io import fits

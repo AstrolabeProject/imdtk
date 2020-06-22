@@ -3,7 +3,8 @@
 #   Written by: Tom Hicks. 6/13/2020.
 #   Last Modified: Add get_calculated.
 #
-import os, sys
+import os
+import sys
 
 
 def get_aliased (metadata):

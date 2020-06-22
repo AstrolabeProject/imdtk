@@ -3,7 +3,8 @@
 #   Written by: Tom Hicks. 6/14/2020.
 #   Last Modified: Copy file information to calculations.
 #
-import os, sys
+import os
+import sys
 import abc
 
 from imdtk.tasks.i_task import IImdTask

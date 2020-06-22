@@ -3,7 +3,8 @@
 #   Written by: Tom Hicks. 6/13/2020.
 #   Last Modified: Remove unused imports.
 #
-import os, sys
+import os
+import sys
 import configparser
 import logging as log
 

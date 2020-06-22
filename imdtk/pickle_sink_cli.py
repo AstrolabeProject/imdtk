@@ -4,7 +4,8 @@
 #   Written by: Tom Hicks. 6/17/20.
 #   Last Modified: Initial creation.
 #
-import os, sys
+import os
+import sys
 import logging as log
 import argparse
 

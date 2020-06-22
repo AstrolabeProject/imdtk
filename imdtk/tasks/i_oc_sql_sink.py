@@ -3,7 +3,8 @@
 #   Written by: Tom Hicks. 6/21/2020.
 #   Last Modified: Initial creation.
 #
-import os, sys
+import os
+import sys
 import configparser
 
 from imdtk.tasks.i_task import IImdTask

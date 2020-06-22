@@ -3,7 +3,8 @@
 #   Written by: Tom Hicks. 6/11/2020.
 #   Last Modified: Add methods to copy file_info to calculations and to estimate image file size.
 #
-import os, sys
+import os
+import sys
 import logging as log
 
 import imdtk.core.fits_utils as fits_utils

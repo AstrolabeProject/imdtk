@@ -3,7 +3,8 @@
 #   Written by: Tom Hicks. 6/17/2020.
 #   Last Modified: Initial creation.
 #
-import os, sys
+import os
+import sys
 import configparser
 import logging as log
 import pickle
