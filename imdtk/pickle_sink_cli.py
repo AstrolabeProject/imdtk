@@ -38,7 +38,7 @@ def main (argv=None):
     parser = argparse.ArgumentParser(
         prog=TOOL_NAME,
         formatter_class=argparse.RawTextHelpFormatter,
-        description='Add information about desired fields to a metadata structure and output it.'
+        description='Save the incoming data structure to a file in Python pickle format.'
     )
 
     cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)

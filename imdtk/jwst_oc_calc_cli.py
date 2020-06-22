@@ -38,7 +38,7 @@ def main (argv=None):
     parser = argparse.ArgumentParser(
         prog=TOOL_NAME,
         formatter_class=argparse.RawTextHelpFormatter,
-        description='Extract image metadata from a FITS file and output it as JSON.'
+        description='Calculate values from incoming metadata, add the calculated fields to the metadata structure, and output it.'
     )
 
     cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
