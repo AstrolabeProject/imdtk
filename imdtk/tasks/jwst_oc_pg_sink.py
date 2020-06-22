@@ -1,12 +1,13 @@
 #
 # Class to sink incoming ObsCore metadata to a PostgreSQL database.
 #   Written by: Tom Hicks. 6/21/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Update for table-name and sql-only arguments.
 #
-import os, sys
+import os
+import sys
 import logging as log
 
-from config.settings import DEFAULT_DBCONFIG_FILEPATH
+from config.settings import DEFAULT_DBCONFIG_FILEPATH, DEFAULT_METADATA_TABLE_NAME
 from imdtk.tasks.i_oc_sql_sink import IObsCoreSQLSink
 
 
@@ -29,10 +30,16 @@ class JWST_ObsCorePostgreSQLSink (IObsCoreSQLSink):
         if (self._DEBUG):
             print("({}.output_results): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
 
+        sql_only = self.args.get('sql_only')
+
         # load the FITS field name aliases from a given file path or a default resource path
         dbconfig_file = self.args.get('dbconfig_file') or DEFAULT_DBCONFIG_FILEPATH
         dbconfig = self.load_db_config(dbconfig_file)
 
+        table_name = self.args.get('table_name') or DEFAULT_METADATA_TABLE_NAME
+
+        print("SQL_ONLY={}".format(sql_only)) # REMOVE LATER
+        print("TABLE_NAME={}".format(table_name)) # REMOVE LATER
         print("DBCONFIG={}".format(dbconfig)) # REMOVE LATER
 
 
