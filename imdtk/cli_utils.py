@@ -1,14 +1,15 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Add database arguments and check methods. Comment out unused input format arg.
-#                  Make filepath metavars consistent.
+#   Last Modified: Add table-name and sql-only arguments to database args.
 #
-import os, sys
+import os
+import sys
 import logging as log
 import argparse
 
-from config.settings import DEFAULT_ALIASES_FILEPATH, DEFAULT_DBCONFIG_FILEPATH, DEFAULT_FIELDS_FILEPATH
+from config.settings import DEFAULT_ALIASES_FILEPATH, DEFAULT_DBCONFIG_FILEPATH
+from config.settings import DEFAULT_FIELDS_FILEPATH, DEFAULT_METADATA_TABLE_NAME
 from imdtk.core.file_utils import good_file_path, validate_file_path
 from imdtk.core.fits_utils import FITS_EXTENTS
 
@@ -32,13 +33,27 @@ def add_collection_arguments (parser, tool_name, version, default_msg='no defaul
         help="Collection name for ingested images [default: {}]".format(default_msg)
     )
 
-def add_database_arguments (parser, tool_name, version, default_msg=DEFAULT_DBCONFIG_FILEPATH):
+def add_database_arguments (parser, tool_name, version,
+                            default_msg=DEFAULT_DBCONFIG_FILEPATH,
+                            table_msg=DEFAULT_METADATA_TABLE_NAME):
     """ Add the argument(s) related to parsing information from a database configuration file
         to the given argparse parser object. """
     parser.add_argument(
         '-db', '--db-config', dest='dbconfig_file', metavar='filepath',
         default=argparse.SUPPRESS,
         help="Path to database configuration file [default: {}]".format(default_msg)
+    )
+
+    parser.add_argument(
+        '-tn', '--table-name', dest='table_name', metavar='schema.table',
+        default=argparse.SUPPRESS,
+        help="Table name for data to be stored in the database [default: {}]".format(table_msg)
+    )
+
+    parser.add_argument(
+        '-sql', '--sql-only', dest='sql_only', action='store_true',
+        default=False,
+        help='If True, output SQL only and do NOT store the data in the database [default: False].'
     )
 
 
