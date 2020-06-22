@@ -1,13 +1,14 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Fix: tool_name should be lowercase, missing logging import.
+#   Last Modified: Add database arguments and check methods. Comment out unused input format arg.
+#                  Make filepath metavars consistent.
 #
 import os, sys
 import logging as log
 import argparse
 
-from config.settings import DEFAULT_ALIASES_FILEPATH, DEFAULT_FIELDS_FILEPATH
+from config.settings import DEFAULT_ALIASES_FILEPATH, DEFAULT_DBCONFIG_FILEPATH, DEFAULT_FIELDS_FILEPATH
 from imdtk.core.file_utils import good_file_path, validate_file_path
 from imdtk.core.fits_utils import FITS_EXTENTS
 
@@ -18,7 +19,7 @@ def add_aliases_arguments (parser, tool_name, version, default_msg=DEFAULT_ALIAS
     parser.add_argument(
         '-a', '--aliases', dest='alias_file', metavar='filepath',
         default=argparse.SUPPRESS,
-        help="File of aliases for metadata header fields [default: {}]".format(default_msg)
+        help="Path to file of aliases for metadata header fields [default: {}]".format(default_msg)
     )
 
 
@@ -31,6 +32,15 @@ def add_collection_arguments (parser, tool_name, version, default_msg='no defaul
         help="Collection name for ingested images [default: {}]".format(default_msg)
     )
 
+def add_database_arguments (parser, tool_name, version, default_msg=DEFAULT_DBCONFIG_FILEPATH):
+    """ Add the argument(s) related to parsing information from a database configuration file
+        to the given argparse parser object. """
+    parser.add_argument(
+        '-db', '--db-config', dest='dbconfig_file', metavar='filepath',
+        default=argparse.SUPPRESS,
+        help="Path to database configuration file [default: {}]".format(default_msg)
+    )
+
 
 def add_fields_info_arguments (parser, tool_name, version, default_msg=DEFAULT_FIELDS_FILEPATH):
     """ Add the argument(s) related to parsing information from fields information files
@@ -38,7 +48,7 @@ def add_fields_info_arguments (parser, tool_name, version, default_msg=DEFAULT_F
     parser.add_argument(
         '-fi', '--fields-info', dest='fields_file', metavar='filepath',
         default=argparse.SUPPRESS,
-        help="Field information file for fields to be processed [default: {}]".format(default_msg)
+        help="Path to fields information file [default: {}]".format(default_msg)
     )
 
 
@@ -52,24 +62,24 @@ def add_fits_file_arguments (parser, tool_name, version):
     )
 
     parser.add_argument(
-        '-ff', '--fits_file', dest='fits_file', required=True, metavar='path_to_image_file',
+        '-ff', '--fits-file', dest='fits_file', required=True, metavar='filepath',
         help='Path to a readable FITS image file from which to extract metadata [required]'
     )
 
 
 def add_input_arguments (parser, tool_name, version):
     """ Add common input arguments to the given argparse parser object. """
-    parser.add_argument(
-        '-ifmt', '--input-format', dest='input_format',
-        default='json',
-        choices=['json', 'text'],
-        help='Format of input data file: "json" or "text" [default: "json"]'
-    )
+    # parser.add_argument(
+    #     '-ifmt', '--input-format', dest='input_format',
+    #     default='json',
+    #     choices=['json', 'text'],
+    #     help='Format of input data file: "json" or "text" [default: "json"]'
+    # )
 
     parser.add_argument(
-        '-if', '--input_file', dest='input_file', metavar='path_to_input_file',
+        '-if', '--input_file', dest='input_file', metavar='filepath',
         default=argparse.SUPPRESS,
-        help='Path to a readable data file to be processed [default: (standard input)]'
+        help='Path to a readable input data file [default: (standard input)]'
     )
 
 
@@ -89,7 +99,7 @@ def add_output_arguments (parser, tool_name, version):
     # )
 
     parser.add_argument(
-        '-of', '--output_file', dest='output_file', metavar='path_to_output_file',
+        '-of', '--output_file', dest='output_file', metavar='filepath',
         default=argparse.SUPPRESS,
         help='File path of file to hold the processing results [default: (standard output)]'
     )
@@ -104,7 +114,7 @@ def add_output_arguments (parser, tool_name, version):
 
 def add_report_arguments (parser, tool_name, version):
     # parser.add_argument(
-    #     '-rf', '--report_file', dest='report_file', metavar='path_to_report_file',
+    #     '-rf', '--report_file', dest='report_file', metavar='filepath',
     #     default=argparse.SUPPRESS,
     #     help='File path of file to hold the output report [default: (standard error)]'
     # )
@@ -137,7 +147,7 @@ def add_shared_arguments (parser, tool_name, version):
     )
 
 
-def check_alias_file (alias_file, tool_name, exit_code=22):
+def check_alias_file (alias_file, tool_name, exit_code=30):
     """
     If a path to an aliases file is given, check that it is a good path. If not, then exit
     the entire program here with the specified (or default) system exit code.
@@ -150,7 +160,20 @@ def check_alias_file (alias_file, tool_name, exit_code=22):
             sys.exit(exit_code)
 
 
-def check_fields_file (fields_file, tool_name, exit_code=23):
+def check_dbconfig_file (dbconfig_file, tool_name, exit_code=31):
+    """
+    If a path to a DB configuration file is given, check that it is a good path. If not,
+    then exit the entire program here with the specified (or default) system exit code.
+    """
+    if (dbconfig_file):                     # if DB configuration file given, check it
+        if (not good_file_path(dbconfig_file)):
+            errMsg = "({}): A readable database configuration file must be specified. Exiting...".format(tool_name)
+            log.error(errMsg)
+            print(errMsg, file=sys.stderr)
+            sys.exit(exit_code)
+
+
+def check_fields_file (fields_file, tool_name, exit_code=32):
     """
     If a path to an aliases file is given, check that it is a good path. If not, then exit
     the entire program here with the specified (or default) system exit code.
