@@ -4,6 +4,9 @@ CONFIG_DIR = '/imdtk/config'
 # Default resource file for header keyword aliases.
 DEFAULT_ALIASES_FILEPATH = "{}/jwst-aliases.ini".format(CONFIG_DIR)
 
+# Default config file for database configuration.
+DEFAULT_DBCONFIG_FILEPATH = "{}/jwst-dbconfig.ini".format(CONFIG_DIR)
+
 # Default resource file for default field values.
 DEFAULT_FIELDS_FILEPATH = "{}/jwst-fields.toml".format(CONFIG_DIR)
 
