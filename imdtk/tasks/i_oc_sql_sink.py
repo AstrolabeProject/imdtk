@@ -1,13 +1,17 @@
 #
 # Class defining interface methods to store incoming data to an SQL database.
 #   Written by: Tom Hicks. 6/21/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Add extent for SQL output files.
 #
 import os
 import sys
 import configparser
 
 from imdtk.tasks.i_task import IImdTask
+
+
+# suffix for SQL output files
+SQL_EXTENT = 'sql'
 
 
 class IObsCoreSQLSink (IImdTask):
