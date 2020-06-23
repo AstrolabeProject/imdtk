@@ -44,7 +44,6 @@ class IObsCoreSQLSink (IImdTask):
         """
         config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation(),
                                            strict=False, empty_lines_in_values=False)
-        # config.optionxform = lambda option: option          # IS NEEDED? REMOVE LATER?
         config.read(dbconfig_file)
         dbconfig = config['db_properties']
         return dict(dbconfig)
