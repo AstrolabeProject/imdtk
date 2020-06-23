@@ -1,11 +1,12 @@
 #
 # Class to sink incoming ObsCore metadata to a PostgreSQL database.
 #   Written by: Tom Hicks. 6/21/2020.
-#   Last Modified: Add SQL output logic, DB store infrastructure but no DB store yet.
+#   Last Modified: Add data selection and filtering. Finish store data path.
 #
 import os
 import sys
 import logging as log
+import psycopg2
 
 import imdtk.core.misc_utils as misc_utils
 import imdtk.tasks.metadata_utils as md_utils
@@ -40,12 +41,18 @@ class JWST_ObsCorePostgreSQLSink (IObsCoreSQLSink):
         if (self._DEBUG):
             print("({}.output_results): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
 
+        # file information is needed by the SQL generation methods below
+        file_info = md_utils.get_file_info(metadata)
+
+        # select and/or filter the data for output
+        outdata = self.select_data_for_output(metadata)
+
         # decide whether we are storing data in the DB or just outputting SQL statements
         sql_only = self.args.get('sql_only')
         if (sql_only):                      # if just outputting SQL
-            self.output_results(metadata)
+            self.write_results(outdata, file_info)
         else:                               # else storing data in a database
-            self.store_results(metadata)
+            self.store_results(outdata, file_info)
 
 
     #
@@ -79,64 +86,66 @@ class JWST_ObsCorePostgreSQLSink (IObsCoreSQLSink):
         return buf                          # return formatted comment line
 
 
-    def make_data_line (self, metadata):
-        table_name = self.args.get('table_name') or DEFAULT_METADATA_TABLE_NAME
-        calculated = md_utils.get_calculated(metadata)
-        misc_utils.remove_entries(calculated, ignore=self.skipColumnList)
-        return self.to_SQL(calculated, table_name)
-
-
-    def make_file_info_comment (self, metadata):
+    def make_file_info_comment (self, file_info):
         """ Return a string containing information about the input file, formatted as a comment. """
-        file_info = md_utils.get_file_info(metadata)
         fname = file_info.get('file_name') if file_info else "NO_FILENAME"
         fsize = file_info.get('file_size') if file_info else 0
         fpath = file_info.get('file_path') if file_info else None
         return self.file_info_to_comment_string(fname, fsize, fpath)
 
 
-    def output_results (self, metadata):
-        """ Generate and output SQL to save the given metadata. """
-        genfile = self.args.get('gen_file_path')
-        outfile = self.args.get('output_file')
-        if (genfile):                       # if generating the output filename/path
-            file_info = md_utils.get_file_info(metadata)
-            fname = file_info.get('file_name') if file_info else "NO_FILENAME"
-            outfile = self.gen_output_file_path(fname, SQL_EXTENT, self.TOOL_NAME)
-            self.output_SQL(metadata, outfile)
-        elif (outfile is not None):         # else if using the given filepath
-            self.output_SQL(metadata, outfile)
-        else:                               # else using standard output
-            self.output_SQL(metadata)
-
-        if (self._VERBOSE):
-            out_dest = outfile if (outfile) else STDOUT_NAME
-            print("({}): Results output to '{}'".format(self.TOOL_NAME, out_dest), file=sys.stderr)
-
-
-    def output_SQL (self, metadata, file_path=None):
+    def make_sql_insert_db (self, datadict, table_name):
         """
-        Create SQL to store the given data structure and write it to the given file path,
-        standard output, or standard error.
+        Return appropriate data structures for inserting the given data dictionary
+        into a database via a database access library. Currently using Psycopg2,
+        so return a tuple of an INSERT template string and a sequence of values.
         """
-        if ((file_path is None) or (file_path == sys.stdout)): # if writing to standard output
-            sys.stdout.write(self.make_file_info_comment(metadata))
-            sys.stdout.write('\n')
-            sys.stdout.write(self.make_data_line(metadata))
-            sys.stdout.write('\n')
-
-        else:                               # else file path was given
-            with open(file_path, 'w') as outfile:
-                outfile.write(self.make_file_info_comment(metadata))
-                outfile.write('\n')
-                outfile.write(self.make_data_line(metadata))
-                outfile.write('\n')
+        keys = ', '.join(datadict.keys())
+        values = list(datadict.values())
+        place_holders = ', '.join(['%s' for v in values])
+        template = "insert into {0} ({1}) values ({2});".format(table_name, keys, place_holders)
+        return (template, values)
 
 
-    def store_results (self, metadata):
-        # load the database configuration from a given or default file path
+    def make_sql_insert_string (self, datadict, table_name):
+        """ Return an SQL INSERT string to store the given data dictionary. """
+        keys = ', '.join(datadict.keys())
+        vals = datadict.values()
+        values = ', '.join([ ("'{}'".format(v) if (isinstance(v, str)) else str(v)) for v in vals ])
+        return "insert into {0} ({1}) values ({2});".format(table_name, keys, values)
+
+
+    def select_data_for_output (self, metadata):
+        """
+        Select a subset of data, from the given metadata, for output.
+        Returns a single dictionary of selected data.
+        """
+        selected = md_utils.get_calculated(metadata).copy()
+        misc_utils.remove_entries(selected, ignore=self.skipColumnList)
+        return selected                     # return selected and filtered dataset
+
+
+    def store_data (self, outdata, table_name, db_connection):
+        """
+        Store the given data structure directly into the given table in the connected database.
+        """
+        # using connection in a with block commits transaction but does NOT close connection
+        with db_connection as conn:
+            with conn.cursor() as cursor:
+                (fmt_str, values) = self.make_sql_insert_db(outdata, table_name)
+                cursor.execute(fmt_str, values)
+
+
+    def store_results (self, outdata, file_info):
+        """
+        Store the given data dictionary into the configured database table.
+        """
+        if (self._DEBUG):
+            print("({}.store_results)".format(self.TOOL_NAME), file=sys.stderr)
+
         table_name = self.args.get('table_name') or DEFAULT_METADATA_TABLE_NAME
 
+        # load the database configuration from a given or default file path
         dbconfig_file = self.args.get('dbconfig_file') or DEFAULT_DBCONFIG_FILEPATH
         dbconfig = self.load_db_config(dbconfig_file)
         if (not dbconfig):
@@ -150,13 +159,53 @@ class JWST_ObsCorePostgreSQLSink (IObsCoreSQLSink):
             log.error(errMsg)
             raise RuntimeError(errMsg)
 
-        # TODO: IMPLEMENT DB store LATER:
-        # self._DB_connection = psycopg2.connect(db_uri)    
+        # open database connection and store the data
+        db_connection = psycopg2.connect(db_uri)
+        self.store_data(outdata, table_name, db_connection)
+        db_connection.close()
+
+        if (self._VERBOSE):
+            print("({}): Results stored in '{}'".format(self.TOOL_NAME, table_name), file=sys.stderr)
 
 
-    def to_SQL (self, adict, table_name):
-        """ Return the given dictionary formatted as an SQL INSERT string. """
-        keys = ', '.join(adict.keys())
-        vals = adict.values()
-        values = ', '.join([ ("'{}'".format(v) if (isinstance(v, str)) else str(v)) for v in vals ])
-        return "insert into {0} ({1}) values ({2});".format(table_name, keys, values)
+    def write_results (self, outdata, file_info):
+        """ Generate and output SQL to save the given data dictionary. """
+        if (self._DEBUG):
+            print("({}.write_results)".format(self.TOOL_NAME), file=sys.stderr)
+
+        genfile = self.args.get('gen_file_path')
+        outfile = self.args.get('output_file')
+        if (genfile):                       # if generating the output filename/path
+            fname = file_info.get('file_name') if file_info else "NO_FILENAME"
+            outfile = self.gen_output_file_path(fname, SQL_EXTENT, self.TOOL_NAME)
+            self.write_SQL(outdata, file_info, outfile)
+        elif (outfile is not None):         # else if using the given filepath
+            self.write_SQL(outdata, file_info, outfile)
+        else:                               # else using standard output
+            self.write_SQL(outdata, file_info)
+
+        if (self._VERBOSE):
+            out_dest = outfile if (outfile) else STDOUT_NAME
+            print("({}): Results output to '{}'".format(self.TOOL_NAME, out_dest), file=sys.stderr)
+
+
+    def write_SQL (self, outdata, file_info, file_path=None):
+        """
+        Generate SQL commands to insert the given data dictionary into the database,
+        using the given file information dictionary. Write the SQL command strings to
+        the given file path or to standard output, if no file path given.
+        """
+        table_name = self.args.get('table_name') or DEFAULT_METADATA_TABLE_NAME
+
+        if ((file_path is None) or (file_path == sys.stdout)): # if writing to standard output
+            sys.stdout.write(self.make_file_info_comment(file_info))
+            sys.stdout.write('\n')
+            sys.stdout.write(self.make_sql_insert_string(outdata, table_name))
+            sys.stdout.write('\n')
+
+        else:                               # else file path was given
+            with open(file_path, 'w') as outfile:
+                outfile.write(self.make_file_info_comment(file_info))
+                outfile.write('\n')
+                outfile.write(self.make_sql_insert_string(outdata, table_name))
+                outfile.write('\n')
