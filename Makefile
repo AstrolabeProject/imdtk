@@ -39,7 +39,7 @@ bash:
 	docker run -it --rm --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work  -v ${RUN}:/imdtk/runit --entrypoint /bin/bash ${TSTIMG}
 
 cleanwork:
-	@rm ${WORKDIR}/*.json ${WORKDIR}/*.pickle
+	@rm ${WORKDIR}/*.json ${WORKDIR}/*.pickle ${WORKDIR}/*.sql
 
 docker:
 	docker build -t ${IMG} .
