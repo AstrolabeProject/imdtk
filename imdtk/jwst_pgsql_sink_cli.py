@@ -2,7 +2,7 @@
 #
 # Module to store incoming data in an ObsCore PostgreSQL database.
 #   Written by: Tom Hicks. 6/21/20.
-#   Last Modified: Increment tool version number.
+#   Last Modified: Update for PG SQL task rename, increment tool version number.
 #
 import os
 import sys
@@ -11,14 +11,14 @@ import argparse
 
 import imdtk.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
-from imdtk.tasks.jwst_oc_pg_sink import JWST_ObsCorePostgreSQLSink
+from imdtk.tasks.jwst_pgsql_sink import JWST_ObsCorePostgreSQLSink
 
 
 # Program name for this tool.
-TOOL_NAME = 'jwst_oc_pg_sink'
+TOOL_NAME = 'jwst_pgsql_sink'
 
 # Version of this tool.
-VERSION = '0.2.0'
+VERSION = '0.3.0'
 
 
 def main (argv=None):
