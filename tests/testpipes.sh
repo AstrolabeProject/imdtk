@@ -168,7 +168,7 @@ aliases -d -if /work/h1 -of /work/ha1
 fields_info -d -if /work/ha1 -of /work/hafi1
 jwst_oc_calc -d -ff /images/DC_191217/F356W.fits -if /work/hafi1 -of /work/hafijoc1
 miss_report -d -if /work/hafijoc1 -of /work/hafijocmr1
-pickle_sink -d -if /work/hafijocmrnr1 -of /work/hafijocmrpk1
+pickle_sink -d -if /work/hafijocmr1 -of /work/hafijocmrpk1
 jwst_pgsql_sink -d -sql -if /work/hafijocmr1 -of /work/hafijocmrsql1
 csv_sink -d -if /work/hafijocmr1 -of /work/hafijocmrcsv1
 
