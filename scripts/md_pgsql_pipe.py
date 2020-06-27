@@ -2,7 +2,7 @@
 #
 # Python pipeline to extract image metadata and store it into a PostreSQL database.
 #   Written by: Tom Hicks. 6/24/20.
-#   Last Modified: Initial creation
+#   Last Modified: Better name for this pipeline and increment version.
 #
 import os, sys
 import logging as log
@@ -21,10 +21,10 @@ from imdtk.tasks.jwst_pgsql_sink import JWST_ObsCorePostgreSQLSink
 
 
 # Program name for this tool.
-TOOL_NAME = 'piper'
+TOOL_NAME = 'md_pgsql_pipe'
 
 # Version of this tool.
-VERSION = '0.1.0'
+VERSION = '0.2.0'
 
 
 def main (argv=None):
