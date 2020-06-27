@@ -29,6 +29,7 @@ miss_report -d --version
 no_op -d --version
 pickle_sink -d --version
 jwst_pgsql_sink -d --version
+csv_sink -d --version
 
 echo "--------------------------------------------"
 echo "All tools: show HELP"
@@ -40,6 +41,7 @@ miss_report --help
 no_op --help
 pickle_sink --help
 jwst_pgsql_sink --help
+# csv_sink --help
 
 echo "--------------------------------------------"
 echo "Headers only, verbose, to STANDARD OUTPUT:"
@@ -121,6 +123,23 @@ headers -ff /images/DC_191217/F356W.fits | aliases | fields_info | jwst_oc_calc 
 
 
 echo "--------------------------------------------"
+echo "CSV pipeline, generated filename:"
+headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | csv_sink -v -g
+
+echo "--------------------------------------------"
+echo "CSV pipeline, named filename:"
+headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | csv_sink -v -of /work/test.csv
+
+echo "--------------------------------------------"
+echo "CSV pipeline, all DEBUG:"
+headers -d -ff /images/DC_191217/F356W.fits | aliases -d | fields_info -d | jwst_oc_calc -d -ff /images/DC_191217/F356W.fits | miss_report -d | csv_sink -d -g
+
+echo "--------------------------------------------"
+echo "CSV pipeline, all SILENT:"
+headers -ff /images/DC_191217/F356W.fits | aliases | fields_info | jwst_oc_calc -ff /images/DC_191217/F356W.fits | miss_report | csv_sink -g
+
+
+echo "--------------------------------------------"
 echo "NO-OPs in various positions, verbose:"
 headers -v -ff /images/DC_191217/F356W.fits | aliases -v | no_op -v -g
 headers -v -ff /images/DC_191217/F356W.fits | no_op -v | aliases -v -g
@@ -132,48 +151,31 @@ headers -d -ff /images/DC_191217/F356W.fits | no_op -d | aliases -d -g
 
 
 echo "--------------------------------------------"
-echo "Explicit intermediate file pickle pipeline:"
+echo "Explicit intermediate file pipeline:"
 headers -d -ff /images/DC_191217/F356W.fits -of /work/h.json
 aliases -d -if /work/h.json -of /work/ha.json
 fields_info -d -if /work/ha.json -of /work/hafi.json
 jwst_oc_calc -d -ff /images/DC_191217/F356W.fits -if /work/hafi.json -of /work/hafijoc.json
 miss_report -d -if /work/hafijoc.json -of /work/hafijocmr.json
-no_op -d -if /work/hafijocmr.json -of /work/hafijocmrnop.json
-pickle_sink -d -if /work/hafijocmrnop.json -of /work/hafijocmrnoppk.pickle
-
-echo "--------------------------------------------"
-echo "Explicit intermediate file pickle pipeline with non-json names:"
-headers -d -ff /images/DC_191217/F356W.fits -of /work/h1
-aliases -d -if /work/h1 -of /work/ha1
-fields_info -d -if /work/ha1 -of /work/hafi1
-jwst_oc_calc -d -ff /images/DC_191217/F356W.fits -if /work/hafi1 -of /work/hafijoc1
-miss_report -d -if /work/hafijoc1 -of /work/hafijocmr1
-no_op -d -if /work/hafijocmr1 -of /work/hafijocmrnop1
-pickle_sink -d -if /work/hafijocmrnop1 -of /work/hafijocmrnoppk1
-
-
-echo "--------------------------------------------"
-echo "Explicit intermediate file SQL pipeline:"
-headers -d -ff /images/DC_191217/F356W.fits -of /work/h.json
-aliases -d -if /work/h.json -of /work/ha.json
-fields_info -d -if /work/ha.json -of /work/hafi.json
-jwst_oc_calc -d -ff /images/DC_191217/F356W.fits -if /work/hafi.json -of /work/hafijoc.json
-miss_report -d -if /work/hafijoc.json -of /work/hafijocmr.json
+pickle_sink -d -if /work/hafijocmr.json -of /work/hafijocmrpk.pickle
 jwst_pgsql_sink -d -sql -if /work/hafijocmr.json -of /work/hafijocmr.sql
+csv_sink -d -if /work/hafijocmr.json -of /work/hafijocmr.csv
 
 echo "--------------------------------------------"
-echo "Explicit intermediate file SQL pipeline with non-json names:"
+echo "Explicit intermediate file pipeline with non-json names:"
 headers -d -ff /images/DC_191217/F356W.fits -of /work/h1
 aliases -d -if /work/h1 -of /work/ha1
 fields_info -d -if /work/ha1 -of /work/hafi1
 jwst_oc_calc -d -ff /images/DC_191217/F356W.fits -if /work/hafi1 -of /work/hafijoc1
 miss_report -d -if /work/hafijoc1 -of /work/hafijocmr1
+pickle_sink -d -if /work/hafijocmrnr1 -of /work/hafijocmrpk1
 jwst_pgsql_sink -d -sql -if /work/hafijocmr1 -of /work/hafijocmrsql1
+csv_sink -d -if /work/hafijocmr1 -of /work/hafijocmrcsv1
 
 
 echo "--------------------------------------------"
 echo "Current development:"
-# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | jwst_pgsql_sink -v
-# headers -d -ff /images/DC_191217/F356W.fits | aliases -d | fields_info -d | jwst_oc_calc -d -ff /images/DC_191217/F356W.fits | miss_report -d | jwst_pgsql_sink -d -g
-# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | jwst_pgsql_sink -sql -v -of /work/testql.sql
-# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | jwst_pgsql_sink -sql -v -g
+# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | csv_sink -v
+# headers -d -ff /images/DC_191217/F356W.fits | aliases -d | fields_info -d | jwst_oc_calc -d -ff /images/DC_191217/F356W.fits | miss_report -d | csv_sink -d -g
+# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | csv_sink -v -of /work/testql.sql
+# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | csv_sink -v -g
