@@ -1,7 +1,7 @@
 #
 # Class to sink incoming ObsCore metadata to a PostgreSQL database.
 #   Written by: Tom Hicks. 6/21/2020.
-#   Last Modified: Add data selection and filtering. Finish store data path.
+#   Last Modified: Update for rename of SQL extension constant.
 #
 import os
 import sys
@@ -12,7 +12,7 @@ import imdtk.core.misc_utils as misc_utils
 import imdtk.tasks.metadata_utils as md_utils
 from config.settings import DEFAULT_DBCONFIG_FILEPATH, DEFAULT_METADATA_TABLE_NAME
 from imdtk.tasks.i_task import STDOUT_NAME
-from imdtk.tasks.i_oc_sql_sink import IObsCoreSQLSink, SQL_EXTENT
+from imdtk.tasks.i_oc_sql_sink import IObsCoreSQLSink, SQL_EXTENSION
 
 
 class JWST_ObsCorePostgreSQLSink (IObsCoreSQLSink):
@@ -177,7 +177,7 @@ class JWST_ObsCorePostgreSQLSink (IObsCoreSQLSink):
         outfile = self.args.get('output_file')
         if (genfile):                       # if generating the output filename/path
             fname = file_info.get('file_name') if file_info else "NO_FILENAME"
-            outfile = self.gen_output_file_path(fname, SQL_EXTENT, self.TOOL_NAME)
+            outfile = self.gen_output_file_path(fname, SQL_EXTENSION, self.TOOL_NAME)
             self.write_SQL(outdata, file_info, outfile)
         elif (outfile is not None):         # else if using the given filepath
             self.write_SQL(outdata, file_info, outfile)
