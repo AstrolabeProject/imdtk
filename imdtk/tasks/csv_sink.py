@@ -1,13 +1,10 @@
 #
 # Class to sink incoming data to a CSV file.
 #   Written by: Tom Hicks. 6/26/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Fix: accidental insertion in last change.
 #
-import os
-import sys
-import configparser
 import csv
-import logging as log
+import sys
 
 import imdtk.core.misc_utils as misc_utils
 import imdtk.tasks.metadata_utils as md_utils
@@ -22,7 +19,6 @@ class CSVSink (IImdTask):
 
     # List of column names to skip when outputting column values.
     skipColumnList = [ 'file_size' ]
-
 
     def __init__(self, args):
         """
@@ -72,19 +68,16 @@ class CSVSink (IImdTask):
         Convert the given data structure to CSV and write it to the given file path,
         standard output, or standard error.
         """
-        if ((file_path is None) or (file_path == sys.stdout)): # if writing to standard output
+        if ((file_path is None) or (file_path == sys.stdout)):  # if writing to standard output
             writer = csv.DictWriter(sys.stdout, fieldnames, extrasaction='ignore')
             writer.writeheader()
             writer.writerows(datadict)
-            # sys.stdout.write('\n')          # REMOVE LATER? may not be needed
 
         else:                               # else file path was given
             with open(file_path, 'w', newline='') as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames, extrasaction='ignore')
                 writer.writeheader()
                 writer.writerows(datadict)
-                # csvfile.write('\n')         # REMOVE LATER? may not be needed
-
 
     def select_data_for_output (self, metadata):
         """
@@ -95,6 +88,6 @@ class CSVSink (IImdTask):
         """
         selected = md_utils.get_calculated(metadata).copy()
         misc_utils.remove_entries(selected, ignore=self.skipColumnList)
-        fieldnames = list(selected.keys())  # TODO: reorder the list with filepath first LATER
+        fieldnames = list(selected.keys())  # TODO: reorder the list with filepath first LATER   
         # return a tuple of the created data dictionary and list of fieldnames (keys)
         return ([selected], fieldnames)
