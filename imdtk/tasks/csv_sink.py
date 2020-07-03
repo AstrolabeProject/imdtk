@@ -1,7 +1,7 @@
 #
 # Class to sink incoming data to a CSV file.
 #   Written by: Tom Hicks. 6/26/2020.
-#   Last Modified: Fix: accidental insertion in last change.
+#   Last Modified: Add/use primary field in output field list.
 #
 import csv
 import sys
@@ -10,15 +10,19 @@ import imdtk.core.misc_utils as misc_utils
 import imdtk.tasks.metadata_utils as md_utils
 from imdtk.tasks.i_task import IImdTask, STDOUT_NAME
 
-# Default file extension for pickle output files
+# Default file extension for CSV output files
 CSV_EXTENSION = 'csv'                       # Note: no dot in extension
 
 
 class CSVSink (IImdTask):
     """ Class to sink incoming data to a CSV file. """
 
+    # Name of output field which must be listed first. If no first field, use None.
+    FIRST_FIELD = 'file_path'
+
     # List of column names to skip when outputting column values.
     skipColumnList = [ 'file_size' ]
+
 
     def __init__(self, args):
         """
@@ -86,8 +90,16 @@ class CSVSink (IImdTask):
           - a singleton list containing the the dictionary of selected data and
           - a list of field names (keys in the returned dictionary) to be output
         """
+
+        # copy the metadata and remove the fields in the skip list
         selected = md_utils.get_calculated(metadata).copy()
         misc_utils.remove_entries(selected, ignore=self.skipColumnList)
-        fieldnames = list(selected.keys())  # TODO: reorder the list with filepath first LATER   
+
+        # list the fields in alphabetical order and, optionally, make one field primary
+        fieldnames = sorted(list(selected.keys()), key=str.lower)
+        if (self.FIRST_FIELD is not None):
+            fieldnames.remove(self.FIRST_FIELD)   # this must exist in fieldname list!
+            fieldnames.insert(0, self.FIRST_FIELD)
+
         # return a tuple of the created data dictionary and list of fieldnames (keys)
         return ([selected], fieldnames)
