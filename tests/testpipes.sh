@@ -30,6 +30,7 @@ no_op -d --version
 pickle_sink -d --version
 jwst_pgsql_sink -d --version
 csv_sink -d --version
+jwst_pghybrid_sink -d --version
 
 echo "--------------------------------------------"
 echo "All tools: show HELP"
@@ -41,7 +42,8 @@ miss_report --help
 no_op --help
 pickle_sink --help
 jwst_pgsql_sink --help
-# csv_sink --help
+csv_sink --help
+jwst_pghybrid_sink --help
 
 echo "--------------------------------------------"
 echo "Headers only, verbose, to STANDARD OUTPUT:"
@@ -86,6 +88,10 @@ headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst
 echo "--------------------------------------------"
 echo "Headers to aliases to fields_info to jwst_oc_calc to miss_report to no_op to jwst_pgsql_sink:"
 headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | no_op -v | jwst_pgsql_sink -v -sql -g
+
+echo "--------------------------------------------"
+echo "Headers to aliases to fields_info to jwst_oc_calc to miss_report to no_op to jwst_pghybrid_sink:"
+headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | no_op -v | jwst_pghybrid_sink -v -sql -g
 
 
 echo "--------------------------------------------"
@@ -140,6 +146,23 @@ headers -ff /images/DC_191217/F356W.fits | aliases | fields_info | jwst_oc_calc 
 
 
 echo "--------------------------------------------"
+echo "PG Hybrid pipeline, generated filename:"
+headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | jwst_pghybrid_sink -v -sql -g
+
+echo "--------------------------------------------"
+echo "PG Hybrid pipeline, named filename:"
+headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | jwst_pghybrid_sink -v -sql -of /work/testql.sql
+
+echo "--------------------------------------------"
+echo "PG Hybrid pipeline, all DEBUG:"
+headers -d -ff /images/DC_191217/F356W.fits | aliases -d | fields_info -d | jwst_oc_calc -d -ff /images/DC_191217/F356W.fits | miss_report -d | jwst_pghybrid_sink -d -sql -g
+
+echo "--------------------------------------------"
+echo "PG Hybrid pipeline, all SILENT:"
+headers -ff /images/DC_191217/F356W.fits | aliases | fields_info | jwst_oc_calc -ff /images/DC_191217/F356W.fits | miss_report | jwst_pghybrid_sink -sql -g
+
+
+echo "--------------------------------------------"
 echo "NO-OPs in various positions, verbose:"
 headers -v -ff /images/DC_191217/F356W.fits | aliases -v | no_op -v -g
 headers -v -ff /images/DC_191217/F356W.fits | no_op -v | aliases -v -g
@@ -158,7 +181,8 @@ fields_info -d -if /work/ha.json -of /work/hafi.json
 jwst_oc_calc -d -ff /images/DC_191217/F356W.fits -if /work/hafi.json -of /work/hafijoc.json
 miss_report -d -if /work/hafijoc.json -of /work/hafijocmr.json
 pickle_sink -d -if /work/hafijocmr.json -of /work/hafijocmrpk.pickle
-jwst_pgsql_sink -d -sql -if /work/hafijocmr.json -of /work/hafijocmr.sql
+jwst_pgsql_sink -d -sql -if /work/hafijocmr.json -of /work/hafijocmrsql.sql
+jwst_pghybrid_sink -d -sql -if /work/hafijocmr.json -of /work/hafijocmrhyb.sql
 csv_sink -d -if /work/hafijocmr.json -of /work/hafijocmr.csv
 
 echo "--------------------------------------------"
@@ -170,12 +194,13 @@ jwst_oc_calc -d -ff /images/DC_191217/F356W.fits -if /work/hafi1 -of /work/hafij
 miss_report -d -if /work/hafijoc1 -of /work/hafijocmr1
 pickle_sink -d -if /work/hafijocmr1 -of /work/hafijocmrpk1
 jwst_pgsql_sink -d -sql -if /work/hafijocmr1 -of /work/hafijocmrsql1
+jwst_pghybrid_sink -d -sql -if /work/hafijocmr1 -of /work/hafijocmrhyb1
 csv_sink -d -if /work/hafijocmr1 -of /work/hafijocmrcsv1
 
 
 echo "--------------------------------------------"
 echo "Current development:"
-# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | csv_sink -v
-# headers -d -ff /images/DC_191217/F356W.fits | aliases -d | fields_info -d | jwst_oc_calc -d -ff /images/DC_191217/F356W.fits | miss_report -d | csv_sink -d -g
-# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | csv_sink -v -of /work/testql.sql
-# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | csv_sink -v -g
+# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | jwst_pghybrid_sink -d -sql -g
+# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | jwst_pghybrid_sink -v -sql -of /work/hybrid1.sql
+# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | jwst_pghybrid_sink -v -sql -g
+# headers -v -ff /images/DC_191217/F356W.fits | aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | jwst_pghybrid_sink -v
