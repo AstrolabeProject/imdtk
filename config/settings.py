@@ -13,6 +13,9 @@ DEFAULT_FIELDS_FILEPATH = "{}/jwst-fields.toml".format(CONFIG_DIR)
 # Default schema and table name in which to store image metadata in a database.
 DEFAULT_METADATA_TABLE_NAME = 'sia.jwst'
 
+# Default hybrid schema and table name in which to store image metadata in a database.
+DEFAULT_HYBRID_TABLE_NAME = 'sia.hybrid'
+
 # Logging level
 LOG_LEVEL = 'INFO'  # CRITICAL / ERROR / WARNING / INFO / DEBUG
 
