@@ -2,7 +2,7 @@
 #
 # Python pipeline to extract image metadata and store it into a PostreSQL database.
 #   Written by: Tom Hicks. 6/24/20.
-#   Last Modified: Better name for this pipeline and increment version.
+#   Last Modified: Convert pipeline to nested calls. Increment tool version number.
 #
 import os, sys
 import logging as log
@@ -24,7 +24,7 @@ from imdtk.tasks.jwst_pgsql_sink import JWST_ObsCorePostgreSQLSink
 TOOL_NAME = 'md_pgsql_pipe'
 
 # Version of this tool.
-VERSION = '0.2.0'
+VERSION = '0.3.0'
 
 
 def main (argv=None):
@@ -87,13 +87,13 @@ def main (argv=None):
     miss_reportTask = MissingFieldsTask(args)
     jwst_pgsql_sinkTask = JWST_ObsCorePostgreSQLSink(args)
 
-    # call the pipeline tasks in order, passing the data along
-    metadata = headersTask.process(None)          # source: creates initial metadata
-    metadata = aliasesTask.process(metadata)
-    metadata = fields_infoTask.process(metadata)
-    metadata = jwst_oc_calcTask.process(metadata)
-    metadata = miss_reportTask.process(metadata)  # report: passes data through
-    jwst_pgsql_sinkTask.output_results(metadata)  # sink: nothing returned
+    # compose and call the pipeline tasks
+    jwst_pgsql_sinkTask.output_results(     # sink: nothing returned
+        miss_reportTask.process(            # report: passes data through
+            jwst_oc_calcTask.process(
+                fields_infoTask.process(
+                     aliasesTask.process(
+                         headersTask.process(None))))))  # source: creates initial metadata
 
 
 
