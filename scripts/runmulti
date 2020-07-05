@@ -1,0 +1,56 @@
+#!/bin/bash
+#
+# Shell script to run a JWST image metadata processing pipeline from inside the
+# imdtk Docker file using the tools it contains. This script should be mounted by
+# the container and runs within its environment.
+#
+
+# echo "ARGS=$*"
+
+Usage () {
+   echo "Usage: $0 image_directory collection_name"
+   echo "where:    image_directory = the path to a directory of FITS images to be processed"
+   echo "          collection_name = the name for this collection of images"
+}
+
+VERBOSE=
+
+while :; do
+    case "$1" in
+        -d)
+            VERBOSE='-d' ;;
+        -h)
+            Usage; exit 0;;
+        -v)
+            VERBOSE='-v' ;;
+        *) break;;
+    esac
+    shift
+done
+
+# echo "ARGS=$*  VERBOSE=${VERBOSE}"
+
+if [ $# -lt 2 ]; then
+    Usage
+    exit 2
+fi
+
+IMG_DIR=${1}
+COLLECTION=${2}
+
+for IMAGE in ${IMG_DIR}/*.fits
+do
+    if [ -n "$VERBOSE" ]; then
+        echo ''
+        echo '--------------------------------------------------------------------------------'
+        echo "Processing ${IMAGE} for collection '${COLLECTION}':"
+        echo '--------------------------------------------------------------------------------'
+    fi
+    headers ${VERBOSE} -ff ${IMAGE} | \
+    aliases ${VERBOSE} | \
+    fields_info ${VERBOSE} | \
+    jwst_oc_calc ${VERBOSE} -c ${COLLECTION} -ff ${IMAGE} | \
+    miss_report ${VERBOSE} | \
+    jwst_pghybrid_sink ${VERBOSE}
+
+done
