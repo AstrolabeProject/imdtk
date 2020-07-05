@@ -1,7 +1,7 @@
 #
 # Class to report on the presence of missing fields in the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/2020.
-#   Last Modified: Remove unused imports.
+#   Last Modified: Make no report unless verbose flag set.
 #
 import os
 import sys
@@ -34,9 +34,11 @@ class MissingFieldsTask (IImdTask):
         if (self._DEBUG):
             print("({}.process): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
 
-        # create and output the report as a side-effect while passing metadata through
-        report = self.check_missing(metadata) # check for missing fields
-        self.output_report(report)          # output the report strings
+        # Create and output the report as a side-effect while passing metadata through
+        # BUT be silent (act like a NO-OP) if the verbose flag is not set.
+        if (self._VERBOSE):
+            report = self.check_missing(metadata)  # check for missing fields
+            self.output_report(report)             # output the report strings
 
         return metadata                     # return metadata unchanged
 
