@@ -2,14 +2,14 @@
 #
 # Module to store incoming data in a Hybrid PostgreSQL database.
 #   Written by: Tom Hicks. 7/3/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Modify table message in db arguments. Increment tool version number.
 #
 import sys
 import logging as log
 import argparse
 
 import imdtk.cli_utils as cli_utils
-from config.settings import LOG_LEVEL
+from config.settings import LOG_LEVEL, DEFAULT_HYBRID_TABLE_NAME
 from imdtk.tasks.jwst_pghybrid_sink import JWST_HybridPostgreSQLSink
 
 
@@ -17,7 +17,7 @@ from imdtk.tasks.jwst_pghybrid_sink import JWST_HybridPostgreSQLSink
 TOOL_NAME = 'jwst_pghybrid_sink'
 
 # Version of this tool.
-VERSION = '0.1.0'
+VERSION = '0.2.0'
 
 
 def main (argv=None):
@@ -44,7 +44,7 @@ def main (argv=None):
     cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_input_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_database_arguments(parser, TOOL_NAME, VERSION)
+    cli_utils.add_database_arguments(parser, TOOL_NAME, VERSION, table_msg=DEFAULT_HYBRID_TABLE_NAME)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))
