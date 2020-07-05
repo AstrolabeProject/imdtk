@@ -1,7 +1,7 @@
 #
 # Class defining interface methods to store incoming data to an SQL database.
 #   Written by: Tom Hicks. 6/21/2020.
-#   Last Modified: Rename extension constant for SQL output files.
+#   Last Modified: Update for rename of this class.
 #
 import os
 import sys
@@ -14,7 +14,7 @@ from imdtk.tasks.i_task import IImdTask
 SQL_EXTENSION = 'sql'
 
 
-class IObsCoreSQLSink (IImdTask):
+class ISQLSink (IImdTask):
     """
     Class defining interface methods to store incoming data to an SQL database.
     """

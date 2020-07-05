@@ -1,7 +1,7 @@
 #
 # Class to sink incoming image metadata to a Hybrid (SQL/JSON) PostgreSQL database.
 #   Written by: Tom Hicks. 7/3/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Update for rename of SQL interface class.
 #
 import json
 import logging as log
@@ -11,10 +11,10 @@ import sys
 import imdtk.tasks.metadata_utils as md_utils
 from config.settings import DEFAULT_DBCONFIG_FILEPATH, DEFAULT_HYBRID_TABLE_NAME
 from imdtk.tasks.i_task import STDOUT_NAME
-from imdtk.tasks.i_oc_sql_sink import IObsCoreSQLSink, SQL_EXTENSION
+from imdtk.tasks.i_sql_sink import ISQLSink, SQL_EXTENSION
 
 
-class JWST_HybridPostgreSQLSink (IObsCoreSQLSink):
+class JWST_HybridPostgreSQLSink (ISQLSink):
     """ Class to sink incoming image metadata to a Hybrid PostgreSQL database. """
 
     # List of names of required SQL fields:

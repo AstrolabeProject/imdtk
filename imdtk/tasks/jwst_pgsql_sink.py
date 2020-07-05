@@ -1,7 +1,7 @@
 #
 # Class to sink incoming ObsCore metadata to a PostgreSQL database.
 #   Written by: Tom Hicks. 6/21/2020.
-#   Last Modified: Update for rename of SQL extension constant.
+#   Last Modified: Update for rename of SQL interface class.
 #
 import os
 import sys
@@ -12,10 +12,10 @@ import imdtk.core.misc_utils as misc_utils
 import imdtk.tasks.metadata_utils as md_utils
 from config.settings import DEFAULT_DBCONFIG_FILEPATH, DEFAULT_METADATA_TABLE_NAME
 from imdtk.tasks.i_task import STDOUT_NAME
-from imdtk.tasks.i_oc_sql_sink import IObsCoreSQLSink, SQL_EXTENSION
+from imdtk.tasks.i_sql_sink import ISQLSink, SQL_EXTENSION
 
 
-class JWST_ObsCorePostgreSQLSink (IObsCoreSQLSink):
+class JWST_ObsCorePostgreSQLSink (ISQLSink):
     """ Class to sink incoming ObsCore metadata to a PostgreSQL database. """
 
     # List of column names to skip when outputting column values.
