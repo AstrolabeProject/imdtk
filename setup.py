@@ -12,6 +12,7 @@ setup(
             'aliases         = imdtk.aliases_cli:main',
             'csv_sink        = imdtk.csv_sink_cli:main',
             'fields_info     = imdtk.fields_info_cli:main',
+            'fits_table      = imdtk.fits_table_cli:main',
             'headers         = imdtk.headers_cli:main',
             'jwst_oc_calc    = imdtk.jwst_oc_calc_cli:main',
             'jwst_pghybrid_sink = imdtk.jwst_pghybrid_sink_cli:main',

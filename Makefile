@@ -1,4 +1,5 @@
 ARGS=
+CATS=${PWD}/catalogs
 COLLECTION=JWST
 ENVLOC=/etc/trhenv
 EP=/bin/bash
@@ -56,19 +57,19 @@ exec:
 	docker exec -it ${NAME} bash
 
 run:
-	@docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work -v ${RUN}:/imdtk/runit ${IMG} ${ARGS}
+	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs -v ${IMGS}:/images:ro -v ${WORKDIR}:/work -v ${RUN}:/imdtk/runit ${IMG} ${ARGS}
 
 runit:
-	@docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work -v ${RUN}:/imdtk/runit ${TSTIMG} ${ARGS}
+	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs -v ${IMGS}:/images:ro -v ${WORKDIR}:/work -v ${RUN}:/imdtk/runit ${TSTIMG} ${ARGS}
 
 runtep:
-	@docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work --entrypoint=${EP} ${TSTIMG} ${ARGS}
+	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs -v ${IMGS}:/images:ro -v ${WORKDIR}:/work --entrypoint=${EP} ${TSTIMG} ${ARGS}
 
 runt1:
-	docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro --entrypoint pytest ${TSTIMG} -vv ${TARG}
+	docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs -v ${IMGS}:/images:ro --entrypoint pytest ${TSTIMG} -vv ${TARG}
 
 runtc:
-	docker run -it --rm --network ${NET} --name ${NAME} -v ${IMGS}:/images:ro --entrypoint pytest ${TSTIMG} -vv --cov-report term-missing --cov ${TARG}
+	docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs -v ${IMGS}:/images:ro --entrypoint pytest ${TSTIMG} -vv --cov-report term-missing --cov ${TARG}
 
 stop:
 	docker stop ${NAME}
