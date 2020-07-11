@@ -1,7 +1,7 @@
 #
 # Class to extract an image table from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 7/6/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Add column information (metadata) to the returned metadata.
 #
 import logging as log
 import os
@@ -48,6 +48,7 @@ class FitsTableSourceTask (IImdTask):
 
         try:
             with fits.open(fits_file) as hdus_list:
+                cinfo = fits_utils.get_column_info(hdus_list, table_hdu)
                 if (ignore_list):
                     hdrs = fits_utils.get_header_fields(hdus_list, table_hdu, ignore_list)
                 else:
@@ -58,12 +59,13 @@ class FitsTableSourceTask (IImdTask):
                 log.error(errMsg)
                 raise RuntimeError(errMsg)
 
-            metadata = self.make_context()  # create larger metadata structure
-            metadata['headers'] = hdrs      # add the headers to the metadata
-            return metadata                 # return the results of processing
+            metadata = self.make_context()    # create overall metadata structure
+            metadata['headers'] = hdrs        # add the headers to the metadata
+            metadata['column_info'] = cinfo   # add column metadata to the metadata
+            return metadata                   # return the results of processing
 
         except Exception as ex:
-            errMsg = "({}.process): Exception while reading table metadata from FITS file '{}': {}.".format(self.TOOL_NAME, fits_file, ex)
+            errMsg = "({}.process): Exception while reading from FITS file '{}': {}.".format(self.TOOL_NAME, fits_file, ex)
             log.error(errMsg)
             raise RuntimeError(errMsg)
 

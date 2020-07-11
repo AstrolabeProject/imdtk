@@ -1,7 +1,7 @@
 #
 # Module to provide FITS utility functions for Astrolabe code.
 #   Written by: Tom Hicks. 1/26/2020.
-#   Last Modified: Merge/enhance get_header_fields methods here.
+#   Last Modified: Add method to get column information (metadata) for a FITS table.
 #
 import fnmatch
 import os
@@ -42,6 +42,19 @@ def fits_utc_date (value_str, scale='utc'):
     #   see: https://docs.astropy.org/en/stable/time/
     #   see: https://docs.astropy.org/en/stable/api/astropy.time.Time.html
     return Time(value_str)
+
+
+def get_column_info (hdus_list, which_hdu=0):
+    """
+    Return a dictionary of metadata describing the columns of the table in the
+    specified HDU. Per Astropy, the returned dictionary contains arrays of metadata,
+    each containing values for a particular property for each table column (e.g., name,
+    format, unit, bscale, etc).
+    """
+    col_md = None
+    if (which_hdu < len(hdus_list)):        # if HDU index is in valid range
+        col_md = hdus_list[which_hdu].columns.info(output=False)
+    return col_md
 
 
 def get_header_fields (hdus_list, which_hdu=0, ignore=FITS_IGNORE_KEYS):
