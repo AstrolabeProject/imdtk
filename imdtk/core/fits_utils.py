@@ -1,7 +1,7 @@
 #
 # Module to provide FITS utility functions for Astrolabe code.
 #   Written by: Tom Hicks. 1/26/2020.
-#   Last Modified: Add method to get column information (metadata) for a FITS table.
+#   Last Modified: Catch wrong HDU spec in get_column_info. Add which_hdu argument to is_catalog_file.
 #
 import fnmatch
 import os
@@ -44,7 +44,7 @@ def fits_utc_date (value_str, scale='utc'):
     return Time(value_str)
 
 
-def get_column_info (hdus_list, which_hdu=0):
+def get_column_info (hdus_list, which_hdu=1):
     """
     Return a dictionary of metadata describing the columns of the table in the
     specified HDU. Per Astropy, the returned dictionary contains arrays of metadata,
@@ -52,8 +52,11 @@ def get_column_info (hdus_list, which_hdu=0):
     format, unit, bscale, etc).
     """
     col_md = None
-    if (which_hdu < len(hdus_list)):        # if HDU index is in valid range
-        col_md = hdus_list[which_hdu].columns.info(output=False)
+    try:
+        if (which_hdu < len(hdus_list)):    # if HDU index is in valid range
+            col_md = hdus_list[which_hdu].columns.info(output=False)
+    except AttributeError:                  # probably wrong HDU was specified
+        return None
     return col_md
 
 
@@ -118,11 +121,12 @@ def get_WCS (ff_hdus_list, which_hdu=0):
     return wcs.WCS(ff_hdus_list[which_hdu].header)
 
 
-def is_catalog_file (ff_hdus_list):
+def is_catalog_file (ff_hdus_list, which_hdu=1):
     """ Tell whether the given FITS file is a FITS catalog or not.
-        Assumes: catalog is never in the first HDU and HDU must be of type BINTABLE:
+        Assumes: catalog HDU must be of type BINTABLE:
     """
-    return ((len(ff_hdus_list) > 1) and (ff_hdus_list[1].header.get('XTENSION') == 'BINTABLE'))
+    return ( (len(ff_hdus_list) > which_hdu) and
+             (ff_hdus_list[which_hdu].header.get('XTENSION') == 'BINTABLE') )
 
 
 def is_fits_file (fyl):
