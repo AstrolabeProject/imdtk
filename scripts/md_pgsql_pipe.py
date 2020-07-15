@@ -2,7 +2,7 @@
 #
 # Python pipeline to extract image metadata and store it into a PostreSQL database.
 #   Written by: Tom Hicks. 6/24/20.
-#   Last Modified: Convert pipeline to nested calls. Increment tool version number.
+#   Last Modified: Update for rename of FITS header task.
 #
 import os, sys
 import logging as log
@@ -12,7 +12,7 @@ from config.settings import LOG_LEVEL
 from imdtk.core.fits_utils import FITS_IGNORE_KEYS
 import imdtk.cli_utils as cli_utils
 
-from imdtk.tasks.headers import HeadersSourceTask
+from imdtk.tasks.fits_headers import FitsHeadersSourceTask
 from imdtk.tasks.aliases import AliasesTask
 from imdtk.tasks.fields_info import FieldsInfoTask
 from imdtk.tasks.jwst_oc_calc import JWST_ObsCoreCalcTask
@@ -24,7 +24,7 @@ from imdtk.tasks.jwst_pgsql_sink import JWST_ObsCorePostgreSQLSink
 TOOL_NAME = 'md_pgsql_pipe'
 
 # Version of this tool.
-VERSION = '0.3.0'
+VERSION = '0.4.0'
 
 
 def main (argv=None):
@@ -80,7 +80,7 @@ def main (argv=None):
     args['VERSION'] = VERSION
 
     # instantiate the tasks which form the pipeline
-    headersTask = HeadersSourceTask(args)
+    fits_headersTask = FitsHeadersSourceTask(args)
     aliasesTask = AliasesTask(args)
     fields_infoTask = FieldsInfoTask(args)
     jwst_oc_calcTask = JWST_ObsCoreCalcTask(args)
@@ -93,7 +93,7 @@ def main (argv=None):
             jwst_oc_calcTask.process(
                 fields_infoTask.process(
                      aliasesTask.process(
-                         headersTask.process(None))))))  # source: creates initial metadata
+                         fits_headersTask.process(None))))))  # source: creates initial metadata
 
 
 

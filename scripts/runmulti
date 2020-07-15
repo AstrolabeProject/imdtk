@@ -46,7 +46,7 @@ do
         echo "Processing ${IMAGE} for collection '${COLLECTION}':"
         echo '--------------------------------------------------------------------------------'
     fi
-    headers ${VERBOSE} -ff ${IMAGE} | \
+    fits_headers ${VERBOSE} -ff ${IMAGE} | \
     aliases ${VERBOSE} | \
     fields_info ${VERBOSE} | \
     jwst_oc_calc ${VERBOSE} -c ${COLLECTION} -ff ${IMAGE} | \
