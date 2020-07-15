@@ -1,6 +1,6 @@
 # Tests of the FITS specific utilities module.
 #   Written by: Tom Hicks. 4/7/2020.
-#   Last Modified: Update/add tests for get_header_fields.
+#   Last Modified: Update/add tests for get_column_info and is_catalog_file.
 #
 import imdtk.core.fits_utils as utils
 
@@ -14,6 +14,39 @@ from astropy.io import fits
 class TestFitsUtils(object):
 
     m13_file = '/imdtk/tests/resources/m13.fits'
+    small_table = '/imdtk/tests/resources/small_table.fits'
+
+
+    def test_get_column_info(self):
+        with fits.open(self.small_table) as hdus:
+            col_info = utils.get_column_info(hdus)
+            assert col_info is not None
+
+
+    def test_get_column_info_good_hdu(self):
+        with fits.open(self.small_table) as hdus:
+            col_info = utils.get_column_info(hdus, which_hdu=1)
+            assert col_info is not None
+
+
+    def test_get_column_info_no_table(self):
+        with fits.open(self.m13_file) as hdus:
+            col_info = utils.get_column_info(hdus)
+            assert col_info is None
+
+
+    def test_get_column_info_bad_low_hdu(self):
+        with fits.open(self.small_table) as hdus:
+            col_info = utils.get_column_info(hdus, which_hdu=0)
+            assert col_info is None
+
+
+    def test_get_column_info_bad_high_hdu(self):
+        with fits.open(self.small_table) as hdus:
+            col_info = utils.get_column_info(hdus, which_hdu=2)
+            assert col_info is None
+
+
 
     def test_get_header_fields_default(self):
         hdrs = None
@@ -117,6 +150,55 @@ class TestFitsUtils(object):
 
 
 
+    def test_get_WCS_default(self):
+        wcs = None
+        with fits.open(self.m13_file) as hdus:
+            wcs = utils.get_WCS(hdus)
+        assert wcs is not None
+
+
+    def test_get_WCS_indexed(self):
+        wcs = None
+        with fits.open(self.m13_file) as hdus:
+            wcs = utils.get_WCS(hdus, 0)
+        assert wcs is not None
+
+
+    def test_get_WCS_badindex(self):
+        wcs = None
+        with fits.open(self.m13_file) as hdus:
+            wcs = utils.get_WCS(hdus, 1)   # no HDU at index 1
+        assert wcs is None
+
+
+
+    def test_is_catalog_file(self):
+        with fits.open(self.small_table) as hdus:
+            assert utils.is_catalog_file(hdus) == True
+
+
+    def test_is_catalog_file_good_hdu(self):
+        with fits.open(self.small_table) as hdus:
+            assert utils.is_catalog_file(hdus, which_hdu=1) == True
+
+
+    def test_is_catalog_file_no_cat(self):
+        with fits.open(self.m13_file) as hdus:
+            assert utils.is_catalog_file(hdus) == False
+
+
+    def test_is_catalog_file_bad_low_hdu(self):
+        with fits.open(self.small_table) as hdus:
+            assert utils.is_catalog_file(hdus, which_hdu=0) == False
+
+
+    def test_is_catalog_file_bad_high_hdu(self):
+        with fits.open(self.small_table) as hdus:
+            assert utils.is_catalog_file(hdus, which_hdu=2) == False
+
+
+
+
     def test_is_fits_file(self):
         assert utils.is_fits_file('m13.fits') == True
         assert utils.is_fits_file('m13.fits.gz') == True
@@ -143,28 +225,6 @@ class TestFitsUtils(object):
         assert utils.is_fits_filename('/usr/dummy/m13') == False
         assert utils.is_fits_filename('/usr/dummy/m13-fits') == False
         assert utils.is_fits_filename('/usr/dummy/m13.gz') == False
-
-
-
-    def test_get_WCS_default(self):
-        wcs = None
-        with fits.open(self.m13_file) as hdus:
-            wcs = utils.get_WCS(hdus)
-        assert wcs is not None
-
-
-    def test_get_WCS_indexed(self):
-        wcs = None
-        with fits.open(self.m13_file) as hdus:
-            wcs = utils.get_WCS(hdus, 0)
-        assert wcs is not None
-
-
-    def test_get_WCS_badindex(self):
-        wcs = None
-        with fits.open(self.m13_file) as hdus:
-            wcs = utils.get_WCS(hdus, 1)   # no HDU at index 1
-        assert wcs is None
 
 
 
