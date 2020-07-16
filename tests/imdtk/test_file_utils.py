@@ -1,6 +1,6 @@
 # Tests for the file utilities module.
 #   Written by: Tom Hicks. 5/22/2020.
-#   Last Modified: Add another test for validate_path_strings.
+#   Last Modified: Add tests for filename_core and full_path.
 #
 import imdtk.core.file_utils as utils
 
@@ -16,6 +16,22 @@ class TestFileUtils(object):
     dirLink = '/tmp/linkToMadeUpDIR'
     fylPath = '/tmp/HiGhLy_UnLiKeLy'
     fylLink = '/tmp/linkToHiGhLy_UnLiKeLy'
+
+
+    def test_filename_core(self):
+        assert utils.filename_core(None) == ''
+        assert utils.filename_core('') == ''
+        assert utils.filename_core('/tmp') == 'tmp'
+        assert utils.filename_core('/tmp/somefile') == 'somefile'
+        assert utils.filename_core('/tmp/somefile.py') == 'somefile'
+
+
+    def test_full_path(self):
+        assert utils.full_path('~') == '/root'
+        assert utils.full_path('~/.bashrc') == '/root/.bashrc'
+        assert utils.full_path('/tmp') == '/tmp'
+        assert utils.full_path('/tmp/somefile') == '/tmp/somefile'
+        assert utils.full_path('/tmp/somefile.py') == '/tmp/somefile.py'
 
 
     def test_gen_file_paths(self):
