@@ -1,5 +1,9 @@
+# Path to the root location of the application. If app is run
+# inside a container (the default) this is container-relative (e.g. '/imdtk')
+APP_ROOT = '/imdtk'
+
 # Configuration information
-CONFIG_DIR = '/imdtk/config'
+CONFIG_DIR = "{}/config".format(APP_ROOT)
 
 # Default resource file for header keyword aliases.
 DEFAULT_ALIASES_FILEPATH = "{}/jwst-aliases.ini".format(CONFIG_DIR)
@@ -23,11 +27,14 @@ LOG_LEVEL = 'INFO'  # CRITICAL / ERROR / WARNING / INFO / DEBUG
 IMAGES_DIR = '/vos'
 IMAGE_FETCH_PREFIX = 'https://hector.cyverse.org/cuts/image_fetch?path='
 
-# Work directory: the mount point in the container for file input and output.
-WORK_DIR = '/work'
-
 # Name of this program: used programmatically so keeping it lower case.
 PROGRAM_NAME = 'imdtk'
 
 # Resource information (currently unused)
 # RESOURCE_PKG = 'imdtk.resources'
+
+# Path to the tests directory.
+TEST_DIR = "{}/tests".format(APP_ROOT)
+
+# Work directory: the mount point in the container for file input and output.
+WORK_DIR = '/work'
