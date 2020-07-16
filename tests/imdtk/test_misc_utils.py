@@ -1,6 +1,6 @@
 # Tests for the misc utilities module.
 #   Written by: Tom Hicks. 5/22/2020.
-#   Last Modified: Add tests for get_in.
+#   Last Modified: Add another test for get_in.
 #
 import os
 import pytest
@@ -14,6 +14,7 @@ class TestMiscUtils(object):
         nester = { 'a': 'a',
                    'L1': { 'a': 'a',
                            'L2': { 'a': 'a',
+                                   'badval': [],
                                    'L3': { 'a': 'a',
                                            'L4': {} } } } }
 
@@ -38,6 +39,7 @@ class TestMiscUtils(object):
         assert isinstance(mutils.get_in(nester, ['L1', 'L2', 'L3']), dict)
         assert mutils.get_in(nester, ['L1', 'L2', 'L3', 'L4']) is not None
         assert isinstance(mutils.get_in(nester, ['L1', 'L2', 'L3', 'L4']), dict)
+        assert mutils.get_in(nester, ['L1', 'L2', 'badval', 'nosuchkey']) is None
 
 
 
