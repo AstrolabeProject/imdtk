@@ -1,18 +1,27 @@
 # Tests for the CLI utilities module.
 #   Written by: Tom Hicks. 7/15/2020.
-#   Last Modified: Initial creation: test all add_*_arguments.
+#   Last Modified: Add tests for check_*_file methods.
 #
-import imdtk.cli_utils as utils
-
-import os
-import pytest
 import argparse
+import pytest
+import os
+
+import imdtk.cli_utils as utils
+from config.settings import TEST_DIR
 
 TOOL_NAME = 'TEST_CLI_UTILS'
 VERSION = '1.0'
 
 
 class TestCliUtils(object):
+
+    nosuch_tstfyl = "/tests/resources/NOSUCHFILE"
+    m13_tstfyl    = "{}/resources/m13.fits".format(TEST_DIR)
+    # alias_tstfyl  = "{}/resources/aliases.yaml".format(TEST_DIR)
+    # dbconf_tstfyl = "{}/resources/test-dbconfig.ini".format(TEST_DIR)
+    # fields_tstfyl = "{}/resources/test-fields.txt".format(TEST_DIR)
+    # text_tstfyl   = "{}/resources/mdkeys.txt".format(TEST_DIR)
+
 
     def test_add_aliases_arguments(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
@@ -200,3 +209,44 @@ class TestCliUtils(object):
         assert 'debug' in args              # it has a default
         assert 'verbose' in args            # it has a default
 
+
+    def test_check_alias_file(self):
+        with pytest.raises(SystemExit) as se:
+            utils.check_alias_file(self.nosuch_tstfyl, TOOL_NAME)
+        assert se.type == SystemExit
+        assert se.value.code == 30
+
+
+    def test_check_dbconfig_file(self):
+        with pytest.raises(SystemExit) as se:
+            utils.check_dbconfig_file(self.nosuch_tstfyl, TOOL_NAME)
+        assert se.type == SystemExit
+        assert se.value.code == 31
+
+
+    def test_check_fields_file(self):
+        with pytest.raises(SystemExit) as se:
+            utils.check_fields_file(self.nosuch_tstfyl, TOOL_NAME)
+        assert se.type == SystemExit
+        assert se.value.code == 32
+
+
+    def test_check_fits_file_bad(self):
+        with pytest.raises(SystemExit) as se:
+            utils.check_fits_file(self.nosuch_tstfyl, TOOL_NAME)
+        assert se.type == SystemExit
+        assert se.value.code == 21
+
+
+    def test_check_fits_file(self):
+        try:
+            utils.check_fits_file(self.m13_tstfyl, TOOL_NAME)
+        except SystemExit as se:
+            pytest.fail("test_cli_utils.test_check_fits_file: unexpected SystemExit: {}".format(repr(se)))
+
+
+    def test_check_input_file(self):
+        with pytest.raises(SystemExit) as se:
+            utils.check_input_file(self.nosuch_tstfyl, TOOL_NAME)
+        assert se.type == SystemExit
+        assert se.value.code == 20
