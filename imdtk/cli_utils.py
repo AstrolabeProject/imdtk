@@ -1,7 +1,7 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Add table-name and sql-only arguments to database args.
+#   Last Modified: Make long form argument names consistent with dashes.
 #
 import os
 import sys
@@ -92,7 +92,7 @@ def add_input_arguments (parser, tool_name, version):
     # )
 
     parser.add_argument(
-        '-if', '--input_file', dest='input_file', metavar='filepath',
+        '-if', '--input-file', dest='input_file', metavar='filepath',
         default=argparse.SUPPRESS,
         help='Path to a readable input data file [default: (standard input)]'
     )
@@ -114,7 +114,7 @@ def add_output_arguments (parser, tool_name, version):
     # )
 
     parser.add_argument(
-        '-of', '--output_file', dest='output_file', metavar='filepath',
+        '-of', '--output-file', dest='output_file', metavar='filepath',
         default=argparse.SUPPRESS,
         help='File path of file to hold the processing results [default: (standard output)]'
     )
@@ -129,7 +129,7 @@ def add_output_arguments (parser, tool_name, version):
 
 def add_report_arguments (parser, tool_name, version):
     # parser.add_argument(
-    #     '-rf', '--report_file', dest='report_file', metavar='filepath',
+    #     '-rf', '--report-file', dest='report_file', metavar='filepath',
     #     default=argparse.SUPPRESS,
     #     help='File path of file to hold the output report [default: (standard error)]'
     # )
