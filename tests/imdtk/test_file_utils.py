@@ -1,12 +1,13 @@
 # Tests for the file utilities module.
 #   Written by: Tom Hicks. 5/22/2020.
-#   Last Modified: Add tests for filename_core and full_path.
+#   Last Modified: Update to use test root relative resource files.
 #
-import imdtk.core.file_utils as utils
-
 import os
 import pytest
 from pathlib import Path
+
+import imdtk.core.file_utils as utils
+from config.settings import TEST_DIR
 
 
 class TestFileUtils(object):
@@ -16,6 +17,11 @@ class TestFileUtils(object):
     dirLink = '/tmp/linkToMadeUpDIR'
     fylPath = '/tmp/HiGhLy_UnLiKeLy'
     fylLink = '/tmp/linkToHiGhLy_UnLiKeLy'
+
+    empty_tstfyl  = "{}/resources/empty.txt".format(TEST_DIR)
+    m13_tstfyl    = "{}/resources/m13.fits".format(TEST_DIR)
+    mdkeys_tstfyl = "{}/resources/mdkeys.txt".format(TEST_DIR)
+    table_tstfyl  = "{}/resources/small_table.fits".format(TEST_DIR)
 
 
     def test_filename_core(self):
@@ -29,7 +35,7 @@ class TestFileUtils(object):
     def test_full_path(self):
         assert utils.full_path('~') == '/root'
         assert utils.full_path('~/.bashrc') == '/root/.bashrc'
-        assert utils.full_path('/tmp') == '/tmp'
+        assert utils.full_path(self.tmpPath) == self.tmpPath
         assert utils.full_path('/tmp/somefile') == '/tmp/somefile'
         assert utils.full_path('/tmp/somefile.py') == '/tmp/somefile.py'
 
@@ -50,7 +56,7 @@ class TestFileUtils(object):
 
         assert utils.good_dir_path('.') == True
         assert utils.good_dir_path('/') == True
-        assert utils.good_dir_path('/tmp') == True
+        assert utils.good_dir_path(self.tmpPath) == True
 
         # setup directories and links
         os.mkdir(self.dirPath, mode=0o444)
@@ -74,7 +80,7 @@ class TestFileUtils(object):
 
         assert utils.good_dir_path('.', True) == True
         assert utils.good_dir_path('/', True) == True
-        assert utils.good_dir_path('/tmp', True) == True
+        assert utils.good_dir_path(self.tmpPath, True) == True
 
         # setup directories and links
         os.mkdir(self.dirPath, mode=0o555)
@@ -96,7 +102,7 @@ class TestFileUtils(object):
         # also tests is_readable
         assert utils.good_file_path('.') == False
         assert utils.good_file_path('/') == False
-        assert utils.good_file_path('/tmp') == False
+        assert utils.good_file_path(self.tmpPath) == False
         assert utils.good_file_path('dummy') == False
         assert utils.good_file_path('/dummy') == False
         assert utils.good_file_path('/images/JADES/NONE.fits') == False
@@ -119,8 +125,8 @@ class TestFileUtils(object):
         # also tests is_writable
         assert utils.good_file_path('.', True) == False
         assert utils.good_file_path('/', True) == False
-        assert utils.good_file_path('/tmp', True) == False
         assert utils.good_file_path('dummy') == False
+        assert utils.good_file_path(self.tmpPath, True) == False
         assert utils.good_file_path(self.fylPath) == False
         assert utils.good_file_path(self.fylLink) == False
 
@@ -190,34 +196,36 @@ class TestFileUtils(object):
     def test_validate_path_strings(self):
         FILE_EXTENTS = ['.txt']
         testpaths = [ '.', '/', '/NoSuch',
-                      '/tmp', '/tmp/NoSuch', '/work',
-                      '/imdtk/tests/resources/empty.txt',
-                      '/imdtk/tests/resources/m13.fits',
+                      self.tmpPath,
+                      '/tmp/NoSuch', '/work',
+                      self.empty_tstfyl,
+                      self.m13_tstfyl,
                       '/images/JADES/NONE.fits',
                       '', None ]
         pathlst = utils.validate_path_strings(testpaths, FILE_EXTENTS)
         print("PATHLIST={}".format(pathlst))
         assert len(pathlst) == 5
-        assert '/tmp' in pathlst
+        assert self.tmpPath in pathlst
         assert '/work' in pathlst
-        assert '/imdtk/tests/resources/empty.txt' in pathlst
-        assert '/imdtk/tests/resources/m13.fits' not in pathlst
+        assert self.empty_tstfyl in pathlst
+        assert self.m13_tstfyl not in pathlst
         assert '/images/JADES/NONE.fits' not in pathlst
 
 
     def test_validate_path_strings_fits(self):
         FITS_EXTENTS = ['.fits', '.fits.gz']
         testpaths = [ '.', '/', '/NoSuch',
-                      '/tmp', '/tmp/NoSuch', '/work',
-                      '/imdtk/tests/resources/empty.txt',
-                      '/imdtk/tests/resources/m13.fits',
+                      self.tmpPath,
+                      '/tmp/NoSuch', '/work',
+                      self.empty_tstfyl,
+                      self.m13_tstfyl,
                       '/images/JADES/NONE.fits',
                       '', None ]
         pathlst = utils.validate_path_strings(testpaths, FITS_EXTENTS)
         print("PATHLIST={}".format(pathlst))
         assert len(pathlst) == 5
-        assert '/tmp' in pathlst
+        assert self.tmpPath in pathlst
         assert '/work' in pathlst
-        assert '/imdtk/tests/resources/m13.fits' in pathlst
+        assert self.m13_tstfyl in pathlst
         assert '/images/JADES/NONE.fits' not in pathlst
-        assert '/imdtk/tests/resources/empty.txt' not in pathlst
+        assert self.empty_tstfyl not in pathlst
