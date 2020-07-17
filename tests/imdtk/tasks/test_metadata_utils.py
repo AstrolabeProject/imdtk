@@ -1,13 +1,13 @@
 # Tests for the metata utilities module.
 #   Written by: Tom Hicks. 7/16/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Correct the class name.
 #
 import pytest
 
 import imdtk.tasks.metadata_utils as utils
 
 
-class TestMiscUtils(object):
+class TestMetadataUtils(object):
 
     metadata = {
         "file_info": {
