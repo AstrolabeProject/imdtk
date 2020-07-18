@@ -1,31 +1,80 @@
 # Tests for the ObsCore Calculation utilities module.
 #   Written by: Tom Hicks. 7/16/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Add tests for calc_access_estsize, calc_scale, calc_corners, calc_spatial_limits.
 #
 import pytest
+from pytest import approx
+
+from astropy import wcs
+from astropy.io import fits
 
 import imdtk.tasks.oc_calc_utils as utils
+from config.settings import TEST_DIR
 
 
 class TestOcCalcUtils(object):
+
+    # empty_tstfyl  = "{}/resources/empty.txt".format(TEST_DIR)
+    # mdkeys_tstfyl = "{}/resources/mdkeys.txt".format(TEST_DIR)
+    table_tstfyl  = "{}/resources/small_table.fits".format(TEST_DIR)
+    m13_tstfyl    = "{}/resources/m13.fits".format(TEST_DIR)
 
     filt_res = {
         'X': 1, 'YY': 2, 'ZZZ': 4
     }
 
-    # def test_calc_access_estsize(self):
-    #     # TODO: IMPLEMENT LATER
-    #     assert False
+
+    def test_calc_access_estsize_no_fileinfo(self):
+        md = dict()
+        calcs = dict()
+        utils.calc_access_estsize(md, calcs)
+        print(calcs)
+        assert len(calcs) == 1                  # it has default
+        assert calcs.get('access_estsize') == 0
 
 
-    # def test_calc_corners(self):
-    #     # TODO: IMPLEMENT LATER
-    #     assert False
+    def test_calc_access_estsize(self):
+        md = { 'file_info': { 'file_name': 'nonesuch', 'file_size': 4242 }}
+        calcs = dict()
+        utils.calc_access_estsize(md, calcs)
+        print(calcs)
+        assert len(calcs) == 1
+        assert calcs.get('access_estsize') == 4242
 
 
-    # def test_calc_scale(self):
-    #     # TODO: IMPLEMENT LATER
-    #     assert False
+
+    def test_calc_corners(self):
+        # also tests calc_spatial_limits
+        calcs = dict()
+        with fits.open(self.m13_tstfyl) as hdus:
+            wcs_info = wcs.WCS(hdus[0].header)
+            utils.calc_corners(wcs_info, calcs)
+        print(calcs)
+        assert len(calcs) == 12             # 8 corner coords (ra/dec) + 4 spatial limits (hi/lo)
+
+
+
+    def test_calc_scale(self):
+        calcs = dict()
+        scale = None
+        with fits.open(self.m13_tstfyl) as hdus:
+            wcs_info = wcs.WCS(hdus[0].header)
+            utils.calc_scale(wcs_info, calcs)
+        print(calcs)
+        assert len(calcs) == 1
+        assert calcs.get('im_scale') == approx(0.0002777)
+
+
+    def test_calc_scale_default(self):
+        calcs = dict()
+        scale = None
+        with fits.open(self.table_tstfyl) as hdus:
+            wcs_info = wcs.WCS(hdus[0].header)
+            utils.calc_scale(wcs_info, calcs)
+        print(calcs)
+        assert len(calcs) == 1
+        assert calcs.get('im_scale') == 1.0  # default if cannot be calculated
+
 
     # def test_calc_pixtype(self):
     #     # TODO: IMPLEMENT LATER
@@ -87,18 +136,6 @@ class TestOcCalcUtils(object):
         assert len(calcs) == 2
         assert calcs.get('s_resolution') is not None
         assert calcs.get('s_resolution') == 4
-
-
-
-    # def test_calc_spatial_resolution(self):
-    #     flds_info = FieldsInfo({
-    #         'filter': FieldInfo({'obsCoreKey': 'filter', 'datatype': 'string'}, value='F444W'),
-    #         's_resolution': FieldInfo({'obsCoreKey': 's_resolution', 'datatype': 'float'})
-    #     })
-    #     assert flds_info.has_value_for('s_resolution') == False
-    #     self.processor.calc_spatial_resolution(flds_info)
-    #     assert flds_info.has_value_for('s_resolution') == True
-    #     assert flds_info.get_value_for('s_resolution') == 0.145
 
 
     # def test_calc_wcs_coords(self):
