@@ -1,6 +1,6 @@
 # Tests for the ObsCore Calculation utilities module.
 #   Written by: Tom Hicks. 7/16/2020.
-#   Last Modified: Add tests for calc_access_estsize, calc_scale, calc_corners, calc_spatial_limits.
+#   Last Modified: Add tests for calc_pixtype, calc_wcs_coords.
 #
 import pytest
 from pytest import approx
@@ -76,9 +76,76 @@ class TestOcCalcUtils(object):
         assert calcs.get('im_scale') == 1.0  # default if cannot be calculated
 
 
-    # def test_calc_pixtype(self):
-    #     # TODO: IMPLEMENT LATER
-    #     assert False
+
+    def test_calc_pixtype_byte(self):
+        md = { 'headers': { 'BITPIX': 8 }}
+        calcs = dict()
+        utils.calc_pixtype(md, calcs)
+        print(calcs)
+        assert len(calcs) == 1
+        assert calcs.get('im_pixtype') == 'byte'
+
+
+    def test_calc_pixtype_byte_str(self):
+        md = { 'headers': { 'BITPIX': '8' }}
+        calcs = dict()
+        utils.calc_pixtype(md, calcs)
+        print(calcs)
+        assert len(calcs) == 1
+        assert calcs.get('im_pixtype') == 'byte'
+
+
+    def test_calc_pixtype_long(self):
+        md = { 'headers': { 'BITPIX': 64 }}
+        calcs = dict()
+        utils.calc_pixtype(md, calcs)
+        print(calcs)
+        assert len(calcs) == 1
+        assert calcs.get('im_pixtype') == 'long'
+
+
+    def test_calc_pixtype_long(self):
+        md = { 'headers': { 'BITPIX': '64' }}
+        calcs = dict()
+        utils.calc_pixtype(md, calcs)
+        print(calcs)
+        assert len(calcs) == 1
+        assert calcs.get('im_pixtype') == 'long'
+
+
+    def test_calc_pixtype_double(self):
+        md = { 'headers': { 'BITPIX': -64 }}
+        calcs = dict()
+        utils.calc_pixtype(md, calcs)
+        print(calcs)
+        assert len(calcs) == 1
+        assert calcs.get('im_pixtype') == 'double'
+
+
+    def test_calc_pixtype_double(self):
+        md = { 'headers': { 'BITPIX': '-64' }}
+        calcs = dict()
+        utils.calc_pixtype(md, calcs)
+        print(calcs)
+        assert len(calcs) == 1
+        assert calcs.get('im_pixtype') == 'double'
+
+
+    def test_calc_pixtype_badpixval(self):
+        md = { 'headers': { 'BITPIX': 2 }}
+        calcs = dict()
+        utils.calc_pixtype(md, calcs)
+        print(calcs)
+        assert len(calcs) == 1
+        assert calcs.get('im_pixtype') is None
+
+    def test_calc_pixtype_badpixval(self):
+        md = { 'headers': { 'NAXIS': 2 }}
+        calcs = dict()
+        utils.calc_pixtype(md, calcs)
+        print(calcs)
+        assert len(calcs) == 0
+        assert calcs.get('im_pixtype') is None
 
 
     def test_calc_spatial_limits_simple(self):
@@ -91,6 +158,7 @@ class TestOcCalcUtils(object):
         assert md.get('spat_hilimit1') == 4.0
         assert md.get('spat_lolimit2') == 11.0
         assert md.get('spat_hilimit2') == 44.0
+
 
 
     def test_calc_spatial_limits(self):
@@ -138,50 +206,54 @@ class TestOcCalcUtils(object):
         assert calcs.get('s_resolution') == 4
 
 
-    # def test_calc_wcs_coords(self):
-    #     with fits.open(self.m13_file) as ff_hdus_list:
-    #         wcs_info = wcs.WCS(ff_hdus_list[0].header)
-    #     fi_ra = FieldInfo({'obsCoreKey': 's_ra', 'datatype': 'double'})
-    #     fi_dec = FieldInfo({'obsCoreKey': 's_dec', 'datatype': 'double'})
-    #     flds_info = FieldsInfo({'s_ra': fi_ra, 's_dec': fi_dec})
-    #     self.debug_proc.calc_wcs_coords(wcs_info, None, flds_info)
-    #     print(flds_info)
-    #     assert flds_info.has_value_for('s_ra') == True
-    #     assert flds_info.has_value_for('s_dec') == True
-    #     assert flds_info.get_value_for('s_ra') == 250.4226
-    #     assert flds_info.get_value_for('s_dec') == 36.4602
+
+    def test_calc_wcs_coords(self):
+        calcs = dict()
+        with fits.open(self.m13_tstfyl) as hdus:
+            wcs_info = wcs.WCS(hdus[0].header)
+        utils.calc_wcs_coordinates(wcs_info, calcs)
+        print(calcs)
+        assert len(calcs) == 2
+        assert 's_ra' in calcs
+        assert 's_dec' in calcs
+        assert calcs.get('s_ra') == 250.4226
+        assert calcs.get('s_dec') == 36.4602
 
 
-    # def test_calc_wcs_coords_rev(self):
-    #     with fits.open(self.m13_file) as ff_hdus_list:
-    #         wcs_info = wcs.WCS(ff_hdus_list[0].header)
-    #     wcs_info.wcs.ctype = [ 'DEC', 'RA' ]    # reverse axes order
-
-    #     fi_ra = FieldInfo({'obsCoreKey': 's_ra', 'datatype': 'double'})
-    #     fi_dec = FieldInfo({'obsCoreKey': 's_dec', 'datatype': 'double'})
-    #     flds_info = FieldsInfo({'s_ra': fi_ra, 's_dec': fi_dec})
-
-    #     self.debug_proc.calc_wcs_coords(wcs_info, None, flds_info)
-    #     print(flds_info)
-    #     assert flds_info.has_value_for('s_ra') == True
-    #     assert flds_info.has_value_for('s_dec') == True
-    #     assert flds_info.get_value_for('s_ra') == 36.4602    # fake switch for this test
-    #     assert flds_info.get_value_for('s_dec') == 250.4226  # fake switch for this test
+    def test_calc_wcs_coords_rev(self):
+        calcs = dict()
+        with fits.open(self.m13_tstfyl) as hdus:
+            wcs_info = wcs.WCS(hdus[0].header)
+        wcs_info.wcs.ctype = [ 'DEC', 'RA' ]    # reverse axes order
+        utils.calc_wcs_coordinates(wcs_info, calcs)
+        print(calcs)
+        assert len(calcs) == 2
+        assert 's_ra' in calcs
+        assert 's_dec' in calcs
+        assert calcs.get('s_ra') == 36.4602     # fake switch for this test
+        assert calcs.get('s_dec') == 250.4226   # fake switch for this test
 
 
-    # def test_calc_wcs_coords_fail(self):
-    #     with fits.open(self.m13_file) as ff_hdus_list:
-    #         wcs_info = wcs.WCS(ff_hdus_list[0].header)
-    #     wcs_info.wcs.ctype = [ 'BAD', 'AXES' ]    # bad values for axes
+    def test_calc_wcs_coords_abort(self):
+        calcs = { 's_ra': 140.2, 's_dec': 14.004 }
+        with fits.open(self.m13_tstfyl) as hdus:
+            wcs_info = wcs.WCS(hdus[0].header)
+            utils.calc_wcs_coordinates(wcs_info, calcs)
+        assert len(calcs) == 2
+        assert 's_ra' in calcs
+        assert 's_dec' in calcs
 
-    #     fi_ra = FieldInfo({'obsCoreKey': 's_ra', 'datatype': 'double'})
-    #     fi_dec = FieldInfo({'obsCoreKey': 's_dec', 'datatype': 'double'})
-    #     flds_info = FieldsInfo({'s_ra': fi_ra, 's_dec': fi_dec})
 
-    #     self.debug_proc.calc_wcs_coords(wcs_info, None, flds_info)
-    #     print(flds_info)
-    #     assert flds_info.has_value_for('s_ra') == False
-    #     assert flds_info.has_value_for('s_dec') == False
+    def test_calc_wcs_coords_fail(self):
+        calcs = dict()
+        with fits.open(self.m13_tstfyl) as hdus:
+            wcs_info = wcs.WCS(hdus[0].header)
+        wcs_info.wcs.ctype = [ 'BAD', 'AXES' ]    # bad values for axes
+        with pytest.raises(RuntimeError):
+            utils.calc_wcs_coordinates(wcs_info, calcs)
+        assert len(calcs) == 0
+        assert 's_ra' not in calcs
+        assert 's_dec' not in calcs
 
 
     # def test_copy_aliased(self):
