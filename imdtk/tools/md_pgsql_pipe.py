@@ -2,7 +2,7 @@
 #
 # Python pipeline to extract image metadata and store it into a PostreSQL database.
 #   Written by: Tom Hicks. 6/24/20.
-#   Last Modified: Update for rename of FITS header task.
+#   Last Modified: Move to tools package.
 #
 import os, sys
 import logging as log
@@ -10,7 +10,7 @@ import argparse
 
 from config.settings import LOG_LEVEL
 from imdtk.core.fits_utils import FITS_IGNORE_KEYS
-import imdtk.cli_utils as cli_utils
+import imdtk.tools.cli_utils as cli_utils
 
 from imdtk.tasks.fits_headers import FitsHeadersSourceTask
 from imdtk.tasks.aliases import AliasesTask
@@ -24,7 +24,7 @@ from imdtk.tasks.jwst_pgsql_sink import JWST_ObsCorePostgreSQLSink
 TOOL_NAME = 'md_pgsql_pipe'
 
 # Version of this tool.
-VERSION = '0.4.0'
+VERSION = '0.10.0'
 
 
 def main (argv=None):

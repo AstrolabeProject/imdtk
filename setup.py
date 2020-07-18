@@ -17,6 +17,7 @@ setup(
             'jwst_oc_calc    = imdtk.tools.jwst_oc_calc_cli:main',
             'jwst_pghybrid_sink = imdtk.tools.jwst_pghybrid_sink_cli:main',
             'jwst_pgsql_sink = imdtk.tools.jwst_pgsql_sink_cli:main',
+            'md_pgsql_pipe   = imdtk.tools.md_pgsql_pipe:main',
             'miss_report     = imdtk.tools.miss_report_cli:main',
             'no_op           = imdtk.tools.nop_cli:main',
             'pickle_sink     = imdtk.tools.pickle_sink_cli:main'

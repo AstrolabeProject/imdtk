@@ -25,6 +25,7 @@ echo "All tools: show versions"
 # aliases -d --version
 # fields_info -d --version
 # jwst_oc_calc -d --version
+# md_pgsql_pipe -d --version
 # miss_report -d --version
 # no_op -d --version
 # pickle_sink -d --version
@@ -39,6 +40,7 @@ echo "All tools: show HELP"
 # aliases --help
 # fields_info --help
 # jwst_oc_calc --help
+# md_pgsql_pipe --help
 # miss_report --help
 # no_op --help
 # pickle_sink --help
@@ -198,6 +200,11 @@ echo "Explicit intermediate file pipeline with non-json names:"
 # jwst_pgsql_sink -d -sql -if /work/hafijocmr1 -of /work/hafijocmrsql1
 # jwst_pghybrid_sink -d -sql -if /work/hafijocmr1 -of /work/hafijocmrhyb1
 # csv_sink -d -if /work/hafijocmr1 -of /work/hafijocmrcsv1
+
+
+echo "--------------------------------------------"
+echo "FITS metadata to PostgreSQL JWST table pipeline:"
+# md_pgsql_pipe -ff /images/DC_191217/F356W.fits -v -sql -g
 
 
 echo "--------------------------------------------"
