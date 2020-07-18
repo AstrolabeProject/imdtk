@@ -1,6 +1,6 @@
 # Tests for the ObsCore Calculation utilities module.
 #   Written by: Tom Hicks. 7/16/2020.
-#   Last Modified: Add tests for calc_pixtype, calc_wcs_coords.
+#   Last Modified: Add tests for copy_aliased, copy_file_info, set_default.
 #
 import pytest
 from pytest import approx
@@ -44,7 +44,7 @@ class TestOcCalcUtils(object):
 
 
     def test_calc_corners(self):
-        # also tests calc_spatial_limits
+        # also tests calc_spatial_limits and set_corner_field
         calcs = dict()
         with fits.open(self.m13_tstfyl) as hdus:
             wcs_info = wcs.WCS(hdus[0].header)
@@ -256,18 +256,63 @@ class TestOcCalcUtils(object):
         assert 's_dec' not in calcs
 
 
-    # def test_copy_aliased(self):
-    #     # TODO: IMPLEMENT LATER
-    #     assert False
 
-    # def test_copy_file_info(self):
-    #     # TODO: IMPLEMENT LATER
-    #     assert False
+    def test_copy_aliased(self):
+        md = {
+            "aliased": {
+                "im_naxes": 2,
+                "s_xel2": 4305,
+                "gmt_date": "2019-12-14T21:10:36.490",
+                "equinox": 2000.0
+            }
+        }
+        calcs = dict()
+        utils.copy_aliased(md, calcs)
+        print(calcs)
+        assert len(calcs) == 4
+        assert 'im_naxes' in calcs
+        assert 's_xel2' in calcs
+        assert 'gmt_date' in calcs
+        assert 'equinox' in calcs
 
-    # def test_set_corner_field(self):
-    #     # TODO: IMPLEMENT LATER
-    #     assert False
 
-    # def test_set_default(self):
-    #     # TODO: IMPLEMENT LATER
-    #     assert False
+
+    def test_copy_file_info(self):
+        md = { 'file_info': { 'file_name': 'nonesuch', 'file_size': 4242 }}
+        calcs = dict()
+        utils.copy_file_info(md, calcs)
+        print(calcs)
+        assert len(calcs) == 2
+        assert 'file_name' in calcs
+        assert 'file_size' in calcs
+
+
+
+    def test_set_default(self):
+        defaults = { 'key1': 1, 'key2': 'value2', 'key3': 88.0088 }
+        calcs = dict()
+        utils.set_default('key2', defaults, calcs)
+        print(calcs)
+        assert len(calcs) == 1
+        assert 'key2' in calcs
+
+
+    def test_set_default_nodefaults(self):
+        defaults = dict()
+        calcs = dict()
+        utils.set_default('key1', defaults, calcs)
+        print(calcs)
+        assert len(calcs) == 0
+        assert 'key1' not in calcs
+
+
+    def test_set_default_badkey(self):
+        defaults = { 'key1': 1, 'key2': 'value2', 'key3': 88.0088 }
+        calcs = dict()
+        utils.set_default('KEY99', defaults, calcs)
+        print(calcs)
+        assert len(calcs) == 0
+        assert 'key1' not in calcs
+        assert 'key2' not in calcs
+        assert 'key3' not in calcs
+        assert 'KEY99' not in calcs
