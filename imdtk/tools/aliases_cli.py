@@ -2,13 +2,13 @@
 #
 # Module to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/30/2020.
-#   Last Modified: Remove unused cleanup call.
+#   Last Modified: Update for tools package.
 #
 import os, sys
 import logging as log
 import argparse
 
-import imdtk.cli_utils as cli_utils
+import imdtk.tools.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
 from imdtk.tasks.aliases import AliasesTask
 
@@ -17,7 +17,7 @@ from imdtk.tasks.aliases import AliasesTask
 TOOL_NAME = 'aliases'
 
 # Version of this tool.
-VERSION = '0.7.1'
+VERSION = '0.10.0'
 
 
 def main (argv=None):

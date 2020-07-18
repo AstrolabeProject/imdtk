@@ -2,13 +2,13 @@
 #
 # Module to pass through the input to the output unchanged.
 #   Written by: Tom Hicks. 6/17/20.
-#   Last Modified: Remove unused cleanup call.
+#   Last Modified: Update for tools package.
 #
 import os, sys
 import logging as log
 import argparse
 
-import imdtk.cli_utils as cli_utils
+import imdtk.tools.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
 from imdtk.tasks.nop import NopTask
 
@@ -17,7 +17,7 @@ from imdtk.tasks.nop import NopTask
 TOOL_NAME = 'no_op'
 
 # Version of this tool.
-VERSION = '0.7.1'
+VERSION = '0.10.0'
 
 
 def main (argv=None):

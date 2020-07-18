@@ -1,16 +1,16 @@
 # Tests for the CLI utilities module.
 #   Written by: Tom Hicks. 7/15/2020.
-#   Last Modified: Add tests for check_*_file methods.
+#   Last Modified: Update for tools package.
 #
 import argparse
 import pytest
 import os
 
-import imdtk.cli_utils as utils
+import imdtk.tools.cli_utils as utils
 from config.settings import TEST_DIR
 
 TOOL_NAME = 'TEST_CLI_UTILS'
-VERSION = '1.0'
+VERSION = '0.10.0'
 
 
 class TestCliUtils(object):

@@ -2,13 +2,13 @@
 #
 # Module to report on the presence of missing fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/20.
-#   Last Modified: Remove unused cleanup call.
+#   Last Modified: Update for tools package.
 #
 import os, sys
 import logging as log
 import argparse
 
-import imdtk.cli_utils as cli_utils
+import imdtk.tools.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
 from imdtk.tasks.miss_report import MissingFieldsTask
 
@@ -17,7 +17,7 @@ from imdtk.tasks.miss_report import MissingFieldsTask
 TOOL_NAME = 'miss_report'
 
 # Version of this tool.
-VERSION = '0.7.1'
+VERSION = '0.10.0'
 
 
 def main (argv=None):

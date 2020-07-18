@@ -2,14 +2,14 @@
 #
 # Module to pickle incoming data to a file.
 #   Written by: Tom Hicks. 6/17/20.
-#   Last Modified: Initial creation.
+#   Last Modified: Update for tools package.
 #
 import os
 import sys
 import logging as log
 import argparse
 
-import imdtk.cli_utils as cli_utils
+import imdtk.tools.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
 from imdtk.tasks.pickle_sink import PickleSink
 
@@ -18,7 +18,7 @@ from imdtk.tasks.pickle_sink import PickleSink
 TOOL_NAME = 'pickle_sink'
 
 # Version of this tool.
-VERSION = '0.1.0'
+VERSION = '0.10.0'
 
 
 def main (argv=None):

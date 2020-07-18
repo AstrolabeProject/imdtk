@@ -2,14 +2,14 @@
 #
 # Module to extract an image table from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 7/6/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Update for tools package.
 #
 import argparse
 import logging as log
 import os
 import sys
 
-import imdtk.cli_utils as cli_utils
+import imdtk.tools.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
 from imdtk.tasks.fits_table import FitsTableSourceTask
 
@@ -18,7 +18,7 @@ from imdtk.tasks.fits_table import FitsTableSourceTask
 TOOL_NAME = 'fits_table'
 
 # Version of this tool.
-VERSION = '0.1.0'
+VERSION = '0.10.0'
 
 
 def main (argv=None):

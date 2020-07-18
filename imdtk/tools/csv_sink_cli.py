@@ -2,14 +2,14 @@
 #
 # Module to output incoming data to a CSV file.
 #   Written by: Tom Hicks. 6/26/20.
-#   Last Modified: Initial creation.
+#   Last Modified: Update for tools package.
 #
 import os
 import sys
 import logging as log
 import argparse
 
-import imdtk.cli_utils as cli_utils
+import imdtk.tools.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
 from imdtk.tasks.csv_sink import CSVSink
 
@@ -18,7 +18,7 @@ from imdtk.tasks.csv_sink import CSVSink
 TOOL_NAME = 'csv_sink'
 
 # Version of this tool.
-VERSION = '0.1.0'
+VERSION = '0.10.0'
 
 
 def main (argv=None):
