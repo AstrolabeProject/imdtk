@@ -1,7 +1,7 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Fix: typo calling add_hdu_arguments.
+#   Last Modified: Add type attribute to HDU argument.
 #
 import argparse
 import logging as log
@@ -81,7 +81,7 @@ def add_hdu_arguments (parser, tool_name, version):
         to the given argparse parser object. """
     parser.add_argument(
         '-hdu', '--hdu', dest='which_hdu', metavar='HDU_index',
-        default=0,
+        default=0, type=int,
         help='Index of HDU containing the metadata [default: 0 (the first)]'
     )
 
