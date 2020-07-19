@@ -1,11 +1,12 @@
 # Tests of the FITS specific utilities module.
 #   Written by: Tom Hicks. 4/7/2020.
-#   Last Modified: Update to use test root relative resource files.
+#   Last Modified: Add tests for gen_fits_file_paths and fits_utc_date.
 #
 import os
 import pytest
 
 from astropy import wcs
+from astropy.time.core import Time
 from astropy.io import fits
 
 import imdtk.core.fits_utils as utils
@@ -18,6 +19,46 @@ class TestFitsUtils(object):
     m13_tstfyl    = "{}/resources/m13.fits".format(TEST_DIR)
     mdkeys_tstfyl = "{}/resources/mdkeys.txt".format(TEST_DIR)
     table_tstfyl  = "{}/resources/small_table.fits".format(TEST_DIR)
+    resources_tstdir = "{}/resources".format(TEST_DIR)
+
+
+    # TODO: update tests when better implementation is used (see tested code for details):
+    def test_fits_utc_date_utc(self):
+        tym = utils.fits_utc_date('1990-12-22T13:49:00')
+        print(tym)
+        assert tym is not None
+        assert type(tym) == Time
+
+
+    def test_fits_utc_date_ymd(self):
+        tym = utils.fits_utc_date('2018-08-25')
+        print(tym)
+        assert tym is not None
+        assert type(tym) == Time
+
+
+    def test_fits_utc_date_yearonly(self):
+        tym = None
+        with pytest.raises(ValueError):
+            tym = utils.fits_utc_date('1990')
+        print(tym)
+        assert tym is None
+
+
+
+    def test_gen_fits_file_paths(self):
+        ffs = [ f for f in utils.gen_fits_file_paths(self.resources_tstdir)]
+        print(ffs)
+        assert len(ffs) > 0
+        assert self.m13_tstfyl in ffs
+
+
+    def test_gen_fits_file_paths_empty(self):
+        ffs = [ f for f in utils.gen_fits_file_paths('/tmp')]
+        print(ffs)
+        assert len(ffs) == 0
+        assert self.m13_tstfyl not in ffs
+
 
 
     def test_get_column_info(self):
