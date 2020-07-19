@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 #
-# Python pipeline to extract image metadata and store it into a PostreSQL database.
-#   Written by: Tom Hicks. 6/24/20.
-#   Last Modified: Cleanups, increment version number.
+# Python pipeline to extract image metadata from each FITS images in a directory, storing
+# the metadata into a PostreSQL database.
+#   Written by: Tom Hicks. 7/18/2020.
+#   Last Modified: Initial creation.
 #
 import argparse
 import logging as log
@@ -10,7 +11,7 @@ import sys
 
 import imdtk.tools.cli_utils as cli_utils
 from config.settings import LOG_LEVEL
-from imdtk.core.fits_utils import FITS_IGNORE_KEYS
+from imdtk.core.fits_utils import FITS_IGNORE_KEYS, gen_fits_file_paths
 from imdtk.tasks.aliases import AliasesTask
 from imdtk.tasks.fields_info import FieldsInfoTask
 from imdtk.tasks.fits_headers import FitsHeadersSourceTask
@@ -20,10 +21,10 @@ from imdtk.tasks.miss_report import MissingFieldsTask
 
 
 # Program name for this tool.
-TOOL_NAME = 'md_pgsql_pipe'
+TOOL_NAME = 'multi_md_pgsql_pipe'
 
 # Version of this tool.
-VERSION = '0.10.1'
+VERSION = '0.10.0'
 
 
 def main (argv=None):
@@ -49,7 +50,8 @@ def main (argv=None):
 
     cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_fits_file_arguments(parser, TOOL_NAME, VERSION)
+    cli_utils.add_input_dir_arguments(parser, TOOL_NAME, VERSION)
+    cli_utils.add_hdu_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_fields_info_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_collection_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_report_arguments(parser, TOOL_NAME, VERSION)
@@ -70,9 +72,9 @@ def main (argv=None):
         args['verbose'] = True              # if debug turn on verbose too
         print("({}.main): ARGS={}".format(TOOL_NAME, args), file=sys.stderr)
 
-    # check the required FITS file path for validity
-    fits_file = args.get('fits_file')
-    cli_utils.check_fits_file(fits_file, TOOL_NAME) # may system exit here and not return!
+    # check the required image directory path for validity
+    input_dir = args.get('input_dir')
+    cli_utils.check_input_dir(input_dir, TOOL_NAME) # may system exit here and not return!
 
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME
@@ -86,13 +88,26 @@ def main (argv=None):
     miss_reportTask = MissingFieldsTask(args)
     jwst_pgsql_sinkTask = JWST_ObsCorePostgreSQLSink(args)
 
-    # compose and call the pipeline tasks
-    jwst_pgsql_sinkTask.output_results(     # sink: nothing returned
-        miss_reportTask.process(            # report: passes data through
-            jwst_oc_calcTask.process(
-                fields_infoTask.process(
-                     aliasesTask.process(
-                         fits_headersTask.process(None))))))  # source: creates initial metadata
+    # call the pipeline on each FITS file in the input directory:
+    if (args.get('verbose')):
+        print("({}): Processing FITS files in '{}'".format(TOOL_NAME, input_dir), file=sys.stderr)
+
+    proc_count = 0                              # initialize count of processed files
+
+    for img_file in gen_fits_file_paths(input_dir):
+        args['fits_file'] = img_file            # reset the FITS file argument to next file
+
+        jwst_pgsql_sinkTask.output_results(     # sink: nothing returned
+            miss_reportTask.process(            # report: passes data through
+                jwst_oc_calcTask.process(
+                    fields_infoTask.process(
+                        aliasesTask.process(
+                            fits_headersTask.process(None))))))  # source: creates initial metadata
+
+        proc_count += 1                         # increment count of processed files
+
+    if (args.get('verbose')):
+        print("({}): Processed {} FITS files.".format(TOOL_NAME, proc_count), file=sys.stderr)
 
 
 
