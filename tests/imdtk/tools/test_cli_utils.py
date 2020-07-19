@@ -1,6 +1,6 @@
 # Tests for the CLI utilities module.
 #   Written by: Tom Hicks. 7/15/2020.
-#   Last Modified: Add tests for HDU and input directory arguments.
+#   Last Modified: Add tests for check_input_dir.
 #
 import argparse
 import pytest
@@ -278,6 +278,20 @@ class TestCliUtils(object):
             utils.check_fits_file(self.m13_tstfyl, TOOL_NAME)
         except SystemExit as se:
             pytest.fail("test_cli_utils.test_check_fits_file: unexpected SystemExit: {}".format(repr(se)))
+
+
+    def test_check_input_dir_bad(self):
+        with pytest.raises(SystemExit) as se:
+            utils.check_input_dir(self.nosuch_tstfyl, TOOL_NAME)
+        assert se.type == SystemExit
+        assert se.value.code == 22
+
+
+    def test_check_input_dir(self):
+        try:
+            utils.check_input_dir(self.resources_tstdir, TOOL_NAME)
+        except SystemExit as se:
+            pytest.fail("test_cli_utils.test_check_input_dir: unexpected SystemExit: {}".format(repr(se)))
 
 
     def test_check_input_file(self):
