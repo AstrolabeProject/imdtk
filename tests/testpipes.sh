@@ -27,6 +27,7 @@ fields_info -d --version
 jwst_oc_calc -d --version
 md_pgsql_pipe -d --version
 miss_report -d --version
+multi_md_pgsql_pipe -d --version
 no_op -d --version
 pickle_sink -d --version
 jwst_pgsql_sink -d --version
@@ -42,6 +43,7 @@ fields_info --help
 jwst_oc_calc --help
 md_pgsql_pipe --help
 miss_report --help
+multi_md_pgsql_pipe --help
 no_op --help
 pickle_sink --help
 jwst_pgsql_sink --help
@@ -209,9 +211,13 @@ md_pgsql_pipe -ff /images/DC_191217/F356W.fits -v -sql -g
 
 echo "--------------------------------------------"
 echo "Current development:"
-fits_table -v -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -d -g
-fits_table -v -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -of /work/ez_cat.json
-fits_table -v -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -g
-fits_table -v -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -d -g
-fits_table -v -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -v -of /work/photo_cat.json
-fits_table -v -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -v -g
+fits_table -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -d -g
+fits_table -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -of /work/ez_cat.json
+fits_table -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -g
+fits_table -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -d -g
+fits_table -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -v -of /work/photo_cat.json
+fits_table -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -v -g
+
+# multi_md_pgsql_pipe -idir /images -c ALLIMGs -v -g
+multi_md_pgsql_pipe -idir /tmp -c JADES -v -g
+multi_md_pgsql_pipe -idir /images/JADES -c JADES -v -g
