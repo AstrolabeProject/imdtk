@@ -1,7 +1,7 @@
 #
 # Module to provide FITS utility functions for Astrolabe code.
 #   Written by: Tom Hicks. 1/26/2020.
-#   Last Modified: Catch wrong HDU spec in get_column_info. Add which_hdu argument to is_catalog_file.
+#   Last Modified: Add method to generate fits_file_paths.
 #
 import fnmatch
 import os
@@ -9,6 +9,8 @@ import os
 from astropy import wcs
 from astropy.time import Time
 from astropy.wcs.utils import proj_plane_pixel_scales
+
+from imdtk.core.file_utils import gen_file_paths, validate_file_path
 
 
 # patterns for identifying FITS and gzipped FITS files
@@ -42,6 +44,13 @@ def fits_utc_date (value_str, scale='utc'):
     #   see: https://docs.astropy.org/en/stable/time/
     #   see: https://docs.astropy.org/en/stable/api/astropy.time.Time.html
     return Time(value_str)
+
+
+def gen_fits_file_paths (root_dir):
+    """ Generator to yield all FITS files in the file tree under the given root directory. """
+    for file_path in gen_file_paths(root_dir):
+        if (validate_file_path(file_path, FITS_EXTENTS)):
+            yield file_path
 
 
 def get_column_info (hdus_list, which_hdu=1):
