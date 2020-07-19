@@ -1,6 +1,6 @@
 # Tests for the CLI utilities module.
 #   Written by: Tom Hicks. 7/15/2020.
-#   Last Modified: Update for tools package.
+#   Last Modified: Add tests for HDU and input directory arguments.
 #
 import argparse
 import pytest
@@ -21,6 +21,7 @@ class TestCliUtils(object):
     # dbconf_tstfyl = "{}/resources/test-dbconfig.ini".format(TEST_DIR)
     # fields_tstfyl = "{}/resources/test-fields.txt".format(TEST_DIR)
     # text_tstfyl   = "{}/resources/mdkeys.txt".format(TEST_DIR)
+    resources_tstdir = "{}/resources".format(TEST_DIR)
 
 
     def test_add_aliases_arguments(self):
@@ -110,11 +111,28 @@ class TestCliUtils(object):
         print(args)
         assert 'fits_file' in args
         assert 'which_hdu' in args          # it has a default
+        assert args.get('which_hdu') == 0   # zero is the default
 
         args = vars(parser.parse_args(['--fits-file', '/fake/astro.fits', '--hdu', '1']))
         print(args)
         assert 'fits_file' in args
         assert 'which_hdu' in args
+        assert args.get('which_hdu') == 1
+
+
+    def test_add_hdu_arguments(self):
+        parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+        utils.add_hdu_arguments(parser, TOOL_NAME, VERSION)
+
+        args = vars(parser.parse_args([]))
+        print(args)
+        assert 'which_hdu' in args          # it has a default
+        assert args.get('which_hdu') == 0   # zero is the default
+
+        args = vars(parser.parse_args(['--hdu', '1']))
+        print(args)
+        assert 'which_hdu' in args
+        assert args.get('which_hdu') == 1
 
 
     def test_add_input_arguments(self):
@@ -132,6 +150,23 @@ class TestCliUtils(object):
         args = vars(parser.parse_args(['--input-file', '/fake/metadata.json']))
         print(args)
         assert 'input_file' in args
+
+
+    def test_add_input_dir_arguments(self):
+        parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+        utils.add_input_dir_arguments(parser, TOOL_NAME, VERSION)
+
+        with pytest.raises(SystemExit) as se:
+            args = vars(parser.parse_args([])) # input-dir is required
+        assert se.type == SystemExit
+
+        args = vars(parser.parse_args(['-idir', self.resources_tstdir]))
+        print(args)
+        assert 'input_dir' in args
+
+        args = vars(parser.parse_args(['--input-dir', '/tmp']))
+        print(args)
+        assert 'input_dir' in args
 
 
     def test_add_output_arguments(self):
