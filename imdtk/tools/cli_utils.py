@@ -1,16 +1,15 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Make long form argument names consistent with dashes.
+#   Last Modified: Add input dir arguments and check input dir methods. Split out add HDU arguments.
 #
-import os
-import sys
-import logging as log
 import argparse
+import logging as log
+import sys
 
 from config.settings import DEFAULT_ALIASES_FILEPATH, DEFAULT_DBCONFIG_FILEPATH
 from config.settings import DEFAULT_FIELDS_FILEPATH, DEFAULT_METADATA_TABLE_NAME
-from imdtk.core.file_utils import good_file_path, validate_file_path
+from imdtk.core.file_utils import good_dir_path, good_file_path, validate_file_path
 from imdtk.core.fits_utils import FITS_EXTENTS
 
 
@@ -71,14 +70,19 @@ def add_fits_file_arguments (parser, tool_name, version):
     """ Add the argument(s) related to parsing information from FITS files
         to the given argparse parser object. """
     parser.add_argument(
+        '-ff', '--fits-file', dest='fits_file', required=True, metavar='filepath',
+        help='Path to a readable FITS image file from which to extract metadata [required]'
+    )
+    add_hdu_arguments(parse, tool_name, version)  # now add HDU argument
+
+
+def add_hdu_arguments (parser, tool_name, version):
+    """ Add the argument(s) related to parsing information from HDUs of FITS files
+        to the given argparse parser object. """
+    parser.add_argument(
         '-hdu', '--hdu', dest='which_hdu', metavar='HDU_index',
         default=0,
         help='Index of HDU containing the metadata [default: 0 (the first)]'
-    )
-
-    parser.add_argument(
-        '-ff', '--fits-file', dest='fits_file', required=True, metavar='filepath',
-        help='Path to a readable FITS image file from which to extract metadata [required]'
     )
 
 
@@ -95,6 +99,15 @@ def add_input_arguments (parser, tool_name, version):
         '-if', '--input-file', dest='input_file', metavar='filepath',
         default=argparse.SUPPRESS,
         help='Path to a readable input data file [default: (standard input)]'
+    )
+
+
+def add_input_dir_arguments (parser, tool_name, version):
+    """ Add the argument(s) related to parsing information from a directory of input files
+        to the given argparse parser object. """
+    parser.add_argument(
+        '-idir', '--input-dir', dest='input_dir', required=True, metavar='dirpath',
+        help='Path to a readable directory of input files to process [required]'
     )
 
 
@@ -208,6 +221,18 @@ def check_fits_file (fits_file, tool_name, exit_code=21):
     """
     if (not validate_file_path(fits_file, FITS_EXTENTS)):
         errMsg = "({}): A readable, valid FITS image file must be specified. Exiting...".format(tool_name)
+        log.error(errMsg)
+        print(errMsg, file=sys.stderr)
+        sys.exit(exit_code)
+
+
+def check_input_dir (input_dir, tool_name, exit_code=22):
+    """
+    Check that the required input direct path is a valid path. If not, then exit
+    the entire program here with the specified (or default) system exit code.
+    """
+    if (not good_dir_path(input_dir)):
+        errMsg = "({}): A readable input directory must be specified. Exiting...".format(tool_name)
         log.error(errMsg)
         print(errMsg, file=sys.stderr)
         sys.exit(exit_code)
