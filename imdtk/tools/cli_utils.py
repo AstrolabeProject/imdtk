@@ -1,7 +1,7 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Add input dir arguments and check input dir methods. Split out add HDU arguments.
+#   Last Modified: Fix: typo calling add_hdu_arguments.
 #
 import argparse
 import logging as log
@@ -73,7 +73,7 @@ def add_fits_file_arguments (parser, tool_name, version):
         '-ff', '--fits-file', dest='fits_file', required=True, metavar='filepath',
         help='Path to a readable FITS image file from which to extract metadata [required]'
     )
-    add_hdu_arguments(parse, tool_name, version)  # now add HDU argument
+    add_hdu_arguments(parser, tool_name, version) # now add HDU argument
 
 
 def add_hdu_arguments (parser, tool_name, version):
