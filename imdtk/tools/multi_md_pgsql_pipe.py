@@ -3,7 +3,7 @@
 # Python pipeline to extract image metadata from each FITS images in a directory, storing
 # the metadata into a PostreSQL database.
 #   Written by: Tom Hicks. 7/18/2020.
-#   Last Modified: Revamp error handling.
+#   Last Modified: Add initial processing announcement for each image.
 #
 import argparse
 import sys
@@ -92,6 +92,9 @@ def main (argv=None):
 
     for img_file in gen_fits_file_paths(input_dir):
         args['fits_file'] = img_file              # reset the FITS file argument to next file
+
+        if (args.get('verbose')):
+            print("({}): Processing FITS file '{}'.".format(TOOL_NAME, img_file), file=sys.stderr)
 
         try:
             jwst_pgsql_sinkTask.output_results(   # sink: nothing returned
