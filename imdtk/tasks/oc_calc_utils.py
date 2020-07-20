@@ -1,12 +1,11 @@
 #
 # Utilities to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/11/2020.
-#   Last Modified: Add methods to copy file_info to calculations and to estimate image file size.
+#   Last Modified: Revamp error handling.
 #
-import os
 import sys
-import logging as log
 
+import imdtk.exceptions as errors
 import imdtk.core.fits_utils as fits_utils
 import imdtk.tasks.metadata_utils as md_utils
 
@@ -94,7 +93,7 @@ def calc_spatial_resolution (calculations, filter_resolutions=None):
             calculations['s_resolution'] = resolution
 
 
-def calc_wcs_coordinates (wcs_info, calculations, tool_name=''):
+def calc_wcs_coordinates (wcs_info, calculations):
     """
     Extract the WCS coordinates for the reference pixel of the current image file.
     Sets both s_ra and s_dec fields simultaneously when either field is processed.
@@ -115,9 +114,8 @@ def calc_wcs_coordinates (wcs_info, calculations, tool_name=''):
             calculations['s_dec'] = crval[0] # put CRVAL1 value into s_dec
             calculations['s_ra']  = crval[1] # put CRVAL2 value into s_ra
         else:
-            errMsg = "({}.calc_wcs_coords): Unable to assign RA/DEC axes from ctype={}".format(tool_name, ctype)
-            log.error(errMsg)
-            raise RuntimeError(errMsg)
+            errMsg = "(calc_wcs_coords) Unable to assign RA/DEC axes from ctype={}".format(ctype)
+            raise errors.ProcessingError(errMsg)
 
 
 def copy_aliased (metadata, calculations):

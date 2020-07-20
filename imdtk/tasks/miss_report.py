@@ -1,13 +1,12 @@
 #
 # Class to report on the presence of missing fields in the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/2020.
-#   Last Modified: Make no report unless verbose flag set.
+#   Last Modified: Revamp error handling.
 #
-import os
-import sys
 import configparser
-import logging as log
+import sys
 
+import imdtk.exceptions as errors
 import imdtk.tasks.metadata_utils as md_utils
 from imdtk.tasks.i_task import IImdTask
 
@@ -77,6 +76,5 @@ class MissingFieldsTask (IImdTask):
                 print(line, file=sys.stderr)
 
         else:
-            errMsg = "({}.process): Invalid report format '{}'.".format(self.TOOL_NAME, rpt_fmt)
-            log.error(errMsg)
-            raise ValueError(errMsg)
+            errMsg = "Invalid report format '{}'.".format(rpt_fmt)
+            raise errors.ProcessingError(errMsg)

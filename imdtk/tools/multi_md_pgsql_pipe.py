@@ -3,14 +3,13 @@
 # Python pipeline to extract image metadata from each FITS images in a directory, storing
 # the metadata into a PostreSQL database.
 #   Written by: Tom Hicks. 7/18/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Revamp error handling.
 #
 import argparse
-import logging as log
 import sys
 
+import imdtk.exceptions as errors
 import imdtk.tools.cli_utils as cli_utils
-from config.settings import LOG_LEVEL
 from imdtk.core.fits_utils import FITS_IGNORE_KEYS, gen_fits_file_paths
 from imdtk.tasks.aliases import AliasesTask
 from imdtk.tasks.fields_info import FieldsInfoTask
@@ -24,7 +23,7 @@ from imdtk.tasks.miss_report import MissingFieldsTask
 TOOL_NAME = 'multi_md_pgsql_pipe'
 
 # Version of this tool.
-VERSION = '0.10.0'
+VERSION = '0.11.0'
 
 
 def main (argv=None):
@@ -37,9 +36,6 @@ def main (argv=None):
     # the main method takes no arguments so it can be called by setuptools
     if (argv is None):                      # if called by setuptools
         argv = sys.argv[1:]                 # then fetch the arguments from the system
-
-    # setup logging configuration
-    log.basicConfig(level=LOG_LEVEL)
 
     # setup command line argument parsing and add shared arguments
     parser = argparse.ArgumentParser(
@@ -90,21 +86,32 @@ def main (argv=None):
 
     # call the pipeline on each FITS file in the input directory:
     if (args.get('verbose')):
-        print("({}): Processing FITS files in '{}'".format(TOOL_NAME, input_dir), file=sys.stderr)
+        print("({}): Processing FITS files in '{}'.".format(TOOL_NAME, input_dir), file=sys.stderr)
 
-    proc_count = 0                              # initialize count of processed files
+    proc_count = 0                                # initialize count of processed files
 
     for img_file in gen_fits_file_paths(input_dir):
-        args['fits_file'] = img_file            # reset the FITS file argument to next file
+        args['fits_file'] = img_file              # reset the FITS file argument to next file
 
-        jwst_pgsql_sinkTask.output_results(     # sink: nothing returned
-            miss_reportTask.process(            # report: passes data through
-                jwst_oc_calcTask.process(
-                    fields_infoTask.process(
-                        aliasesTask.process(
-                            fits_headersTask.process(None))))))  # source: creates initial metadata
+        try:
+            jwst_pgsql_sinkTask.output_results(   # sink: nothing returned
+                miss_reportTask.process(          # report: passes data through
+                    jwst_oc_calcTask.process(
+                        fields_infoTask.process(
+                            aliasesTask.process(
+                                fits_headersTask.process(None)))))) # metadata source
 
-        proc_count += 1                         # increment count of processed files
+            proc_count += 1                       # increment count of processed files
+
+        except errors.UnsupportedTypeError as ute:
+            errMsg = "({}): ERROR: Unsupported File Type ({}): {}".format(
+                TOOL_NAME, ute.error_code, ute.message)
+            print(errMsg, file=sys.stderr)
+
+        except errors.ProcessingError as pe:
+            errMsg = "({}): ERROR: Processing Error ({}): {}".format(
+                TOOL_NAME, pe.error_code, pe.message)
+            print(errMsg, file=sys.stderr)
 
     if (args.get('verbose')):
         print("({}): Processed {} FITS files.".format(TOOL_NAME, proc_count), file=sys.stderr)

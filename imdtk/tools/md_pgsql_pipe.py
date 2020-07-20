@@ -2,14 +2,13 @@
 #
 # Python pipeline to extract image metadata and store it into a PostreSQL database.
 #   Written by: Tom Hicks. 6/24/20.
-#   Last Modified: Cleanups, increment version number.
+#   Last Modified: Revamp error handling.
 #
 import argparse
-import logging as log
 import sys
 
+import imdtk.exceptions as errors
 import imdtk.tools.cli_utils as cli_utils
-from config.settings import LOG_LEVEL
 from imdtk.core.fits_utils import FITS_IGNORE_KEYS
 from imdtk.tasks.aliases import AliasesTask
 from imdtk.tasks.fields_info import FieldsInfoTask
@@ -23,7 +22,7 @@ from imdtk.tasks.miss_report import MissingFieldsTask
 TOOL_NAME = 'md_pgsql_pipe'
 
 # Version of this tool.
-VERSION = '0.10.1'
+VERSION = '0.11.0'
 
 
 def main (argv=None):
@@ -36,9 +35,6 @@ def main (argv=None):
     # the main method takes no arguments so it can be called by setuptools
     if (argv is None):                      # if called by setuptools
         argv = sys.argv[1:]                 # then fetch the arguments from the system
-
-    # setup logging configuration
-    log.basicConfig(level=LOG_LEVEL)
 
     # setup command line argument parsing and add shared arguments
     parser = argparse.ArgumentParser(
@@ -87,12 +83,31 @@ def main (argv=None):
     jwst_pgsql_sinkTask = JWST_ObsCorePostgreSQLSink(args)
 
     # compose and call the pipeline tasks
-    jwst_pgsql_sinkTask.output_results(     # sink: nothing returned
-        miss_reportTask.process(            # report: passes data through
-            jwst_oc_calcTask.process(
-                fields_infoTask.process(
-                     aliasesTask.process(
-                         fits_headersTask.process(None))))))  # source: creates initial metadata
+    if (args.get('verbose')):
+        print("({}): Processing FITS file '{}'.".format(TOOL_NAME, fits_file), file=sys.stderr)
+
+    try:
+        jwst_pgsql_sinkTask.output_results(     # sink: nothing returned
+            miss_reportTask.process(            # report: passes data through
+                jwst_oc_calcTask.process(
+                    fields_infoTask.process(
+                        aliasesTask.process(
+                            fits_headersTask.process(None))))))  # metadata source
+
+    except errors.UnsupportedTypeError as ute:
+        errMsg = "({}): ERROR: Unsupported File Type ({}): {}".format(
+            TOOL_NAME, ute.error_code, ute.message)
+        print(errMsg, file=sys.stderr)
+        sys.exit(ute.error_code)
+
+    except errors.ProcessingError as pe:
+        errMsg = "({}): ERROR: Processing Error ({}): {}".format(
+            TOOL_NAME, pe.error_code, pe.message)
+        print(errMsg, file=sys.stderr)
+        sys.exit(pe.error_code)
+
+    if (args.get('verbose')):
+        print("({}): Processed FITS file '{}'.".format(TOOL_NAME, fits_file), file=sys.stderr)
 
 
 

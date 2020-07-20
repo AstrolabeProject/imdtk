@@ -1,25 +1,24 @@
 #
-# Class to extract an image table from a FITS file and output it as JSON.
+# Class to extract image table metadata from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 7/6/2020.
-#   Last Modified: Add column information (metadata) to the returned metadata.
+#   Last Modified: Revamp error handling.
 #
-import logging as log
 import os
 import sys
 
 from astropy.io import fits
 
+import imdtk.exceptions as errors
 import imdtk.core.fits_utils as fits_utils
 from imdtk.tasks.i_task import IImdTask, STDOUT_NAME
-# import imdtk.tasks.metadata_utils as md_utils
 
 
 class FitsTableSourceTask (IImdTask):
-    """ Class to extract an image table from a FITS file and output it as JSON. """
+    """ Class to extract image table metadata from a FITS file and output it as JSON. """
 
     def __init__(self, args):
         """
-        Constructor for the class to extract an image table from a FITS file and output it as JSON.
+        Constructor for the class to extract image table metadta from a FITS file and output it as JSON.
         """
         super().__init__(args)
 
@@ -40,34 +39,27 @@ class FitsTableSourceTask (IImdTask):
 
         # process the given, already validated FITS file
         fits_file = self.args.get('fits_file')
-        if (self._VERBOSE):
-            print("({}): Processing FITS file '{}'".format(self.TOOL_NAME, fits_file), file=sys.stderr)
-
-        ignore_list = self.args.get('ignore_list')
+        ignore_list = self.args.get('ignore_list') or fits_utils.FITS_IGNORE_KEYS
         table_hdu = self.args.get('table_hdu', 1)
 
         try:
             with fits.open(fits_file) as hdus_list:
+                if (not fits_utils.is_catalog_file(hdus_list)):
+                    errMsg = "Skipping non-catalog FITS file '{}'".format(fits_file)
+                    raise errors.UnsupportedTypeError(errMsg)
+
+                hdrs = fits_utils.get_header_fields(hdus_list, table_hdu, ignore_list)
                 cinfo = fits_utils.get_column_info(hdus_list, table_hdu)
-                if (ignore_list):
-                    hdrs = fits_utils.get_header_fields(hdus_list, table_hdu, ignore_list)
-                else:
-                    hdrs = fits_utils.get_header_fields(hdus_list, table_hdu)
 
-            if (hdrs is None):
-                errMsg = "({}.process): Unable to read table metadata from FITS file '{}'.".format(self.TOOL_NAME, fits_file)
-                log.error(errMsg)
-                raise RuntimeError(errMsg)
+        except OSError as oserr:
+            errMsg = "Unable to read table metadata from FITS file '{}': {}.".format(fits_file, oserr)
+            raise errors.ProcessingError(errMsg)
 
-            metadata = self.make_context()    # create overall metadata structure
-            metadata['headers'] = hdrs        # add the headers to the metadata
-            metadata['column_info'] = cinfo   # add column metadata to the metadata
-            return metadata                   # return the results of processing
+        metadata = self.make_context()      # create overall metadata structure
+        metadata['headers'] = hdrs          # add the headers to the metadata
+        metadata['column_info'] = cinfo     # add column metadata to the metadata
+        return metadata                     # return the results of processing
 
-        except Exception as ex:
-            errMsg = "({}.process): Exception while reading from FITS file '{}': {}.".format(self.TOOL_NAME, fits_file, ex)
-            log.error(errMsg)
-            raise RuntimeError(errMsg)
 
 
     #

@@ -3,12 +3,11 @@
 #   Written by: Tom Hicks. 6/17/2020.
 #   Last Modified: Initial creation.
 #
-import os
-import sys
 import configparser
-import logging as log
 import pickle
+import sys
 
+import imdtk.exceptions as errors
 import imdtk.tasks.metadata_utils as md_utils
 from imdtk.tasks.i_task import IImdTask, STDOUT_NAME
 
@@ -43,9 +42,8 @@ class PickleSink (IImdTask):
         elif (outfile is not None):         # else if using the given filepath
             self.output_pickle(metadata, outfile)
         else:                               # else trying to use standard output
-            errMsg = "({}.process): Pickle cannot be written to {}.".format(self.TOOL_NAME, STDOUT_NAME)
-            log.error(errMsg)
-            raise ValueError(errMsg)
+            errMsg = "Pickle cannot be written to {}.".format(STDOUT_NAME)
+            raise errors.ProcessingError(errMsg)
 
         if (self._VERBOSE):
             print("({}): Pickled data output to '{}'".format(self.TOOL_NAME, outfile), file=sys.stderr)

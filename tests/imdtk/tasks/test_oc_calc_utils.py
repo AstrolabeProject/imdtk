@@ -1,6 +1,6 @@
 # Tests for the ObsCore Calculation utilities module.
 #   Written by: Tom Hicks. 7/16/2020.
-#   Last Modified: Add tests for copy_aliased, copy_file_info, set_default.
+#   Last Modified: Revamp error handling.
 #
 import pytest
 from pytest import approx
@@ -8,8 +8,9 @@ from pytest import approx
 from astropy import wcs
 from astropy.io import fits
 
-import imdtk.tasks.oc_calc_utils as utils
 from config.settings import TEST_DIR
+import imdtk.exceptions as errors
+import imdtk.tasks.oc_calc_utils as utils
 
 
 class TestOcCalcUtils(object):
@@ -249,7 +250,7 @@ class TestOcCalcUtils(object):
         with fits.open(self.m13_tstfyl) as hdus:
             wcs_info = wcs.WCS(hdus[0].header)
         wcs_info.wcs.ctype = [ 'BAD', 'AXES' ]    # bad values for axes
-        with pytest.raises(RuntimeError):
+        with pytest.raises(errors.ProcessingError):
             utils.calc_wcs_coordinates(wcs_info, calcs)
         assert len(calcs) == 0
         assert 's_ra' not in calcs

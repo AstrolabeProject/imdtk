@@ -2,15 +2,12 @@
 #
 # Module to pickle incoming data to a file.
 #   Written by: Tom Hicks. 6/17/20.
-#   Last Modified: Update for tools package.
+#   Last Modified: Revamp error handling.
 #
-import os
-import sys
-import logging as log
 import argparse
+import sys
 
 import imdtk.tools.cli_utils as cli_utils
-from config.settings import LOG_LEVEL
 from imdtk.tasks.pickle_sink import PickleSink
 
 
@@ -18,7 +15,7 @@ from imdtk.tasks.pickle_sink import PickleSink
 TOOL_NAME = 'pickle_sink'
 
 # Version of this tool.
-VERSION = '0.10.0'
+VERSION = '0.11.0'
 
 
 def main (argv=None):
@@ -31,9 +28,6 @@ def main (argv=None):
     # the main method takes no arguments so it can be called by setuptools
     if (argv is None):                      # if called by setuptools
         argv = sys.argv[1:]                 # then fetch the arguments from the system
-
-    # setup logging configuration
-    log.basicConfig(level=LOG_LEVEL)
 
     # setup command line argument parsing and add shared arguments
     parser = argparse.ArgumentParser(

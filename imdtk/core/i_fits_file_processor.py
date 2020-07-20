@@ -1,7 +1,7 @@
 #
 # Abstract class defining the interface that all Processor classes must implement.
 #   Written by: Tom Hicks. 4/4/2020.
-#   Last Modified: Move string to value to metadata fields class.
+#   Last Modified: Revamp error handling.
 #
 import abc
 import configparser
@@ -34,14 +34,14 @@ class IFitsFileProcessor (abc.ABC):
 
     def load_db_configuration (self, db_config_file):
         """ Load database configuration parameters from the given DB config filepath. """
-        if (self._VERBOSE):
+        if (self._DEBUG):
             print("(IFitsFileProcessor.load_db_configuration): Loading from DB config file '{}'".format(db_config_file))
 
         config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
         config.read(db_config_file)
         db_config = config['db_properties']
 
-        if (self._VERBOSE):
+        if (self._DEBUG):
             print("(IFitsFileProcessor.load_db_configuration): Read {} DB configuration properties.".format(len(db_config)))
 
         return dict(db_config)
@@ -49,7 +49,7 @@ class IFitsFileProcessor (abc.ABC):
 
     def load_aliases (self, alias_file):
         """ Load field name aliases from the given alias filepath. """
-        if (self._VERBOSE):
+        if (self._DEBUG):
             print("(IFitsFileProcessor.load_aliases): Loading from aliases file '{}'".format(alias_file))
 
         config = configparser.ConfigParser(strict=False, empty_lines_in_values=False)
@@ -57,7 +57,7 @@ class IFitsFileProcessor (abc.ABC):
         config.read(alias_file)
         aliases = config['aliases']
 
-        if (self._VERBOSE):
+        if (self._DEBUG):
             print("(IFitsFileProcessor.load_aliases): Read {} field name aliases.".format(len(aliases)))
 
         return dict(aliases)

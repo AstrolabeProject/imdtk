@@ -1,14 +1,14 @@
 #
 # Abstract class defining the interface for task components.
 #   Written by: Tom Hicks. 5/27/2020.
-#   Last Modified: Redo to remove last abstract task method.
+#   Last Modified: Revamp error handling.
 #
 import datetime
 import json
-import logging as log
 import sys
 
 from config.settings import WORK_DIR
+import imdtk.exceptions as errors
 import imdtk.core.file_utils as file_utils
 import imdtk.tasks.metadata_utils as md_utils
 
@@ -71,8 +71,7 @@ class IImdTask ():
             data = self.input_JSON(input_file)
         else:                               # currently, no other input formats
             errMsg = "({}.process): Invalid input format '{}'.".format(self.TOOL_NAME, input_format)
-            log.error(errMsg)
-            raise ValueError(errMsg)
+            raise errors.ProcessingError(errMsg)
 
         return data                         # return the input data
 
@@ -137,8 +136,7 @@ class IImdTask ():
 
         else:
             errMsg = "({}.process): Invalid output format '{}'.".format(self.TOOL_NAME, out_fmt)
-            log.error(errMsg)
-            raise ValueError(errMsg)
+            raise errors.ProcessingError(errMsg)
 
         if (self._VERBOSE):
             out_dest = outfile if (outfile) else STDOUT_NAME

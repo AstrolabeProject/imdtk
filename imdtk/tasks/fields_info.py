@@ -1,13 +1,11 @@
 #
 # Class to add information about desired fields to the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/2020.
-#   Last Modified: Remove unused imports.
+#   Last Modified: Revamp error handling.
 #
-import os
-import sys
 import configparser
-import logging as log
 import toml
+import sys
 
 from config.settings import DEFAULT_FIELDS_FILEPATH
 from imdtk.tasks.i_task import IImdTask
@@ -37,12 +35,12 @@ class FieldsInfoTask (IImdTask):
 
         # load the field information from a given file path or a default resource path
         fields_file = self.args.get('fields_file') or DEFAULT_FIELDS_FILEPATH
-        if (self._VERBOSE):
+        if (self._DEBUG):
             print("({}): Loading from fields info file '{}'".format(self.TOOL_NAME, fields_file), file=sys.stderr)
 
         fields_info = self.load_fields_info(fields_file)
 
-        if (self._VERBOSE):
+        if (self._DEBUG):
             print("({}): Read {} fields.".format(self.TOOL_NAME, len(fields_info)), file=sys.stderr)
 
         metadata['fields_info'] = fields_info # add field information to metadata

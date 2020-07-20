@@ -1,14 +1,14 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: Rename this task.
+#   Last Modified: Revamp error handling.
 #
 import os
 import sys
-import logging as log
 
 from astropy.io import fits
 
+import imdtk.exceptions as errors
 import imdtk.core.fits_utils as fits_utils
 from imdtk.tasks.i_task import IImdTask, STDOUT_NAME
 
@@ -39,32 +39,25 @@ class FitsHeadersSourceTask (IImdTask):
 
         # process the given, already validated FITS file
         fits_file = self.args.get('fits_file')
-        if (self._VERBOSE):
-            print("({}): Processing FITS file '{}'".format(self.TOOL_NAME, fits_file), file=sys.stderr)
-
-        ignore_list = self.args.get('ignore_list')
+        ignore_list = self.args.get('ignore_list') or fits_utils.FITS_IGNORE_KEYS
         which_hdu = self.args.get('which_hdu', 0)
 
         try:
             with fits.open(fits_file) as hdus_list:
-                if (ignore_list):
-                    hdrs = fits_utils.get_header_fields(hdus_list, which_hdu, ignore_list)
-                else:
-                    hdrs = fits_utils.get_header_fields(hdus_list, which_hdu)
+                if (fits_utils.is_catalog_file(hdus_list)):
+                    errMsg = "Skipping FITS catalog '{}'".format(fits_file)
+                    raise errors.UnsupportedTypeError(errMsg)
 
-            if (hdrs is None):
-                errMsg = "({}.process): Unable to read metadata from FITS file '{}'.".format(self.TOOL_NAME, fits_file)
-                log.error(errMsg)
-                raise RuntimeError(errMsg)
+                hdrs = fits_utils.get_header_fields(hdus_list, which_hdu, ignore_list)
 
-            metadata = self.make_context()  # create larger metadata structure
-            metadata['headers'] = hdrs      # add the headers to the metadata
-            return metadata                 # return the results of processing
+        except OSError as oserr:
+            errMsg = "Unable to read image metadata from FITS file '{}': {}.".format(fits_file, oserr)
+            raise errors.ProcessingError(errMsg)
 
-        except Exception as ex:
-            errMsg = "({}.process): Exception while reading metadata from FITS file '{}': {}.".format(self.TOOL_NAME, fits_file, ex)
-            log.error(errMsg)
-            raise RuntimeError(errMsg)
+        metadata = self.make_context()      # create overall metadata structure
+        metadata['headers'] = hdrs          # add the headers to the metadata
+        return metadata                     # return the results of processing
+
 
 
     #

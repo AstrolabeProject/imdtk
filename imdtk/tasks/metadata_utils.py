@@ -1,9 +1,8 @@
 #
 # Utilities to the various metadata components in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/2020.
-#   Last Modified: Add get_calculated.
+#   Last Modified: Remove unused import.
 #
-import os
 import sys
 
 

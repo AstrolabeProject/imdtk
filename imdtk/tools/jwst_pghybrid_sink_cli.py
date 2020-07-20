@@ -2,14 +2,13 @@
 #
 # Module to store incoming data in a Hybrid PostgreSQL database.
 #   Written by: Tom Hicks. 7/3/2020.
-#   Last Modified: Update for tools package.
+#   Last Modified: Revamp error handling.
 #
-import sys
-import logging as log
 import argparse
+import sys
 
 import imdtk.tools.cli_utils as cli_utils
-from config.settings import LOG_LEVEL, DEFAULT_HYBRID_TABLE_NAME
+from config.settings import DEFAULT_HYBRID_TABLE_NAME
 from imdtk.tasks.jwst_pghybrid_sink import JWST_HybridPostgreSQLSink
 
 
@@ -17,7 +16,7 @@ from imdtk.tasks.jwst_pghybrid_sink import JWST_HybridPostgreSQLSink
 TOOL_NAME = 'jwst_pghybrid_sink'
 
 # Version of this tool.
-VERSION = '0.10.0'
+VERSION = '0.11.0'
 
 
 def main (argv=None):
@@ -30,9 +29,6 @@ def main (argv=None):
     # the main method takes no arguments so it can be called by setuptools
     if (argv is None):                      # if called by setuptools
         argv = sys.argv[1:]                 # then fetch the arguments from the system
-
-    # setup logging configuration
-    log.basicConfig(level=LOG_LEVEL)
 
     # setup command line argument parsing and add shared arguments
     parser = argparse.ArgumentParser(

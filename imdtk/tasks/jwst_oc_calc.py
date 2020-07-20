@@ -1,19 +1,18 @@
 #
 # Class to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/2020.
-#   Last Modified: Remove unused imports.
+#   Last Modified: Revamp error handling.
 #
-import os
 import sys
-import logging as log
 
 from astropy.io import fits
 
 from config.settings import IMAGE_FETCH_PREFIX, IMAGES_DIR
-from imdtk.tasks.i_oc_calc import IObsCoreCalcTask
+import imdtk.exceptions as errors
 import imdtk.core.fits_utils as fits_utils
 import imdtk.tasks.metadata_utils as md_utils
 import imdtk.tasks.oc_calc_utils as occ_utils
+from imdtk.tasks.i_oc_calc import IObsCoreCalcTask
 
 
 class JWST_ObsCoreCalcTask (IObsCoreCalcTask):
@@ -54,18 +53,23 @@ class JWST_ObsCoreCalcTask (IObsCoreCalcTask):
 
         # process the given, already validated FITS file
         fits_file = self.args.get('fits_file')
-        if (self._VERBOSE):
+        if (self._DEBUG):
             print("({}): Reading FITS file '{}'".format(self.TOOL_NAME, fits_file), file=sys.stderr)
 
         # compute the WCS information from the specified HDU of the FITS file
         which_hdu = self.args.get('which_hdu', 0)
-        with fits.open(fits_file) as hdus_list:
-            wcs_info = fits_utils.get_WCS(hdus_list, which_hdu)
+
+        try:
+            with fits.open(fits_file) as hdus_list:
+                wcs_info = fits_utils.get_WCS(hdus_list, which_hdu)
+
+        except OSError as oserr:
+            errMsg = "Unable to read WCS info FITS file '{}': {}.".format(fits_file, oserr)
+            raise errors.ProcessingError(errMsg)
 
         if (wcs_info is None):
-            errMsg = "({}.process): Unable to read WCS info from FITS file '{}'.".format(self.TOOL_NAME, fits_file)
-            log.error(errMsg)
-            raise RuntimeError(errMsg)
+            errMsg = "No WCS info found in FITS file '{}'.".format(fits_file)
+            raise errors.ProcessingError(errMsg)
 
         # try to produce values for each of the desired result fields
         calculated = self.calculate_results(wcs_info, metadata)

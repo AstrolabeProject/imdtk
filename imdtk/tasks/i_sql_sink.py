@@ -1,10 +1,8 @@
 #
 # Class defining interface methods to store incoming data to an SQL database.
 #   Written by: Tom Hicks. 6/21/2020.
-#   Last Modified: Update for rename of this class.
+#   Last Modified: Remove unused imports.
 #
-import os
-import sys
 import configparser
 
 from imdtk.tasks.i_task import IImdTask

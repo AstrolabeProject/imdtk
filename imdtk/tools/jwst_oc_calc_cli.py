@@ -2,14 +2,13 @@
 #
 # Module to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/11/2020.
-#   Last Modified: Update for tools package.
+#   Last Modified: Revamp error handling.
 #
-import os, sys
-import logging as log
 import argparse
+import sys
 
+import imdtk.exceptions as errors
 import imdtk.tools.cli_utils as cli_utils
-from config.settings import LOG_LEVEL
 from imdtk.tasks.jwst_oc_calc import JWST_ObsCoreCalcTask
 
 
@@ -17,7 +16,7 @@ from imdtk.tasks.jwst_oc_calc import JWST_ObsCoreCalcTask
 TOOL_NAME = 'jwst_oc_calc'
 
 # Version of this tool.
-VERSION = '0.10.0'
+VERSION = '0.11.0'
 
 
 def main (argv=None):
@@ -30,9 +29,6 @@ def main (argv=None):
     # the main method takes no arguments so it can be called by setuptools
     if (argv is None):                      # if called by setuptools
         argv = sys.argv[1:]                 # then fetch the arguments from the system
-
-    # setup logging configuration
-    log.basicConfig(level=LOG_LEVEL)
 
     # setup command line argument parsing and add shared arguments
     parser = argparse.ArgumentParser(
@@ -68,8 +64,15 @@ def main (argv=None):
     args['VERSION'] = VERSION
 
     # call the task layer to process the given, validated files
-    tool = JWST_ObsCoreCalcTask(args)
-    tool.input_process_output()
+    try:
+        tool = JWST_ObsCoreCalcTask(args)
+        tool.input_process_output()
+
+    except errors.ProcessingError as pe:
+        errMsg = "({}): ERROR: Processing Error ({}): {}".format(
+            TOOL_NAME, pe.error_code, pe.message)
+        print(errMsg, file=sys.stderr)
+        sys.exit(pe.error_code)
 
 
 

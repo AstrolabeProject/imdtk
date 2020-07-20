@@ -2,15 +2,13 @@
 #
 # Module to extract an image table from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 7/6/2020.
-#   Last Modified: Update for tools package.
+#   Last Modified: Revamp error handling.
 #
 import argparse
-import logging as log
-import os
 import sys
 
+import imdtk.exceptions as errors
 import imdtk.tools.cli_utils as cli_utils
-from config.settings import LOG_LEVEL
 from imdtk.tasks.fits_table import FitsTableSourceTask
 
 
@@ -18,7 +16,7 @@ from imdtk.tasks.fits_table import FitsTableSourceTask
 TOOL_NAME = 'fits_table'
 
 # Version of this tool.
-VERSION = '0.10.0'
+VERSION = '0.11.0'
 
 
 def main (argv=None):
@@ -31,9 +29,6 @@ def main (argv=None):
     # the main method takes no arguments so it can be called by setuptools
     if (argv is None):                      # if called by setuptools
         argv = sys.argv[1:]                 # then fetch the arguments from the system
-
-    # setup logging configuration
-    log.basicConfig(level=LOG_LEVEL)
 
     # setup command line argument parsing and add shared arguments
     parser = argparse.ArgumentParser(
@@ -70,8 +65,27 @@ def main (argv=None):
     args['VERSION'] = VERSION
 
     # call the task layer to process the given, validated FITS file
-    tool = FitsTableSourceTask(args)
-    tool.process_and_output()
+    if (args.get('verbose')):
+        print("({}): Processing FITS file '{}'.".format(TOOL_NAME, fits_file), file=sys.stderr)
+
+    try:
+        tool = FitsTableSourceTask(args)
+        tool.process_and_output()
+
+    except errors.UnsupportedTypeError as ute:
+        errMsg = "({}): ERROR: Unsupported File Type ({}): {}".format(
+            TOOL_NAME, ute.error_code, ute.message)
+        print(errMsg, file=sys.stderr)
+        sys.exit(ute.error_code)
+
+    except errors.ProcessingError as pe:
+        errMsg = "({}): ERROR: Processing Error ({}): {}".format(
+            TOOL_NAME, pe.error_code, pe.message)
+        print(errMsg, file=sys.stderr)
+        sys.exit(pe.error_code)
+
+    if (args.get('verbose')):
+        print("({}): Processed FITS file '{}'.".format(TOOL_NAME, fits_file), file=sys.stderr)
 
 
 

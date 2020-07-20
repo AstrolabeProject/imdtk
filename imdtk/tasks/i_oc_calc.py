@@ -1,10 +1,8 @@
 #
 # Class to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/14/2020.
-#   Last Modified: Copy file information to calculations.
+#   Last Modified: Remove unused imports.
 #
-import os
-import sys
 import abc
 
 from imdtk.tasks.i_task import IImdTask

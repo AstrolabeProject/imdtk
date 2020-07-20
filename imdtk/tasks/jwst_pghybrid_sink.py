@@ -1,15 +1,15 @@
 #
 # Class to sink incoming image metadata to a Hybrid (SQL/JSON) PostgreSQL database.
 #   Written by: Tom Hicks. 7/3/2020.
-#   Last Modified: Update for rename of SQL interface class.
+#   Last Modified: Revamp error handling.
 #
 import json
-import logging as log
 import psycopg2
 import sys
 
-import imdtk.tasks.metadata_utils as md_utils
 from config.settings import DEFAULT_DBCONFIG_FILEPATH, DEFAULT_HYBRID_TABLE_NAME
+import imdtk.exceptions as errors
+import imdtk.tasks.metadata_utils as md_utils
 from imdtk.tasks.i_task import STDOUT_NAME
 from imdtk.tasks.i_sql_sink import ISQLSink, SQL_EXTENSION
 
@@ -60,12 +60,12 @@ class JWST_HybridPostgreSQLSink (ISQLSink):
 
     def load_db_config (self, dbconfig_file):
         """ Load the database configuration from the given filepath. """
-        if (self._VERBOSE):
+        if (self._DEBUG):
             print("({}): Reading DB configuration file '{}'".format(self.TOOL_NAME, dbconfig_file), file=sys.stderr)
 
         dbconfig = self.load_db_configuration(dbconfig_file)
 
-        if (self._VERBOSE):
+        if (self._DEBUG):
             print("({}): Read {} DB configuration properties.".format(self.TOOL_NAME, len(dbconfig)), file=sys.stderr)
 
         return dbconfig
@@ -157,15 +157,13 @@ class JWST_HybridPostgreSQLSink (ISQLSink):
         dbconfig_file = self.args.get('dbconfig_file') or DEFAULT_DBCONFIG_FILEPATH
         dbconfig = self.load_db_config(dbconfig_file)
         if (not dbconfig):
-            errMsg = "({}.store_results): DB storage specified but no database configuration parameters found.".format(self.TOOL_NAME)
-            log.error(errMsg)
-            raise RuntimeError(errMsg)
+            errMsg = 'DB storage specified but no database configuration parameters found.'
+            raise errors.ProcessingError(errMsg)
 
         db_uri = dbconfig.get('db_uri')
         if (not db_uri):
-            errMsg = "({}.store_results): DB storage specified but no database URI (db_uri) parameter found.".format(self.TOOL_NAME)
-            log.error(errMsg)
-            raise RuntimeError(errMsg)
+            errMsg = 'DB storage specified but no database URI (db_uri) parameter found.'
+            raise errors.ProcessingError(errMsg)
 
         # open database connection and store the data
         db_connection = psycopg2.connect(db_uri)

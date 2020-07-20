@@ -1,10 +1,9 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Add type attribute to HDU argument.
+#   Last Modified: Revamp error handling.
 #
 import argparse
-import logging as log
 import sys
 
 from config.settings import DEFAULT_ALIASES_FILEPATH, DEFAULT_DBCONFIG_FILEPATH
@@ -183,7 +182,6 @@ def check_alias_file (alias_file, tool_name, exit_code=30):
     if (alias_file):                        # if aliases file given, check it
         if (not good_file_path(alias_file)):
             errMsg = "({}): A readable aliases file must be specified. Exiting...".format(tool_name)
-            log.error(errMsg)
             print(errMsg, file=sys.stderr)
             sys.exit(exit_code)
 
@@ -196,7 +194,6 @@ def check_dbconfig_file (dbconfig_file, tool_name, exit_code=31):
     if (dbconfig_file):                     # if DB configuration file given, check it
         if (not good_file_path(dbconfig_file)):
             errMsg = "({}): A readable database configuration file must be specified. Exiting...".format(tool_name)
-            log.error(errMsg)
             print(errMsg, file=sys.stderr)
             sys.exit(exit_code)
 
@@ -209,7 +206,6 @@ def check_fields_file (fields_file, tool_name, exit_code=32):
     if (fields_file):                       # if fields info file given, check it
         if (not good_file_path(fields_file)):
             errMsg = "({}): A readable fields information file must be specified. Exiting...".format(tool_name)
-            log.error(errMsg)
             print(errMsg, file=sys.stderr)
             sys.exit(exit_code)
 
@@ -221,7 +217,6 @@ def check_fits_file (fits_file, tool_name, exit_code=21):
     """
     if (not validate_file_path(fits_file, FITS_EXTENTS)):
         errMsg = "({}): A readable, valid FITS image file must be specified. Exiting...".format(tool_name)
-        log.error(errMsg)
         print(errMsg, file=sys.stderr)
         sys.exit(exit_code)
 
@@ -233,7 +228,6 @@ def check_input_dir (input_dir, tool_name, exit_code=22):
     """
     if (not good_dir_path(input_dir)):
         errMsg = "({}): A readable input directory must be specified. Exiting...".format(tool_name)
-        log.error(errMsg)
         print(errMsg, file=sys.stderr)
         sys.exit(exit_code)
 
@@ -246,6 +240,5 @@ def check_input_file (input_file, tool_name, exit_code=20):
     if (input_file):                        # if input file given, check it
         if (not good_file_path(input_file)):
             errMsg = "({}): A readable, valid input data file must be specified. Exiting...".format(tool_name)
-            log.error(errMsg)
             print(errMsg, file=sys.stderr)
             sys.exit(exit_code)

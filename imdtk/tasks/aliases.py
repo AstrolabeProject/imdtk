@@ -1,12 +1,10 @@
 #
 # Class to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/29/2020.
-#   Last Modified: Remove unused imports.
+#   Last Modified: Revamp error handling.
 #
-import os
-import sys
 import configparser
-import logging as log
+import sys
 
 from config.settings import DEFAULT_ALIASES_FILEPATH
 import imdtk.tasks.metadata_utils as md_utils
@@ -64,7 +62,7 @@ class AliasesTask (IImdTask):
 
     def load_aliases (self, alias_file):
         """ Load field name aliases from the given alias filepath. """
-        if (self._VERBOSE):
+        if (self._DEBUG):
             print("({}): Loading from aliases file '{}'".format(self.TOOL_NAME, alias_file), file=sys.stderr)
 
         config = configparser.ConfigParser(strict=False, empty_lines_in_values=False)
@@ -72,6 +70,6 @@ class AliasesTask (IImdTask):
         config.read(alias_file)
         aliases = config['aliases']
 
-        if (self._VERBOSE):
+        if (self._DEBUG):
             print("({}): Read {} field name aliases.".format(self.TOOL_NAME, len(aliases)), file=sys.stderr)
         return dict(aliases)
