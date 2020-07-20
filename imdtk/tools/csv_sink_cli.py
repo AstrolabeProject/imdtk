@@ -2,11 +2,12 @@
 #
 # Module to output incoming data to a CSV file.
 #   Written by: Tom Hicks. 6/26/20.
-#   Last Modified: Revamp error handling.
+#   Last Modified: Revamp error handling: catch exceptions.
 #
 import argparse
 import sys
 
+import imdtk.exceptions as errors
 import imdtk.tools.cli_utils as cli_utils
 from imdtk.tasks.csv_sink import CSVSink
 
@@ -57,8 +58,15 @@ def main (argv=None):
     args['VERSION'] = VERSION
 
     # call the task layer to process the given, validated input file
-    task = CSVSink(args)
-    task.input_process_output()
+    try:
+        task = CSVSink(args)
+        task.input_process_output()
+
+    except errors.ProcessingError as pe:
+        errMsg = "({}): ERROR: Processing Error ({}): {}".format(
+            TOOL_NAME, pe.error_code, pe.message)
+        print(errMsg, file=sys.stderr)
+        sys.exit(pe.error_code)
 
 
 

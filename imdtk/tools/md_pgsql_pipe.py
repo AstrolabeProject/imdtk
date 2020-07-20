@@ -2,7 +2,7 @@
 #
 # Python pipeline to extract image metadata and store it into a PostreSQL database.
 #   Written by: Tom Hicks. 6/24/20.
-#   Last Modified: Revamp error handling.
+#   Last Modified: Revamp error handling: info not error.
 #
 import argparse
 import sys
@@ -95,7 +95,7 @@ def main (argv=None):
                             fits_headersTask.process(None))))))  # metadata source
 
     except errors.UnsupportedTypeError as ute:
-        errMsg = "({}): ERROR: Unsupported File Type ({}): {}".format(
+        errMsg = "({}): INFO: Unsupported File Type ({}): {}".format(
             TOOL_NAME, ute.error_code, ute.message)
         print(errMsg, file=sys.stderr)
         sys.exit(ute.error_code)

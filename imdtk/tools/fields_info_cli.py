@@ -2,11 +2,12 @@
 #
 # Module to add information about desired fields to the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/20.
-#   Last Modified: Revamp error handling.
+#   Last Modified: Revamp error handling: catch exceptions.
 #
 import argparse
 import sys
 
+import imdtk.exceptions as errors
 import imdtk.tools.cli_utils as cli_utils
 from imdtk.tasks.fields_info import FieldsInfoTask
 
@@ -62,8 +63,15 @@ def main (argv=None):
     args['VERSION'] = VERSION
 
     # call the task layer to process the given, validated input file
-    tool = FieldsInfoTask(args)
-    tool.input_process_output()
+    try:
+        tool = FieldsInfoTask(args)
+        tool.input_process_output()
+
+    except errors.ProcessingError as pe:
+        errMsg = "({}): ERROR: Processing Error ({}): {}".format(
+            TOOL_NAME, pe.error_code, pe.message)
+        print(errMsg, file=sys.stderr)
+        sys.exit(pe.error_code)
 
 
 

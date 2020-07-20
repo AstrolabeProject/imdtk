@@ -2,13 +2,14 @@
 #
 # Module to store incoming data in a Hybrid PostgreSQL database.
 #   Written by: Tom Hicks. 7/3/2020.
-#   Last Modified: Revamp error handling.
+#   Last Modified: Revamp error handling: catch exceptions.
 #
 import argparse
 import sys
 
-import imdtk.tools.cli_utils as cli_utils
 from config.settings import DEFAULT_HYBRID_TABLE_NAME
+import imdtk.exceptions as errors
+import imdtk.tools.cli_utils as cli_utils
 from imdtk.tasks.jwst_pghybrid_sink import JWST_HybridPostgreSQLSink
 
 
@@ -63,8 +64,15 @@ def main (argv=None):
     args['VERSION'] = VERSION
 
     # call the task layer to process the given, validated input file
-    tool = JWST_HybridPostgreSQLSink(args)
-    tool.input_process_output()
+    try:
+        tool = JWST_HybridPostgreSQLSink(args)
+        tool.input_process_output()
+
+    except errors.ProcessingError as pe:
+        errMsg = "({}): ERROR: Processing Error ({}): {}".format(
+            TOOL_NAME, pe.error_code, pe.message)
+        print(errMsg, file=sys.stderr)
+        sys.exit(pe.error_code)
 
 
 

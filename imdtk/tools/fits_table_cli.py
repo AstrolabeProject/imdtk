@@ -2,7 +2,7 @@
 #
 # Module to extract an image table from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 7/6/2020.
-#   Last Modified: Revamp error handling.
+#   Last Modified: Revamp error handling: info not error.
 #
 import argparse
 import sys
@@ -73,7 +73,7 @@ def main (argv=None):
         tool.process_and_output()
 
     except errors.UnsupportedTypeError as ute:
-        errMsg = "({}): ERROR: Unsupported File Type ({}): {}".format(
+        errMsg = "({}): INFO: Unsupported File Type ({}): {}".format(
             TOOL_NAME, ute.error_code, ute.message)
         print(errMsg, file=sys.stderr)
         sys.exit(ute.error_code)
