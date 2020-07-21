@@ -8,6 +8,7 @@
 .vscode
 /catalogs
 /images
+/imgtmp
 /out
 /work
 Dockerfile

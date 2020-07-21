@@ -97,6 +97,7 @@ imdtk.code-workspace
 
 # Application specific directories
 /images
+/imgtmp
 /catalogs
 /out
 /work
