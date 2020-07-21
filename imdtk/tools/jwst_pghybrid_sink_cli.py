@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Module to store incoming data in a Hybrid PostgreSQL database.
+# Module to store incoming data in a hybrid PostgreSQL/JSON database.
 #   Written by: Tom Hicks. 7/3/2020.
 #   Last Modified: Revamp error handling: catch exceptions.
 #

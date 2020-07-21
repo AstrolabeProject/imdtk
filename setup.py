@@ -19,7 +19,8 @@ setup(
             'jwst_pgsql_sink = imdtk.tools.jwst_pgsql_sink_cli:main',
             'md_pgsql_pipe   = imdtk.tools.md_pgsql_pipe:main',
             'miss_report     = imdtk.tools.miss_report_cli:main',
-            'multi_md_pgsql_pipe = imdtk.tools.multi_md_pgsql_pipe:main',
+            'multi_md_pghybrid_pipe = imdtk.tools.multi_md_pghybrid_pipe:main',
+            'multi_md_pgsql_pipe    = imdtk.tools.multi_md_pgsql_pipe:main',
             'no_op           = imdtk.tools.nop_cli:main',
             'pickle_sink     = imdtk.tools.pickle_sink_cli:main'
         ]
