@@ -1,7 +1,7 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Revamp error handling.
+#   Last Modified: Remove unused output sink argument.
 #
 import argparse
 import sys
@@ -117,13 +117,6 @@ def add_output_arguments (parser, tool_name, version):
         default=False,
         help='Automatically generate the output filename and path. [default: False].'
     )
-
-    # parser.add_argument(
-    #     '-os', '--output-sink', dest='output_sink', nargs='?',
-    #     default='stdout',
-    #     choices=['file', 'genfile', 'stdout'],
-    #     help='Where to send the results of processing [default: stdout (standard output)]'
-    # )
 
     parser.add_argument(
         '-of', '--output-file', dest='output_file', metavar='filepath',
