@@ -270,11 +270,29 @@ echo "Multiple FITS metadata to PostgreSQL JWST table pipeline:"
 echo "--------------------------------------------"
 multi_md_pgsql_pipe -idir /tmp -c JADES -sql -g -v
 echo "--------------------------------------------"
+# multi_md_pgsql_pipe -idir /images/JADES -v
 # multi_md_pgsql_pipe -idir /images/JADES -sql -g -v
 echo "--------------------------------------------"
+# multi_md_pgsql_pipe -idir /images/DC_191217 -v
 # multi_md_pgsql_pipe -idir /images/DC_191217 -sql -g -v
 echo "--------------------------------------------"
+# multi_md_pgsql_pipe -idir /images -v
 # multi_md_pgsql_pipe -idir /images -sql -g -v
+
+
+echo "============================================"
+echo "Multiple FITS metadata to hybrid PostgreSQL/JSON JWST table pipeline:"
+echo "--------------------------------------------"
+multi_md_pghybrid_pipe -idir /tmp -c JADES -sql -g -v
+echo "--------------------------------------------"
+# multi_md_pghybrid_pipe -idir /images/JADES -v
+# multi_md_pghybrid_pipe -idir /images/JADES -sql -g -v
+echo "--------------------------------------------"
+# multi_md_pghybrid_pipe -idir /images/DC_191217 -v
+# multi_md_pghybrid_pipe -idir /images/DC_191217 -sql -g -v
+echo "--------------------------------------------"
+# multi_md_pghybrid_pipe -idir /images -c ALLIMGS -v
+# multi_md_pghybrid_pipe -idir /images -c ALLIMGS -sql -g -v
 
 
 echo "============================================"
