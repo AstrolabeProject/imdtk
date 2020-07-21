@@ -1,7 +1,7 @@
 #
 # Abstract class defining the interface for task components.
 #   Written by: Tom Hicks. 5/27/2020.
-#   Last Modified: Revamp error handling.
+#   Last Modified: Use default output format constant.
 #
 import datetime
 import json
@@ -121,7 +121,7 @@ class IImdTask ():
         """ Output the given metadata in the configured output format. """
         genfile = self.args.get('gen_file_path')
         outfile = self.args.get('output_file')
-        out_fmt = self.args.get('output_format') or 'json'
+        out_fmt = self.args.get('output_format') or DEFAULT_OUTPUT_FORMAT
 
         if (out_fmt == 'json'):
             if (genfile):                   # if generating the output filename/path
