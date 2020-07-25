@@ -1,7 +1,7 @@
 #
 # Class to sink incoming image metadata to a Hybrid (SQL/JSON) PostgreSQL database.
 #   Written by: Tom Hicks. 7/3/2020.
-#   Last Modified: Revamp error handling.
+#   Last Modified: WIP: refactor some non-DB specific SQL methods to parent SQL class.
 #
 import json
 import psycopg2
@@ -57,41 +57,6 @@ class JWST_HybridPostgreSQLSink (ISQLSink):
     #
     # Non-interface and/or task-specific Methods
     #
-
-    def load_db_config (self, dbconfig_file):
-        """ Load the database configuration from the given filepath. """
-        if (self._DEBUG):
-            print("({}): Reading DB configuration file '{}'".format(self.TOOL_NAME, dbconfig_file), file=sys.stderr)
-
-        dbconfig = self.load_db_configuration(dbconfig_file)
-
-        if (self._DEBUG):
-            print("({}): Read {} DB configuration properties.".format(self.TOOL_NAME, len(dbconfig)), file=sys.stderr)
-
-        return dbconfig
-
-
-    def file_info_to_comment_string (self, file_name, file_size, file_path):
-        """
-        Return an SQL comment string containing the given file information.
-        """
-        buf = self.SQL_COMMENT + ' '    # generating an SQL comment line
-        if (file_name is not None):
-            buf += file_name + ' '
-        if (file_size is not None):
-            buf += str(file_size) + ' '
-        if (file_path is not None):
-            buf += file_path
-        return buf                          # return formatted comment line
-
-
-    def make_file_info_comment (self, file_info):
-        """ Return a string containing information about the input file, formatted as a comment. """
-        fname = file_info.get('file_name') if file_info else "NO_FILENAME"
-        fsize = file_info.get('file_size') if file_info else 0
-        fpath = file_info.get('file_path') if file_info else None
-        return self.file_info_to_comment_string(fname, fsize, fpath)
-
 
     def make_sql_insert_db (self, datadict, table_name):
         """
@@ -208,7 +173,7 @@ class JWST_HybridPostgreSQLSink (ISQLSink):
         """
         table_name = self.args.get('table_name') or DEFAULT_HYBRID_TABLE_NAME
 
-        if ((file_path is None) or (file_path == sys.stdout)):  # if writing to standard output
+        if ((file_path is None) or (file_path == sys.stdout)): # if writing to standard output
             sys.stdout.write(self.make_file_info_comment(file_info))
             sys.stdout.write('\n')
             sys.stdout.write(self.make_sql_insert_string(outdata, table_name))

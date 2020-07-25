@@ -1,7 +1,7 @@
 #
 # Class defining interface methods to store incoming data to an SQL database.
 #   Written by: Tom Hicks. 6/21/2020.
-#   Last Modified: Remove unused imports.
+#   Last Modified: WIP: refactor some non-DB specific SQL methods here.
 #
 import configparser
 
@@ -35,7 +35,31 @@ class ISQLSink (IImdTask):
     # Non-interface and/or sink-specific Methods
     #
 
-    def load_db_configuration (self, dbconfig_file):
+    def file_info_to_comment_string (self, file_name, file_size, file_path):
+        """
+        Return an SQL comment string containing the given file information.
+        """
+        buf = self.SQL_COMMENT + ' '    # generating an SQL comment line
+        if (file_name is not None):
+            buf += file_name + ' '
+        if (file_size is not None):
+            buf += str(file_size) + ' '
+        if (file_path is not None):
+            buf += file_path
+        return buf                          # return formatted comment line
+
+
+    def load_db_configation (self, dbconfig_file):
+        """ Load the database configuration from the given filepath. """
+        if (self._DEBUG):
+            print("({}): Reading DB configuration file '{}'".format(self.TOOL_NAME, dbconfig_file), file=sys.stderr)
+        dbconfig = self.load_db_config_file(dbconfig_file)
+        if (self._DEBUG):
+            print("({}): Read {} DB configuration properties.".format(self.TOOL_NAME, len(dbconfig)), file=sys.stderr)
+        return dbconfig
+
+
+    def load_db_config_file (self, dbconfig_file):
         """
         Load the database configuration from the given filepath. Returns a dictionary
         of database configuration parameters.
@@ -45,3 +69,11 @@ class ISQLSink (IImdTask):
         config.read(dbconfig_file)
         dbconfig = config['db_properties']
         return dict(dbconfig)
+
+
+    def make_file_info_comment (self, file_info):
+        """ Return a string containing information about the input file, formatted as a comment. """
+        fname = file_info.get('file_name') if file_info else "NO_FILENAME"
+        fsize = file_info.get('file_size') if file_info else 0
+        fpath = file_info.get('file_path') if file_info else None
+        return self.file_info_to_comment_string(fname, fsize, fpath)

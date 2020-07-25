@@ -1,7 +1,7 @@
 #
-# Class to sink incoming ObsCore metadata to a PostgreSQL database.
+# Class to sink incoming image metadata to a PostgreSQL database.
 #   Written by: Tom Hicks. 6/21/2020.
-#   Last Modified: Revamp error handling.
+#   Last Modified: WIP: refactor some non-DB specific SQL methods to parent SQL class.
 #
 import psycopg2
 import sys
@@ -15,7 +15,7 @@ from imdtk.tasks.i_sql_sink import ISQLSink, SQL_EXTENSION
 
 
 class JWST_ObsCorePostgreSQLSink (ISQLSink):
-    """ Class to sink incoming ObsCore metadata to a PostgreSQL database. """
+    """ Class to sink incoming image metadata to a PostgreSQL database. """
 
     # List of column names to skip when outputting column values.
     skipColumnList = [ 'file_size' ]
@@ -23,7 +23,7 @@ class JWST_ObsCorePostgreSQLSink (ISQLSink):
 
     def __init__(self, args):
         """
-        Constructor for class to sink incoming ObsCore metadata to a PostgreSQL database.
+        Constructor for class to sink incoming image metadata to a PostgreSQL database.
         """
         super().__init__(args)
 
@@ -57,41 +57,6 @@ class JWST_ObsCorePostgreSQLSink (ISQLSink):
     #
     # Non-interface and/or task-specific Methods
     #
-
-    def load_db_config (self, dbconfig_file):
-        """ Load the database configuration from the given filepath. """
-        if (self._DEBUG):
-            print("({}): Reading DB configuration file '{}'".format(self.TOOL_NAME, dbconfig_file), file=sys.stderr)
-
-        dbconfig = self.load_db_configuration(dbconfig_file)
-
-        if (self._DEBUG):
-            print("({}): Read {} DB configuration properties.".format(self.TOOL_NAME, len(dbconfig)), file=sys.stderr)
-
-        return dbconfig
-
-
-    def file_info_to_comment_string (self, file_name, file_size, file_path):
-        """
-        Return an SQL comment string containing the given file information.
-        """
-        buf = self.SQL_COMMENT + ' '    # generating an SQL comment line
-        if (file_name is not None):
-            buf += file_name + ' '
-        if (file_size is not None):
-            buf += str(file_size) + ' '
-        if (file_path is not None):
-            buf += file_path
-        return buf                          # return formatted comment line
-
-
-    def make_file_info_comment (self, file_info):
-        """ Return a string containing information about the input file, formatted as a comment. """
-        fname = file_info.get('file_name') if file_info else "NO_FILENAME"
-        fsize = file_info.get('file_size') if file_info else 0
-        fpath = file_info.get('file_path') if file_info else None
-        return self.file_info_to_comment_string(fname, fsize, fpath)
-
 
     def make_sql_insert_db (self, datadict, table_name):
         """
