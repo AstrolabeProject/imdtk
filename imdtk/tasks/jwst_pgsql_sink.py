@@ -1,15 +1,16 @@
 #
 # Class to sink incoming image metadata to a PostgreSQL database.
 #   Written by: Tom Hicks. 6/21/2020.
-#   Last Modified: WIP: refactor some non-DB specific SQL methods to parent SQL class.
+#   Last Modified: Refactor some PG-specific SQL methods to pg_sql module.
 #
 import psycopg2
 import sys
 
 from config.settings import DEFAULT_DBCONFIG_FILEPATH, DEFAULT_METADATA_TABLE_NAME
 import imdtk.exceptions as errors
-import imdtk.core.misc_utils as misc_utils
+import imdtk.core.pg_sql as pg_sql
 import imdtk.tasks.metadata_utils as md_utils
+from imdtk.core.misc_utils import remove_entries
 from imdtk.tasks.i_task import STDOUT_NAME
 from imdtk.tasks.i_sql_sink import ISQLSink, SQL_EXTENSION
 
@@ -58,46 +59,14 @@ class JWST_ObsCorePostgreSQLSink (ISQLSink):
     # Non-interface and/or task-specific Methods
     #
 
-    def make_sql_insert_db (self, datadict, table_name):
-        """
-        Return appropriate data structures for inserting the given data dictionary
-        into a database via a database access library. Currently using Psycopg2,
-        so return a tuple of an INSERT template string and a sequence of values.
-        """
-        keys = ', '.join(datadict.keys())
-        values = list(datadict.values())
-        place_holders = ', '.join(['%s' for v in values])
-        template = "insert into {0} ({1}) values ({2});".format(table_name, keys, place_holders)
-        return (template, values)
-
-
-    def make_sql_insert_string (self, datadict, table_name):
-        """ Return an SQL INSERT string to store the given data dictionary. """
-        keys = ', '.join(datadict.keys())
-        vals = datadict.values()
-        values = ', '.join([ ("'{}'".format(v) if (isinstance(v, str)) else str(v)) for v in vals ])
-        return "insert into {0} ({1}) values ({2});".format(table_name, keys, values)
-
-
     def select_data_for_output (self, metadata):
         """
         Select a subset of data, from the given metadata, for output.
         Returns a single dictionary of selected data.
         """
         selected = md_utils.get_calculated(metadata).copy()
-        misc_utils.remove_entries(selected, ignore=self.skipColumnList)
+        remove_entries(selected, ignore=self.skipColumnList)
         return selected                     # return selected and filtered dataset
-
-
-    def store_data (self, outdata, table_name, db_connection):
-        """
-        Store the given data structure directly into the given table in the connected database.
-        """
-        # using connection in a with block commits transaction but does NOT close connection
-        with db_connection as conn:
-            with conn.cursor() as cursor:
-                (fmt_str, values) = self.make_sql_insert_db(outdata, table_name)
-                cursor.execute(fmt_str, values)
 
 
     def store_results (self, outdata, file_info):
@@ -111,20 +80,10 @@ class JWST_ObsCorePostgreSQLSink (ISQLSink):
 
         # load the database configuration from a given or default file path
         dbconfig_file = self.args.get('dbconfig_file') or DEFAULT_DBCONFIG_FILEPATH
-        dbconfig = self.load_db_config(dbconfig_file)
-        if (not dbconfig):
-            errMsg = 'DB storage specified but no database configuration parameters found.'
-            raise errors.ProcessingError(errMsg)
+        dbconfig = self.load_sql_db_config(dbconfig_file)
 
-        db_uri = dbconfig.get('db_uri')
-        if (not db_uri):
-            errMsg = 'DB storage specified but no database URI (db_uri) parameter found.'
-            raise errors.ProcessingError(errMsg)
-
-        # open database connection and store the data
-        db_connection = psycopg2.connect(db_uri)
-        self.store_data(outdata, table_name, db_connection)
-        db_connection.close()
+        # store the given data dictionary into the named table
+        pg_sql.store_data(outdata, table_name, dbconfig)
 
         if (self._VERBOSE):
             print("({}): Results stored in '{}'".format(self.TOOL_NAME, table_name), file=sys.stderr)
@@ -162,12 +121,12 @@ class JWST_ObsCorePostgreSQLSink (ISQLSink):
         if ((file_path is None) or (file_path == sys.stdout)): # if writing to standard output
             sys.stdout.write(self.make_file_info_comment(file_info))
             sys.stdout.write('\n')
-            sys.stdout.write(self.make_sql_insert_string(outdata, table_name))
+            sys.stdout.write(pg_sql.make_sql_insert_string(outdata, table_name))
             sys.stdout.write('\n')
 
         else:                               # else file path was given
             with open(file_path, 'w') as outfile:
                 outfile.write(self.make_file_info_comment(file_info))
                 outfile.write('\n')
-                outfile.write(self.make_sql_insert_string(outdata, table_name))
+                outfile.write(pg_sql.make_sql_insert_string(outdata, table_name))
                 outfile.write('\n')

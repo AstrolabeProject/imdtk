@@ -1,10 +1,11 @@
 #
 # Class defining interface methods to store incoming data to an SQL database.
 #   Written by: Tom Hicks. 6/21/2020.
-#   Last Modified: WIP: refactor some non-DB specific SQL methods here.
+#   Last Modified: Consolidate DB configuration loading and checking.
 #
 import configparser
 
+import imdtk.exceptions as errors
 from imdtk.tasks.i_task import IImdTask
 
 
@@ -49,26 +50,31 @@ class ISQLSink (IImdTask):
         return buf                          # return formatted comment line
 
 
-    def load_db_configation (self, dbconfig_file):
-        """ Load the database configuration from the given filepath. """
-        if (self._DEBUG):
-            print("({}): Reading DB configuration file '{}'".format(self.TOOL_NAME, dbconfig_file), file=sys.stderr)
-        dbconfig = self.load_db_config_file(dbconfig_file)
-        if (self._DEBUG):
-            print("({}): Read {} DB configuration properties.".format(self.TOOL_NAME, len(dbconfig)), file=sys.stderr)
-        return dbconfig
-
-
-    def load_db_config_file (self, dbconfig_file):
+    def load_sql_db_config (self, dbconfig_file):
         """
         Load the database configuration from the given filepath. Returns a dictionary
         of database configuration parameters.
         """
+        if (self._DEBUG):
+            print("({}): Reading DB configuration file '{}'".format(self.TOOL_NAME, dbconfig_file), file=sys.stderr)
+
         config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation(),
                                            strict=False, empty_lines_in_values=False)
         config.read(dbconfig_file)
-        dbconfig = config['db_properties']
-        return dict(dbconfig)
+        dbconfig = dict(config['db_properties'])
+
+        if (not dbconfig):
+            errMsg = 'DB storage specified but no database configuration parameters found.'
+            raise errors.ProcessingError(errMsg)
+
+        if (dbconfig.get('db_uri') is None):
+            errMsg = 'DB storage specified but no database URI (db_uri) parameter found.'
+            raise errors.ProcessingError(errMsg)
+
+        if (self._DEBUG):
+            print("({}): Read {} DB configuration properties.".format(self.TOOL_NAME, len(dbconfig)), file=sys.stderr)
+
+        return dbconfig
 
 
     def make_file_info_comment (self, file_info):

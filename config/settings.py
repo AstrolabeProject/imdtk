@@ -33,6 +33,9 @@ PROGRAM_NAME = 'imdtk'
 # Resource information (currently unused)
 # RESOURCE_PKG = 'imdtk.resources'
 
+# List of required SQL fields in the hybrid PG/JSON database table (excluding JSON fields):
+SQL_FIELDS_HYBRID = [ 's_dec', 's_ra', 'obs_collection', 'is_public' ]
+
 # Path to the tests directory.
 TEST_DIR = "{}/tests".format(APP_ROOT)
 
