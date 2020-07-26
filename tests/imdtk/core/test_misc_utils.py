@@ -1,6 +1,6 @@
 # Tests for the misc utilities module.
 #   Written by: Tom Hicks. 5/22/2020.
-#   Last Modified: Add another test for get_in.
+#   Last Modified: Add tests for to_JSON.
 #
 import os
 import pytest
@@ -123,3 +123,23 @@ class TestMiscUtils(object):
         assert 'history' not in hdrs
         assert 'COMMENT' not in hdrs
         assert 'comment' not in hdrs
+
+
+
+    def test_to_JSON_empty (self):
+        tstdict = dict()
+        json = mutils.to_JSON(tstdict)
+        print(json)
+        assert json is not None
+        assert json == '{}'
+
+
+    def test_to_JSON (self):
+        tstdict = {'a': 1, 'b': 'bee', 'pi': 3.14159, 'AA': 'Milne' }
+        json = mutils.to_JSON(tstdict)
+        print(json)
+        assert json is not None
+        assert '"a": 1' in json
+        assert '"b": "bee"' in json
+        assert '"pi": 3.14159' in json
+        assert '"AA": "Milne"' in json
