@@ -1,7 +1,7 @@
 #
 # Module to interact with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Continue refactoring PostgreSQL access methods here.
+#   Last Modified: Update for to_JSON taking json.dumps keywords.
 #
 import sys
 from string import Template
@@ -96,7 +96,7 @@ def make_sql_insert_hybrid (datadict, table_name):
     keys = ', '.join(fieldnames)
 
     values = [ datadict.get(key) for key in SQL_FIELDS_HYBRID if datadict.get(key) is not None ]
-    values.append(to_JSON(datadict))    # add the JSON for the metadata field
+    values.append(to_JSON(datadict, sort_keys=True))  # add the JSON for the metadata field
 
     place_holders = ', '.join(['%s' for v in values])
     template = "insert into {0} ({1}) values ({2});".format(table_name, keys, place_holders)
@@ -118,7 +118,7 @@ def make_sql_insert_string_hybrid (datadict, table_name):
     keys = ', '.join(fieldnames)
 
     vals = [ datadict.get(key) for key in SQL_FIELDS_HYBRID if datadict.get(key) is not None ]
-    vals.append(to_JSON(datadict))      # add the JSON for the metadata field
+    vals.append(to_JSON(datadict, sort_keys=True))  # add the JSON for the metadata field
     values = ', '.join([ ("'{}'".format(v) if (isinstance(v, str)) else str(v)) for v in vals ])
 
     return "insert into {0} ({1}) values ({2});".format(table_name, keys, values)

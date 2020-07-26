@@ -1,6 +1,6 @@
 # Tests for the misc utilities module.
 #   Written by: Tom Hicks. 5/22/2020.
-#   Last Modified: Add tests for to_JSON.
+#   Last Modified: Add test of to_JSON for json.dumps keywords.
 #
 import os
 import pytest
@@ -143,3 +143,20 @@ class TestMiscUtils(object):
         assert '"b": "bee"' in json
         assert '"pi": 3.14159' in json
         assert '"AA": "Milne"' in json
+
+
+    def test_to_JSON_keywords (self):
+        tstdict = {'a': 1, 'b': 'bee', 'pi': 3.14159, 'AA': 'Milne' }
+        json = mutils.to_JSON(tstdict, sort_keys=True)
+        print(json)
+        assert json is not None
+        assert '"a": 1' in json
+        assert '"b": "bee"' in json
+        assert '"pi": 3.14159' in json
+        assert '"AA": "Milne"' in json
+        assert json.index('"AA"') < json.index('"a"')
+        assert json.index('"AA"') < json.index('"b"')
+        assert json.index('"AA"') < json.index('"pi"')
+        assert json.index('"a"') < json.index('"b"')
+        assert json.index('"a"') < json.index('"pi"')
+        assert json.index('"b"') < json.index('"pi"')

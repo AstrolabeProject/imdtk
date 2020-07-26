@@ -1,7 +1,7 @@
 #
 # Miscellaneous Utility Methods.
 #   Written by: Tom Hicks. 5/22/2020.
-#   Last Modified: Move method to dump dictionary as JSON here.
+#   Last Modified: Enhance JSON dumps method to take all json keywords.
 #
 import json
 
@@ -33,6 +33,11 @@ def remove_entries (a_dictionary, ignore=[]):
         a_dictionary.pop(key, None)         # remove keyed entry: ignore key errors
 
 
-def to_JSON (datadict, sort_keys=True):
-    """ Create and return a JSON string corresponding to the given data dictionary. """
-    return json.dumps(datadict, sort_keys=sort_keys)
+def to_JSON (datadict, **json_kwargs):
+    """
+    Create and return a JSON string corresponding to the given data dictionary.
+
+    :param json_kwargs: dictionary containing arguments to the json.dumps call.
+    :return a JSON string
+    """
+    return json.dumps(datadict, **json_kwargs)
