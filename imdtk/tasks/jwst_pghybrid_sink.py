@@ -1,7 +1,7 @@
 #
 # Class to sink incoming image metadata to a Hybrid (SQL/JSON) PostgreSQL database.
 #   Written by: Tom Hicks. 7/3/2020.
-#   Last Modified: Refactor some PG-specific SQL methods to pg_sql module.
+#   Last Modified: Update for SQL generation and output refactoring.
 #
 import psycopg2
 import sys
@@ -70,21 +70,20 @@ class JWST_HybridPostgreSQLSink (ISQLSink):
         if (self._DEBUG):
             print("({}.store_results)".format(self.TOOL_NAME), file=sys.stderr)
 
-        table_name = self.args.get('table_name') or DEFAULT_HYBRID_TABLE_NAME
-
         # load the database configuration from a given or default file path
         dbconfig_file = self.args.get('dbconfig_file') or DEFAULT_DBCONFIG_FILEPATH
         dbconfig = self.load_sql_db_config(dbconfig_file)
 
-        # store the given data dictionary into the named table
-        pg_sql.store_data_hybrid(outdata, table_name, dbconfig)
+        # execute SQL to store the given data dictionary into the named table
+        table_name = self.args.get('table_name') or DEFAULT_HYBRID_TABLE_NAME
+        pg_sql.store_to_hybrid_table(dbconfig, outdata, table_name)
 
         if (self._VERBOSE):
             print("({}): Results stored in '{}'".format(self.TOOL_NAME, table_name), file=sys.stderr)
 
 
     def write_results (self, outdata, file_info):
-        """ Generate and output SQL to save the given data dictionary. """
+        """ Generate and output SQL which would save the given data dictionary. """
         if (self._DEBUG):
             print("({}.write_results)".format(self.TOOL_NAME), file=sys.stderr)
 
@@ -106,21 +105,14 @@ class JWST_HybridPostgreSQLSink (ISQLSink):
 
     def write_SQL (self, outdata, file_info, file_path=None):
         """
-        Generate SQL commands to insert the given data dictionary into the database,
-        using the given file information dictionary. Write the SQL command strings to
-        the given file path or to standard output, if no file path given.
+        Generate and output SQL commands which would insert the given data dictionary
+        into the database, using the given file information dictionary.
+        Writes the SQL command strings to the given file path or to standard output,
+        if no file path is given.
+
+        Note: the generated SQL strings are for debugging only and ARE NOT SQL-INJECTION safe.
         """
+        comment = self.sql_file_info_comment_str(file_info)
         table_name = self.args.get('table_name') or DEFAULT_HYBRID_TABLE_NAME
-
-        if ((file_path is None) or (file_path == sys.stdout)): # if writing to standard output
-            sys.stdout.write(self.make_file_info_comment(file_info))
-            sys.stdout.write('\n')
-            sys.stdout.write(pg_sql.make_sql_insert_string_hybrid(outdata, table_name))
-            sys.stdout.write('\n')
-
-        else:                               # else file path was given
-            with open(file_path, 'w') as outfile:
-                outfile.write(self.make_file_info_comment(file_info))
-                outfile.write('\n')
-                outfile.write(pg_sql.make_sql_insert_string_hybrid(outdata, table_name))
-                outfile.write('\n')
+        insert_str = pg_sql.sql_insert_hybrid_str(outdata, table_name)
+        self.output_SQL(insert_str, comment=comment, file_path=file_path)

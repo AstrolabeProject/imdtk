@@ -1,9 +1,10 @@
 #
 # Class defining interface methods to store incoming data to an SQL database.
 #   Written by: Tom Hicks. 6/21/2020.
-#   Last Modified: Consolidate DB configuration loading and checking.
+#   Last Modified: Refactor method to output commented line of SQL here. Rename SQL comment method.
 #
 import configparser
+import sys
 
 import imdtk.exceptions as errors
 from imdtk.tasks.i_task import IImdTask
@@ -77,8 +78,33 @@ class ISQLSink (IImdTask):
         return dbconfig
 
 
-    def make_file_info_comment (self, file_info):
-        """ Return a string containing information about the input file, formatted as a comment. """
+    def output_SQL (self, sql_str, comment=None, file_path=None):
+        """
+        Output the given SQL string, and optional leading comment, to the given file path or
+        to standard output, if no file path given.
+
+        Note: the given SQL strings are assumed to be valid and safe and are not vetted.
+        """
+        if ((file_path is None) or (file_path == sys.stdout)): # if writing to standard output
+            if (comment is not None):
+                sys.stdout.write(comment)
+                sys.stdout.write('\n')
+            sys.stdout.write(sql_str)
+            sys.stdout.write('\n')
+
+        else:                               # else file path was given
+            with open(file_path, 'w') as outfile:
+                if (comment is not None):
+                    outfile.write(comment)
+                    outfile.write('\n')
+                outfile.write(sql_str)
+                outfile.write('\n')
+
+
+    def sql_file_info_comment_str (self, file_info):
+        """
+        Return an SQL comment string containing information about the input file.
+        """
         fname = file_info.get('file_name') if file_info else "NO_FILENAME"
         fsize = file_info.get('file_size') if file_info else 0
         fpath = file_info.get('file_path') if file_info else None
