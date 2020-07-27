@@ -1,16 +1,19 @@
 #
 # Module to provide FITS utility functions for Astrolabe code.
 #   Written by: Tom Hicks. 1/26/2020.
-#   Last Modified: Add method to generate fits_file_paths.
+#   Last Modified: Add method to dump FITS table as JSON.
 #
 import fnmatch
-import os
+import json
+from collections import OrderedDict
 
 from astropy import wcs
 from astropy.time import Time
 from astropy.wcs.utils import proj_plane_pixel_scales
+from numpyencoder import NumpyEncoder
 
 from imdtk.core.file_utils import gen_file_paths, validate_file_path
+from imdtk.core.misc_utils import to_JSON
 
 
 # patterns for identifying FITS and gzipped FITS files
@@ -154,3 +157,23 @@ def lookup_pixtype (bitpix, default='UNKNOWN'):
     Returns default value if the code is not found upon lookup.
     """
     return PIXTYPE_TABLE.get(bitpix, default)
+
+
+def table_to_JSON (table, **json_kwargs):
+    """
+    Create a JSON string from the given astropy.table.Table object.
+    Written by: JHunkeler at StSci.
+
+    :param table: astropy.table.Table
+        The extra parameter, table.meta, if present, is expected to be
+        a dictionary of FITS keyword/value pairs.
+    :param json_kwargs: dictionary containing arguments to the json.dumps call.
+    :return a JSON string
+    """
+    outdata = {}                            # dictionary to be dumped as JSON
+    try:
+        outdata['header'] = table.meta      # table metadata is optional
+    except AttributeError:
+        pass
+    outdata['columns'] = OrderedDict((name, list(table[name])) for name in table.colnames)
+    return to_JSON(outdata, cls=NumpyEncoder)

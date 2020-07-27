@@ -1,5 +1,6 @@
 astropy==4.0.1.post1
 # numpy==1.18.1
+numpyencoder==0.2.0
 pyyaml==5.3.1
 toml==0.10.1
 
