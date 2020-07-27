@@ -1,6 +1,6 @@
 # Tests for the PostgreSQL interface module.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Initial creation
+#   Last Modified: Update tests for change in list_* API.
 #
 import pytest
 
@@ -9,9 +9,8 @@ import imdtk.core.pg_sql as pgsql
 
 class TestPgSql(object):
 
+    args = { 'debug': True, 'verbose': True }
     dbargs = {
-        'debug': True,
-        'verbose': True,
         # 'db_host': 'pgdb',
         # 'db_name': 'vos',
         # 'db_port': '5432',
@@ -23,7 +22,7 @@ class TestPgSql(object):
 
 
     def test_list_table_names_schema (self):
-        tbls = pgsql.list_table_names(self.dbargs, db_schema='sia')
+        tbls = pgsql.list_table_names(self.args, self.dbargs, db_schema='sia')
         print(tbls)
         assert tbls is not None
         assert len(tbls) > 0
@@ -37,7 +36,7 @@ class TestPgSql(object):
 
 
     def test_list_table_names (self):
-        tbls = pgsql.list_table_names(self.dbargs)
+        tbls = pgsql.list_table_names(self.args, self.dbargs)
         print(tbls)
         assert tbls is not None
         assert len(tbls) > 0
@@ -51,7 +50,7 @@ class TestPgSql(object):
 
 
     def test_list_table_names_bad_schema (self):
-        tbls = pgsql.list_table_names(self.dbargs, db_schema='nosuch')
+        tbls = pgsql.list_table_names(self.args, self.dbargs, db_schema='nosuch')
         print(tbls)
         assert tbls is not None
         assert len(tbls) == 0
@@ -59,7 +58,7 @@ class TestPgSql(object):
 
 
     def test_list_catalogs_schema (self):
-        cats = pgsql.list_catalogs(self.dbargs, db_schema='sia')
+        cats = pgsql.list_catalogs(self.args, self.dbargs, db_schema='sia')
         print(cats)
         assert cats is not None
         assert len(cats) > 0
@@ -73,7 +72,7 @@ class TestPgSql(object):
 
 
     def test_list_catalogs (self):
-        cats = pgsql.list_catalogs(self.dbargs)
+        cats = pgsql.list_catalogs(self.args, self.dbargs)
         print(cats)
         assert cats is not None
         assert len(cats) > 0
@@ -87,7 +86,7 @@ class TestPgSql(object):
 
 
     def test_list_catalogs_bad_schema (self):
-        cats = pgsql.list_catalogs(self.dbargs, db_schema='nosuch')
+        cats = pgsql.list_catalogs(self.args, self.dbargs, db_schema='nosuch')
         print(cats)
         assert cats is not None
         assert len(cats) == 0

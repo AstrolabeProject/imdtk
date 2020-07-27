@@ -1,7 +1,7 @@
 #
 # Module to interact with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Update for to_JSON taking json.dumps keywords.
+#   Last Modified: Make list_* methods take full DB config arguments.
 #
 import sys
 from string import Template
@@ -12,17 +12,17 @@ from config.settings import SQL_FIELDS_HYBRID
 from imdtk.core.misc_utils import to_JSON
 
 
-def list_catalogs (args, db_schema=None):
+def list_catalogs (args, dbconfig, db_schema=None):
     """
     List available image catalogs from the VOS database.
 
-    :param args: dictionary containing database arguments used by this method:
-                 verbose, DB_URI
+    :param args: dictionary containing context arguments used by this method: debug
+    :param dbconfig: dictionary containing database parameters used by this method: db_uri
     :return a list of catalog names from the TAP schema "tables" table for the selected schema.
     """
-    db_schema_name = db_schema or args.get('db_schema_name')
+    db_schema_name = db_schema or dbconfig.get('db_schema_name')
 
-    conn = psycopg2.connect(args.get('db_uri'))
+    conn = psycopg2.connect(dbconfig.get('db_uri'))
     cur = conn.cursor()
 
     catq = "SELECT table_name FROM tap_schema.tables WHERE schema_name = (%s);"
@@ -39,17 +39,17 @@ def list_catalogs (args, db_schema=None):
     return catalogs
 
 
-def list_table_names (args, db_schema=None):
+def list_table_names (args, dbconfig, db_schema=None):
     """
     List available tables from the VOS database.
 
-    :param args: dictionary containing database arguments used by this method:
-                 verbose, DB_URI
+    :param args: dictionary containing context arguments used by this method: debug
+    :param dbconfig: dictionary containing database parameters used by this method: db_uri
     :return a list of table_names for the selected schema.
     """
-    db_schema_name = db_schema or args.get('db_schema_name')
+    db_schema_name = db_schema or dbconfig.get('db_schema_name')
 
-    conn = psycopg2.connect(args.get('db_uri'))
+    conn = psycopg2.connect(dbconfig.get('db_uri'))
     cur = conn.cursor()
 
     tblq = """
