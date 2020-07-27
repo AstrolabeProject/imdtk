@@ -22,7 +22,7 @@ class AliasesTask (IImdTask):
 
 
     #
-    # Concrete methods implementing ITask abstract methods
+    # Methods overriding IImdTask interface methods
     #
 
     def process (self, metadata):

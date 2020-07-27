@@ -32,7 +32,7 @@ class CSVSink (IImdTask):
 
 
     #
-    # Methods overriding ITask interface methods
+    # Methods overriding IImdTask interface methods
     #
 
     def output_results (self, metadata):

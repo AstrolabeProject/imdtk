@@ -40,7 +40,7 @@ class JWST_ObsCoreCalcTask (IObsCoreCalcTask):
 
 
     #
-    # Concrete methods implementing ITask and IObsCoreCalcTask abstract methods
+    # Concrete methods overriding IImdTask and implementing IObsCoreCalcTask abstract methods
     #
 
     def process (self, metadata):
