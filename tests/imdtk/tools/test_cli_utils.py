@@ -1,6 +1,6 @@
 # Tests for the CLI utilities module.
 #   Written by: Tom Hicks. 7/15/2020.
-#   Last Modified: Add tests for check_input_dir.
+#   Last Modified: Add tests for add_catalog_table_arguments and check_catalog_table.
 #
 import argparse
 import pytest
@@ -39,6 +39,23 @@ class TestCliUtils(object):
         args = vars(parser.parse_args(['--aliases', '/fake/aliases.ini']))
         print(args)
         assert 'alias_file' in args
+
+
+    def test_add_catalog_table_arguments(self):
+        parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+        utils.add_catalog_table_arguments(parser, TOOL_NAME, VERSION)
+
+        with pytest.raises(SystemExit) as se:
+            args = vars(parser.parse_args([])) # catalog table name is required
+        assert se.type == SystemExit
+
+        args = vars(parser.parse_args(['-ct', 'cat_table_name']))
+        print(args)
+        assert 'catalog_table' in args
+
+        args = vars(parser.parse_args(['--catalog-table', 'catalog_table_name']))
+        print(args)
+        assert 'catalog_table' in args
 
 
     def test_add_collection_arguments(self):
@@ -249,28 +266,35 @@ class TestCliUtils(object):
         with pytest.raises(SystemExit) as se:
             utils.check_alias_file(self.nosuch_tstfyl, TOOL_NAME)
         assert se.type == SystemExit
-        assert se.value.code == 30
+        assert se.value.code == utils.ALIAS_FILE_EXIT_CODE
+
+
+    def test_check_catalog_table(self):
+        with pytest.raises(SystemExit) as se:
+            utils.check_catalog_table('', TOOL_NAME)
+        assert se.type == SystemExit
+        assert se.value.code == utils.CATALOG_TABLE_EXIT_CODE
 
 
     def test_check_dbconfig_file(self):
         with pytest.raises(SystemExit) as se:
             utils.check_dbconfig_file(self.nosuch_tstfyl, TOOL_NAME)
         assert se.type == SystemExit
-        assert se.value.code == 31
+        assert se.value.code == utils.DBCONFIG_FILE_EXIT_CODE
 
 
     def test_check_fields_file(self):
         with pytest.raises(SystemExit) as se:
             utils.check_fields_file(self.nosuch_tstfyl, TOOL_NAME)
         assert se.type == SystemExit
-        assert se.value.code == 32
+        assert se.value.code == utils.FIELDS_FILE_EXIT_CODE
 
 
     def test_check_fits_file_bad(self):
         with pytest.raises(SystemExit) as se:
             utils.check_fits_file(self.nosuch_tstfyl, TOOL_NAME)
         assert se.type == SystemExit
-        assert se.value.code == 21
+        assert se.value.code == utils.FITS_FILE_EXIT_CODE
 
 
     def test_check_fits_file(self):
@@ -284,7 +308,7 @@ class TestCliUtils(object):
         with pytest.raises(SystemExit) as se:
             utils.check_input_dir(self.nosuch_tstfyl, TOOL_NAME)
         assert se.type == SystemExit
-        assert se.value.code == 22
+        assert se.value.code == utils.INPUT_DIR_EXIT_CODE
 
 
     def test_check_input_dir(self):
@@ -298,4 +322,4 @@ class TestCliUtils(object):
         with pytest.raises(SystemExit) as se:
             utils.check_input_file(self.nosuch_tstfyl, TOOL_NAME)
         assert se.type == SystemExit
-        assert se.value.code == 20
+        assert se.value.code == utils.INPUT_FILE_EXIT_CODE
