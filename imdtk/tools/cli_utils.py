@@ -1,7 +1,7 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Remove unused output sink argument.
+#   Last Modified: Add/use exit code constants. Add catalog table args & check catalog table methods.
 #
 import argparse
 import sys
@@ -10,6 +10,18 @@ from config.settings import DEFAULT_ALIASES_FILEPATH, DEFAULT_DBCONFIG_FILEPATH
 from config.settings import DEFAULT_FIELDS_FILEPATH, DEFAULT_METADATA_TABLE_NAME
 from imdtk.core.file_utils import good_dir_path, good_file_path, validate_file_path
 from imdtk.core.fits_utils import FITS_EXTENTS
+
+
+# required arguments:
+FITS_FILE_EXIT_CODE = 20
+INPUT_DIR_EXIT_CODE = 21
+CATALOG_TABLE_EXIT_CODE = 22
+
+# optional arguments:
+ALIAS_FILE_EXIT_CODE = 30
+DBCONFIG_FILE_EXIT_CODE = 31
+FIELDS_FILE_EXIT_CODE = 32
+INPUT_FILE_EXIT_CODE = 33
 
 
 def add_aliases_arguments (parser, tool_name, version, default_msg=DEFAULT_ALIASES_FILEPATH):
@@ -22,6 +34,15 @@ def add_aliases_arguments (parser, tool_name, version, default_msg=DEFAULT_ALIAS
     )
 
 
+def add_catalog_table_arguments (parser, tool_name, version, default_msg='no default'):
+    """ Add the argument(s) related to naming a database table for a catalog
+        to the given argparse parser object. """
+    parser.add_argument(
+        '-ct', '--catalog-table', dest='catalog_table', required=True, metavar='schema.table',
+        help="Catalog table name in the database [default: {}]".format(default_msg)
+    )
+
+
 def add_collection_arguments (parser, tool_name, version, default_msg='no default'):
     """ Add the argument(s) related to collection specification
         to the given argparse parser object. """
@@ -30,6 +51,7 @@ def add_collection_arguments (parser, tool_name, version, default_msg='no defaul
         default=argparse.SUPPRESS,
         help="Collection name for ingested images [default: {}]".format(default_msg)
     )
+
 
 def add_database_arguments (parser, tool_name, version,
                             default_msg=DEFAULT_DBCONFIG_FILEPATH,
@@ -167,7 +189,18 @@ def add_shared_arguments (parser, tool_name, version):
     )
 
 
-def check_alias_file (alias_file, tool_name, exit_code=30):
+def check_catalog_table (catalog_table_name, tool_name, exit_code=CATALOG_TABLE_EXIT_CODE):
+    """
+    Check that the required catalog table name is provided If not, then exit
+    the entire program here with the specified (or default) system exit code.
+    """
+    if (not catalog_table_name):
+        errMsg = "({}): A catalog table name must be specified. Exiting...".format(tool_name)
+        print(errMsg, file=sys.stderr)
+        sys.exit(exit_code)
+
+
+def check_alias_file (alias_file, tool_name, exit_code=ALIAS_FILE_EXIT_CODE):
     """
     If a path to an aliases file is given, check that it is a good path. If not, then exit
     the entire program here with the specified (or default) system exit code.
@@ -179,7 +212,7 @@ def check_alias_file (alias_file, tool_name, exit_code=30):
             sys.exit(exit_code)
 
 
-def check_dbconfig_file (dbconfig_file, tool_name, exit_code=31):
+def check_dbconfig_file (dbconfig_file, tool_name, exit_code=DBCONFIG_FILE_EXIT_CODE):
     """
     If a path to a DB configuration file is given, check that it is a good path. If not,
     then exit the entire program here with the specified (or default) system exit code.
@@ -191,7 +224,7 @@ def check_dbconfig_file (dbconfig_file, tool_name, exit_code=31):
             sys.exit(exit_code)
 
 
-def check_fields_file (fields_file, tool_name, exit_code=32):
+def check_fields_file (fields_file, tool_name, exit_code=FIELDS_FILE_EXIT_CODE):
     """
     If a path to an aliases file is given, check that it is a good path. If not, then exit
     the entire program here with the specified (or default) system exit code.
@@ -203,7 +236,7 @@ def check_fields_file (fields_file, tool_name, exit_code=32):
             sys.exit(exit_code)
 
 
-def check_fits_file (fits_file, tool_name, exit_code=21):
+def check_fits_file (fits_file, tool_name, exit_code=FITS_FILE_EXIT_CODE):
     """
     Check that the required FITS file path is a valid path. If not, then exit
     the entire program here with the specified (or default) system exit code.
@@ -214,7 +247,7 @@ def check_fits_file (fits_file, tool_name, exit_code=21):
         sys.exit(exit_code)
 
 
-def check_input_dir (input_dir, tool_name, exit_code=22):
+def check_input_dir (input_dir, tool_name, exit_code=INPUT_DIR_EXIT_CODE):
     """
     Check that the required input direct path is a valid path. If not, then exit
     the entire program here with the specified (or default) system exit code.
@@ -225,7 +258,7 @@ def check_input_dir (input_dir, tool_name, exit_code=22):
         sys.exit(exit_code)
 
 
-def check_input_file (input_file, tool_name, exit_code=20):
+def check_input_file (input_file, tool_name, exit_code=INPUT_FILE_EXIT_CODE):
     """
     If an input file path is given, check that it is a good path. If not, then exit
     the entire program here with the specified (or default) system exit code.
