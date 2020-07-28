@@ -2,7 +2,7 @@
 #
 # Module to store incoming data in a hybrid PostgreSQL/JSON database.
 #   Written by: Tom Hicks. 7/3/2020.
-#   Last Modified: Revamp error handling: catch exceptions.
+#   Last Modified: Rename variable to task.
 #
 import argparse
 import sys
@@ -17,7 +17,7 @@ from imdtk.tasks.jwst_pghybrid_sink import JWST_HybridPostgreSQLSink
 TOOL_NAME = 'jwst_pghybrid_sink'
 
 # Version of this tool.
-VERSION = '0.11.0'
+VERSION = '0.11.1'
 
 
 def main (argv=None):
@@ -65,8 +65,8 @@ def main (argv=None):
 
     # call the task layer to process the given, validated input file
     try:
-        tool = JWST_HybridPostgreSQLSink(args)
-        tool.input_process_output()
+        task = JWST_HybridPostgreSQLSink(args)
+        task.input_process_output()
 
     except errors.ProcessingError as pe:
         errMsg = "({}): ERROR: Processing Error ({}): {}".format(

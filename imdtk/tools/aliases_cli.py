@@ -2,7 +2,7 @@
 #
 # Module to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/30/2020.
-#   Last Modified: Revamp error handling: catch exceptions.
+#   Last Modified: Rename variable to task.
 #
 import argparse
 import sys
@@ -16,7 +16,7 @@ from imdtk.tasks.aliases import AliasesTask
 TOOL_NAME = 'aliases'
 
 # Version of this tool.
-VERSION = '0.11.0'
+VERSION = '0.11.1'
 
 
 def main (argv=None):
@@ -64,8 +64,8 @@ def main (argv=None):
 
     # call the task layer to process the given, validated input file
     try:
-        tool = AliasesTask(args)
-        tool.input_process_output()
+        task = AliasesTask(args)
+        task.input_process_output()
 
     except errors.ProcessingError as pe:
         errMsg = "({}): ERROR: Processing Error ({}): {}".format(

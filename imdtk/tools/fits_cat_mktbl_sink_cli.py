@@ -2,7 +2,7 @@
 #
 # Module to create a new database table from the metadata of a FITS catalog file.
 #   Written by: Tom Hicks. 7/22/2020.
-#   Last Modified: Get/check catalog table arguments. Update for rename of task. Fix tool description.
+#   Last Modified: Rename variable to task.
 #
 import argparse
 import sys
@@ -16,7 +16,7 @@ from imdtk.tasks.fits_cat_mktbl_sink import FitsCatalogMakeTableSink
 TOOL_NAME = 'fits_cat_mktbl_sink'
 
 # Version of this tool.
-VERSION = '0.11.0'
+VERSION = '0.11.1'
 
 
 def main (argv=None):
@@ -69,8 +69,8 @@ def main (argv=None):
 
     # call the task layer to process the given, validated input file
     try:
-        tool = FitsCatalogMakeTableSink(args)
-        tool.input_process_output()
+        task = FitsCatalogMakeTableSink(args)
+        task.input_process_output()
 
     except errors.ProcessingError as pe:
         errMsg = "({}): ERROR: Processing Error ({}): {}".format(

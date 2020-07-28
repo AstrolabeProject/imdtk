@@ -2,7 +2,7 @@
 #
 # Module to extract an image table from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 7/6/2020.
-#   Last Modified: Revamp error handling: info not error.
+#   Last Modified: Rename variable to task.
 #
 import argparse
 import sys
@@ -16,7 +16,7 @@ from imdtk.tasks.fits_table import FitsTableSourceTask
 TOOL_NAME = 'fits_table'
 
 # Version of this tool.
-VERSION = '0.11.0'
+VERSION = '0.11.1'
 
 
 def main (argv=None):
@@ -69,8 +69,8 @@ def main (argv=None):
         print("({}): Processing FITS file '{}'.".format(TOOL_NAME, fits_file), file=sys.stderr)
 
     try:
-        tool = FitsTableSourceTask(args)
-        tool.process_and_output()
+        task = FitsTableSourceTask(args)
+        task.process_and_output()
 
     except errors.UnsupportedTypeError as ute:
         errMsg = "({}): INFO: Unsupported File Type ({}): {}".format(

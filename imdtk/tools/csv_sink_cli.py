@@ -2,7 +2,7 @@
 #
 # Module to output incoming data to a CSV file.
 #   Written by: Tom Hicks. 6/26/20.
-#   Last Modified: Revamp error handling: catch exceptions.
+#   Last Modified: Note that Rename variable to task was already done.
 #
 import argparse
 import sys
@@ -16,7 +16,7 @@ from imdtk.tasks.csv_sink import CSVSink
 TOOL_NAME = 'csv_sink'
 
 # Version of this tool.
-VERSION = '0.11.0'
+VERSION = '0.11.1'
 
 
 def main (argv=None):

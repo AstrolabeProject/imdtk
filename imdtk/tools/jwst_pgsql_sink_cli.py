@@ -2,7 +2,7 @@
 #
 # Module to store incoming data in an ObsCore PostgreSQL database.
 #   Written by: Tom Hicks. 6/21/20.
-#   Last Modified: Revamp error handling: catch exceptions.
+#   Last Modified: Rename variable to task.
 #
 import argparse
 import sys
@@ -16,7 +16,7 @@ from imdtk.tasks.jwst_pgsql_sink import JWST_ObsCorePostgreSQLSink
 TOOL_NAME = 'jwst_pgsql_sink'
 
 # Version of this tool.
-VERSION = '0.11.0'
+VERSION = '0.11.1'
 
 
 def main (argv=None):
@@ -64,8 +64,8 @@ def main (argv=None):
 
     # call the task layer to process the given, validated input file
     try:
-        tool = JWST_ObsCorePostgreSQLSink(args)
-        tool.input_process_output()
+        task = JWST_ObsCorePostgreSQLSink(args)
+        task.input_process_output()
 
     except errors.ProcessingError as pe:
         errMsg = "({}): ERROR: Processing Error ({}): {}".format(

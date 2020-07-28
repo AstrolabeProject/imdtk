@@ -2,7 +2,7 @@
 #
 # Module to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/11/2020.
-#   Last Modified: Revamp error handling.
+#   Last Modified: Rename variable to task.
 #
 import argparse
 import sys
@@ -16,7 +16,7 @@ from imdtk.tasks.jwst_oc_calc import JWST_ObsCoreCalcTask
 TOOL_NAME = 'jwst_oc_calc'
 
 # Version of this tool.
-VERSION = '0.11.0'
+VERSION = '0.11.1'
 
 
 def main (argv=None):
@@ -65,8 +65,8 @@ def main (argv=None):
 
     # call the task layer to process the given, validated files
     try:
-        tool = JWST_ObsCoreCalcTask(args)
-        tool.input_process_output()
+        task = JWST_ObsCoreCalcTask(args)
+        task.input_process_output()
 
     except errors.ProcessingError as pe:
         errMsg = "({}): ERROR: Processing Error ({}): {}".format(
