@@ -1,6 +1,6 @@
 # Tests for the PostgreSQL interface module.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Update tests for change in list_* API.
+#   Last Modified: Update tests for list_catalog_tables rename.
 #
 import pytest
 
@@ -57,8 +57,8 @@ class TestPgSql(object):
 
 
 
-    def test_list_catalogs_schema (self):
-        cats = pgsql.list_catalogs(self.args, self.dbargs, db_schema='sia')
+    def test_list_catalog_tables_schema (self):
+        cats = pgsql.list_catalog_tables(self.args, self.dbargs, db_schema='sia')
         print(cats)
         assert cats is not None
         assert len(cats) > 0
@@ -71,8 +71,8 @@ class TestPgSql(object):
         assert 'sia.schemas' not in cats
 
 
-    def test_list_catalogs (self):
-        cats = pgsql.list_catalogs(self.args, self.dbargs)
+    def test_list_catalog_tables (self):
+        cats = pgsql.list_catalog_tables(self.args, self.dbargs)
         print(cats)
         assert cats is not None
         assert len(cats) > 0
@@ -85,8 +85,8 @@ class TestPgSql(object):
         assert 'sia.schemas' not in cats
 
 
-    def test_list_catalogs_bad_schema (self):
-        cats = pgsql.list_catalogs(self.args, self.dbargs, db_schema='nosuch')
+    def test_list_catalog_tables_bad_schema (self):
+        cats = pgsql.list_catalog_tables(self.args, self.dbargs, db_schema='nosuch')
         print(cats)
         assert cats is not None
         assert len(cats) == 0

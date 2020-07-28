@@ -1,7 +1,7 @@
 #
 # Module to interact with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Refactor: consolidate and rename SQL generation and output methods.
+#   Last Modified: WIP: Add stubs for methods creating a new catalog table. Rename list catalog tables method.
 #
 import sys
 from string import Template
@@ -30,7 +30,7 @@ def execute_sql (dbconfig, sql_format_string, sql_values):
         db_connection.close()
 
 
-def list_catalogs (args, dbconfig, db_schema=None):
+def list_catalog_tables (args, dbconfig, db_schema=None):
     """
     List available image catalogs from the VOS database.
 
@@ -55,7 +55,7 @@ def list_catalogs (args, dbconfig, db_schema=None):
     catalogs = [cat[0] for cat in cats]     # extract names from wrappers
 
     if (args.get('debug')):
-        print("(list_catalogs): => '{}'".format(catalogs), file=sys.stderr)
+        print("(list_catalog_tables): => '{}'".format(catalogs), file=sys.stderr)
 
     return catalogs
 
@@ -94,6 +94,26 @@ def list_table_names (args, dbconfig, db_schema=None):
         print("(pg_sql.list_table_names): => '{}'".format(tables), file=sys.stderr)
 
     return tables
+
+
+def sql_create_table (dbconfig, metadata, table_name):
+    """
+    Create a new table with the given table name, columns, and types as specified by
+    the given catalog metadata dictionary using the given DB parameters.
+    """
+    # TODO: IMPLEMENT LATER
+    return "-- Creating table '{}'".format(table_name)
+
+
+def sql_create_table_str (datadict, table_name):
+    """
+    Return an SQL string to create a new table with the given table name, columns,
+    and types specified by the given catalog metadata dictionary.
+
+    Note: the returned string is for debugging only and IS NOT SQL-INJECTION safe.
+    """
+    # TODO: IMPLEMENT LATER
+    return "-- Creating table SQL string for table '{}'".format(table_name)
 
 
 def sql_insert_str (datadict, table_name):
