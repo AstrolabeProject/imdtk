@@ -2,14 +2,14 @@
 #
 # Module to create a new database table from the metadata of a FITS catalog file.
 #   Written by: Tom Hicks. 7/22/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Get/check catalog table arguments. Update for rename of task. Fix tool description.
 #
 import argparse
 import sys
 
 import imdtk.exceptions as errors
 import imdtk.tools.cli_utils as cli_utils
-from imdtk.tasks.fits_cat_mktbl_sink import FitsCatalogTableSink
+from imdtk.tasks.fits_cat_mktbl_sink import FitsCatalogMakeTableSink
 
 
 # Program name for this tool.
@@ -34,13 +34,14 @@ def main (argv=None):
     parser = argparse.ArgumentParser(
         prog=TOOL_NAME,
         formatter_class=argparse.RawTextHelpFormatter,
-        description='Save the incoming data to a ObsCore PostgreSQL database'
+        description='Create a new catalog table in a PostgreSQL database'
     )
 
     cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_input_arguments(parser, TOOL_NAME, VERSION)
     cli_utils.add_database_arguments(parser, TOOL_NAME, VERSION)
+    cli_utils.add_catalog_table_arguments(parser, TOOL_NAME, VERSION)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))
@@ -58,13 +59,17 @@ def main (argv=None):
     dbconfig_file = args.get('dbconfig_file')
     cli_utils.check_dbconfig_file(dbconfig_file, TOOL_NAME) # may system exit here and not return!
 
+    # if database config file path given, check the file path for validity
+    catalog_table = args.get('catalog_table')
+    cli_utils.check_catalog_table(catalog_table, TOOL_NAME) # may system exit here and not return!
+
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME
     args['VERSION'] = VERSION
 
     # call the task layer to process the given, validated input file
     try:
-        tool = FitsCatalogTableSink(args)
+        tool = FitsCatalogMakeTableSink(args)
         tool.input_process_output()
 
     except errors.ProcessingError as pe:
