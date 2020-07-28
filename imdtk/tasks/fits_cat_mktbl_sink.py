@@ -1,20 +1,20 @@
 #
 # Class to create a new database table from the metadata of a FITS catalog file.
 #   Written by: Tom Hicks. 7/22/2020.
-#   Last Modified: WIP: refactor some non-DB specific SQL methods to parent SQL class.
+#   Last Modified: Continue task development. Rename task. Use refactored SQL generation/output methods.
 #
-import configparser
 import psycopg2
 import sys
 
 from config.settings import DEFAULT_DBCONFIG_FILEPATH
 import imdtk.exceptions as errors
+import imdtk.core.pg_sql as pg_sql
 import imdtk.tasks.metadata_utils as md_utils
 from imdtk.tasks.i_task import STDOUT_NAME
 from imdtk.tasks.i_sql_sink import ISQLSink, SQL_EXTENSION
 
 
-class FitsCatalogTableSink (ISQLSink):
+class FitsCatalogMakeTableSink (ISQLSink):
     """ Class to create a new DB table from metadata of a FITS catalog file. """
 
     def __init__(self, args):
@@ -25,7 +25,7 @@ class FitsCatalogTableSink (ISQLSink):
 
 
     #
-    # Methods overriding ITask interface methods
+    # Methods overriding IImdTask interface methods
     #
 
     def output_results (self, metadata):
@@ -36,100 +36,77 @@ class FitsCatalogTableSink (ISQLSink):
         if (self._DEBUG):
             print("({}.output_results): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
 
+        # load the database configuration from a given or default file path
+        dbconfig_file = self.args.get('dbconfig_file') or DEFAULT_DBCONFIG_FILEPATH
+        dbconfig = self.load_sql_db_config(dbconfig_file)
+
         # check table name to see if it is still available in the database
-        table_name = self.args.get('table_name')
-        if (not self.check_table_name):
-            errMsg = "Table name '{}' is not valid or already exists.".format(table_name)
+        catalog_table = self.args.get('catalog_table')
+        if (self.table_exists(dbconfig, catalog_table)):
+            errMsg = "Specified catalog table name '{}' already exists.".format(catalog_table)
             raise errors.ProcessingError(errMsg)
 
         # file information is needed by the SQL generation methods below
         file_info = md_utils.get_file_info(metadata)
 
-        # Create or output the database table as a side-effect while passing metadata through.
         # Decide whether we are creating a table in the DB or just outputting SQL statements.
         sql_only = self.args.get('sql_only')
         if (sql_only):                      # if just outputting SQL
-            self.write_table(table_name, metadata, file_info)
-        else:                               # else storing data in a database
-            self.create_table(table_name, metadata, file_info)
+            self.write_table(catalog_table, metadata, file_info)
+        else:                               # else creating the table in the database
+            self.create_table(dbconfig, catalog_table, metadata, file_info)
 
 
     #
     # Non-interface and/or task-specific Methods
     #
 
-    def check_table_name (self, table_name):
-        """
-        Return True if the given table name is valid and does not already exist
-        in the database, else False.
-        """
-        if (table_name is not None):        # TODO: IMPLEMENT LATER
-            return True
-        else:
-            return False
+    def table_exists (self, dbconfig, catalog_table):
+        """ Return True if the named table already exists in the database, else False. """
+        return catalog_table in pg_sql.list_catalog_tables(self.args, dbconfig, catalog_table)
 
 
-    def create_table (self, table_name, metadata, file_info):
+    def create_table (self, dbconfig, catalog_table, metadata, file_info):
         if (self._DEBUG):
-            print("({}): Creating table: '{}'".format(self.TOOL_NAME, table_name), file=sys.stderr)
-
-        # load the database configuration from a given or default file path
-        dbconfig_file = self.args.get('dbconfig_file') or DEFAULT_DBCONFIG_FILEPATH
-        dbconfig = self.load_db_configuration(dbconfig_file)
-        if (not dbconfig):
-            errMsg = 'DB storage specified but no database configuration parameters found.'
-            raise errors.ProcessingError(errMsg)
-
-        db_uri = dbconfig.get('db_uri')
-        if (not db_uri):
-            errMsg = 'DB storage specified but no database URI (db_uri) parameter found.'
-            raise errors.ProcessingError(errMsg)
+            print("({}): Creating table: '{}'".format(self.TOOL_NAME, catalog_table), file=sys.stderr)
 
         # open database connection and create the specified table
-        db_connection = psycopg2.connect(db_uri)
-        # self.create_db_table(outdata, table_name, db_connection)  # TODO: IMPLEMENT LATER
-        db_connection.close()
+        pg_sql.create_table(dbconfig, metadata, catalog_table)
 
         if (self._VERBOSE):
-            print("({}): Database table '{}' created.".format(self.TOOL_NAME, table_name), file=sys.stderr)
+            print("({}): Database table '{}' created.".format(self.TOOL_NAME, catalog_table), file=sys.stderr)
 
 
-    def write_SQL (self, table_name, metadata, file_info, file_path=None):
-        """
-        Generate SQL commands to insert the given data dictionary into the database,
-        using the given file information dictionary. Write the SQL command strings to
-        the given file path or to standard output, if no file path given.
-        """
-        if ((file_path is None) or (file_path == sys.stdout)):  # if writing to standard output
-            sys.stdout.write(self.make_file_info_comment(file_info))
-            sys.stdout.write('\n')
-            # sys.stdout.write(self.make_sql_insert_string(metadata, table_name))
-            sys.stdout.write('\n')
-
-        else:                               # else file path was given
-            with open(file_path, 'w') as outfile:
-                outfile.write(self.make_file_info_comment(file_info))
-                outfile.write('\n')
-                # outfile.write(self.make_sql_insert_string(metadata, table_name))
-                outfile.write('\n')
-
-
-    def write_table (self, table_name, metadata, file_info):
-        """ Generate and output SQL to create a new catalog table. """
+    def write_table (self, catalog_table, metadata, file_info):
+        """ Generate and output SQL that would create a new catalog table. """
         if (self._DEBUG):
-            print("({}.write_table): '{}'".format(self.TOOL_NAME, table_name), file=sys.stderr)
+            print("({}.write_table): '{}'".format(self.TOOL_NAME, catalog_table), file=sys.stderr)
 
         genfile = self.args.get('gen_file_path')
         outfile = self.args.get('output_file')
         if (genfile):                       # if generating the output filename/path
             fname = file_info.get('file_name') if file_info else "NO_FILENAME"
             outfile = self.gen_output_file_path(fname, SQL_EXTENSION, self.TOOL_NAME)
-            self.write_SQL(metadata, table_name, file_info, outfile)
+            self.write_SQL(catalog_table, metadata, file_info, outfile)
         elif (outfile is not None):         # else if using the given filepath
-            self.write_SQL(metadata, table_name, file_info, outfile)
+            self.write_SQL(catalog_table, metadata, file_info, outfile)
         else:                               # else using standard output
-            self.write_SQL(metadata, table_name, file_info)
+            self.write_SQL(catalog_table, metadata, file_info)
 
         if (self._VERBOSE):
             out_dest = outfile if (outfile) else STDOUT_NAME
             print("({}): SQL output to '{}'".format(self.TOOL_NAME, out_dest), file=sys.stderr)
+
+
+    def write_SQL (self, catalog_table, metadata, file_info, file_path=None):
+        """
+        Generate and output SQL commands which would create the specified table
+        in the database, using the given database configuration.
+        Writes the SQL command strings to the given file path or to standard output,
+        if no file path is given.
+
+        Note: the generated SQL strings are for debugging only and ARE NOT SQL-INJECTION safe.
+        """
+        comment = self.sql_file_info_comment_str(file_info)
+        create_str = pg_sql.sql_create_table_str(metadata, catalog_table)
+        self.output_SQL(create_str, comment=comment, file_path=file_path)
