@@ -1,9 +1,8 @@
 #
 # Class to sink incoming data to a python pickle file on disk.
 #   Written by: Tom Hicks. 6/17/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Remove unused import.
 #
-import configparser
 import pickle
 import sys
 

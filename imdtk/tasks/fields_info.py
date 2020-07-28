@@ -1,9 +1,8 @@
 #
 # Class to add information about desired fields to the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/2020.
-#   Last Modified: Revamp error handling.
+#   Last Modified: Remove unused import.
 #
-import configparser
 import toml
 import sys
 

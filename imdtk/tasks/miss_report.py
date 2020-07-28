@@ -1,9 +1,8 @@
 #
 # Class to report on the presence of missing fields in the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/2020.
-#   Last Modified: Revamp error handling.
+#   Last Modified: Remove unused import.
 #
-import configparser
 import sys
 
 import imdtk.exceptions as errors
