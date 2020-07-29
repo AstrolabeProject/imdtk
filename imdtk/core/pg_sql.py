@@ -1,7 +1,7 @@
 #
 # Module to interact with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: WIP: Add stubs for methods creating a new catalog table. Rename list catalog tables method.
+#   Last Modified: Add key/val match checks for hybrid insertions.
 #
 import sys
 from string import Template
@@ -113,7 +113,7 @@ def sql_create_table_str (datadict, table_name):
     Note: the returned string is for debugging only and IS NOT SQL-INJECTION safe.
     """
     # TODO: IMPLEMENT LATER
-    return "-- Creating table SQL string for table '{}'".format(table_name)
+    return "-- SQL string for creating table '{}'".format(table_name)
 
 
 def sql_insert_str (datadict, table_name):
@@ -131,18 +131,23 @@ def sql_insert_str (datadict, table_name):
 def sql_insert_hybrid_str (datadict, table_name):
     """
     Return an SQL string to insert a data dictionary into the named hybrid SQL/JSON table.
-
+    Returns None if the given data dictionary does not contain the field names required
+    for the hybrid table (including the 'metadata' field).
     Note: the returned string is for debugging only and IS NOT SQL-INJECTION safe.
     """
     fieldnames = SQL_FIELDS_HYBRID.copy()
-    fieldnames.append('metadata')       # add name of the JSON metadata field
+    num_keys = len(fieldnames)              # number of keys minus 1 (no metadata)
+    fieldnames.append('metadata')           # add name of the JSON metadata field
     keys = ', '.join(fieldnames)
 
     vals = [ datadict.get(key) for key in SQL_FIELDS_HYBRID if datadict.get(key) is not None ]
-    vals.append(to_JSON(datadict, sort_keys=True))  # add the JSON for the metadata field
-    values = ', '.join([ ("'{}'".format(v) if (isinstance(v, str)) else str(v)) for v in vals ])
-
-    return "insert into {0} ({1}) values ({2});".format(table_name, keys, values)
+    num_vals = len(vals)                    # number of values minus 1 (no metadata yet)
+    if (num_keys == num_vals):              # must have a value for each key
+        vals.append(to_JSON(datadict, sort_keys=True))  # add the JSON for the metadata field
+        values = ', '.join([ ("'{}'".format(v) if (isinstance(v, str)) else str(v)) for v in vals ])
+        return "insert into {0} ({1}) values ({2});".format(table_name, keys, values)
+    else:                                   # there was a mismatch of keys and values
+        return None                         # signal failure
 
 
 def sql4_table_insert (datadict, table_name):
@@ -163,17 +168,23 @@ def sql4_hybrid_table_insert (datadict, table_name):
     Return appropriate data structures for inserting the given data dictionary
     into a database via a database access library. Currently using Psycopg2,
     so return a tuple of an INSERT template string and a sequence of values.
+    Returns None if the given data dictionary does not contain the field names required
+    for the hybrid table (including the 'metadata' field).
     """
     fieldnames = SQL_FIELDS_HYBRID.copy()
-    fieldnames.append('metadata')       # add name of the JSON metadata field
+    num_keys = len(fieldnames)              # number of keys minus 1 (no metadata)
+    fieldnames.append('metadata')           # add name of the JSON metadata field
     keys = ', '.join(fieldnames)
 
     values = [ datadict.get(key) for key in SQL_FIELDS_HYBRID if datadict.get(key) is not None ]
-    values.append(to_JSON(datadict, sort_keys=True))  # add the JSON for the metadata field
-
-    place_holders = ', '.join(['%s' for v in values])
-    template = "insert into {0} ({1}) values ({2});".format(table_name, keys, place_holders)
-    return (template, values)
+    num_vals = len(values)                  # number of values minus 1 (no metadata yet)
+    if (num_keys == num_vals):              # must have a value for each key
+        values.append(to_JSON(datadict, sort_keys=True))  # add the JSON for the metadata field
+        place_holders = ', '.join(['%s' for v in values])
+        template = "insert into {0} ({1}) values ({2});".format(table_name, keys, place_holders)
+        return (template, values)
+    else:                                   # there was a mismatch of keys and values
+        return None                         # signal failure
 
 
 def store_to_table (dbconfig, datadict, table_name):
