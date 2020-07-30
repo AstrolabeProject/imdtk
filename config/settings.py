@@ -36,8 +36,5 @@ PROGRAM_NAME = 'imdtk'
 # List of required SQL fields in the hybrid PG/JSON database table (excluding JSON fields):
 SQL_FIELDS_HYBRID = [ 's_dec', 's_ra', 'obs_collection', 'is_public' ]
 
-# Path to the tests directory.
-TEST_DIR = "{}/tests".format(APP_ROOT)
-
 # Work directory: the mount point in the container for file input and output.
 WORK_DIR = '/work'
