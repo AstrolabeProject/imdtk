@@ -3,24 +3,16 @@
 #   Last Modified: Add tests for sql_insert_str, sql_insert_hybrid_str, sql4_hybrid_table_insert
 #                  and stubs for sql_create_table and sql_create_table_str.
 #
-import pytest
-
 from config.settings import SQL_FIELDS_HYBRID
+from tests.imdtk.sql_test_setup import load_test_dbconfig
 import imdtk.core.pg_sql as pgsql
 
 
 class TestPgSql(object):
 
-    args = { 'debug': True, 'verbose': True }
-    dbargs = {
-        # 'db_host': 'pgdb',
-        # 'db_name': 'vos',
-        # 'db_port': '5432',
-        # 'db_pwd': 'changeMe',
-        # 'db_user': 'astrolabe',
-        'db_schema_name': 'sia',
-        'db_uri': 'postgresql://astrolabe:changeMe@pgdb:5432/vos'
-    }
+    args = { 'debug': True, 'verbose': True, 'TOOL_NAME': 'TestPgSql'}
+    dbargs = load_test_dbconfig(tool_name='TestPgSql')
+    print("TestPgSql:dbargs={}".format(dbargs))
 
     datad = {
         "SIMPLE": True,

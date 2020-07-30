@@ -7,7 +7,7 @@ import pytest
 from pathlib import Path
 
 import imdtk.core.file_utils as utils
-from config.settings import TEST_DIR
+from tests import TEST_DIR
 
 
 class TestFileUtils(object):
@@ -33,8 +33,9 @@ class TestFileUtils(object):
 
 
     def test_full_path(self):
-        assert utils.full_path('~') == '/root'
-        assert utils.full_path('~/.bashrc') == '/root/.bashrc'
+        home = str(Path.home())
+        assert utils.full_path('~') == home
+        assert utils.full_path('~/.bashrc') == f'{home}/.bashrc'
         assert utils.full_path(self.tmpPath) == self.tmpPath
         assert utils.full_path('/tmp/somefile') == '/tmp/somefile'
         assert utils.full_path('/tmp/somefile.py') == '/tmp/somefile.py'
@@ -50,26 +51,27 @@ class TestFileUtils(object):
 
     def test_good_dir_path(self):
         # also tests is_readable
-        assert utils.good_dir_path('dummy') == False
-        assert utils.good_dir_path(self.fylPath) == False
-        assert utils.good_dir_path(self.dirPath) == False
+        assert utils.good_dir_path('dummy') is False
+        assert utils.good_dir_path(self.fylPath) is False
+        assert utils.good_dir_path(self.dirPath) is False
 
-        assert utils.good_dir_path('.') == True
-        assert utils.good_dir_path('/') == True
-        assert utils.good_dir_path(self.tmpPath) == True
+        assert utils.good_dir_path('.') is True
+        assert utils.good_dir_path('/') is True
+        assert utils.good_dir_path(self.tmpPath) is True
 
         # setup directories and links
-        os.mkdir(self.dirPath, mode=0o444)
-        dirp = Path(self.dirPath)
-        dlnk = Path(self.dirLink)
-        dlnk.symlink_to(dirp)
+        try:
+            os.mkdir(self.dirPath, mode=0o444)
+            dirp = Path(self.dirPath)
+            dlnk = Path(self.dirLink)
+            dlnk.symlink_to(dirp)
 
-        assert utils.good_dir_path(self.dirPath) == True
-        assert utils.good_dir_path(self.dirLink) == True
-
-        # cleanup directories and links
-        os.rmdir(self.dirPath)
-        os.remove(self.dirLink)
+            assert utils.good_dir_path(self.dirPath) is True
+            assert utils.good_dir_path(self.dirLink) is True
+        finally:
+            # cleanup directories and links
+            os.rmdir(self.dirPath)
+            os.remove(self.dirLink)
 
 
     def test_good_dir_path_write(self):
@@ -79,23 +81,24 @@ class TestFileUtils(object):
         assert utils.good_dir_path(self.dirPath, True) == False
 
         assert utils.good_dir_path('.', True) == True
-        assert utils.good_dir_path('/', True) == True
         assert utils.good_dir_path(self.tmpPath, True) == True
 
-        # setup directories and links
-        os.mkdir(self.dirPath, mode=0o555)
-        dirp = Path(self.dirPath)
-        dlnk = Path(self.dirLink)
-        dlnk.symlink_to(dirp)
+        try:
+            # setup directories and links
+            os.mkdir(self.dirPath, mode=0o775)
+            dirp = Path(self.dirPath)
+            dlnk = Path(self.dirLink)
+            dlnk.symlink_to(dirp)
 
-        assert utils.good_dir_path(self.dirPath) == True
-        assert utils.good_dir_path(self.dirPath, True) == True
-        assert utils.good_dir_path(self.dirLink) == True
-        assert utils.good_dir_path(self.dirLink, True) == True
+            assert utils.good_dir_path(self.dirPath) == True
+            assert utils.good_dir_path(self.dirPath, True) == True
+            assert utils.good_dir_path(self.dirLink) == True
+            assert utils.good_dir_path(self.dirLink, True) == True
 
-        # cleanup directories and links
-        os.rmdir(self.dirPath)
-        os.remove(self.dirLink)
+        finally:
+            # cleanup directories and links
+            os.rmdir(self.dirPath)
+            os.remove(self.dirLink)
 
 
     def test_good_file_path(self):
@@ -197,16 +200,15 @@ class TestFileUtils(object):
         FILE_EXTENTS = ['.txt']
         testpaths = [ '.', '/', '/NoSuch',
                       self.tmpPath,
-                      '/tmp/NoSuch', '/work',
+                      '/tmp/NoSuch',
                       self.empty_tstfyl,
                       self.m13_tstfyl,
                       '/images/JADES/NONE.fits',
                       '', None ]
         pathlst = utils.validate_path_strings(testpaths, FILE_EXTENTS)
         print("PATHLIST={}".format(pathlst))
-        assert len(pathlst) == 5
+        assert len(pathlst) == 4
         assert self.tmpPath in pathlst
-        assert '/work' in pathlst
         assert self.empty_tstfyl in pathlst
         assert self.m13_tstfyl not in pathlst
         assert '/images/JADES/NONE.fits' not in pathlst
@@ -216,16 +218,15 @@ class TestFileUtils(object):
         FITS_EXTENTS = ['.fits', '.fits.gz']
         testpaths = [ '.', '/', '/NoSuch',
                       self.tmpPath,
-                      '/tmp/NoSuch', '/work',
+                      '/tmp/NoSuch',
                       self.empty_tstfyl,
                       self.m13_tstfyl,
                       '/images/JADES/NONE.fits',
                       '', None ]
         pathlst = utils.validate_path_strings(testpaths, FITS_EXTENTS)
         print("PATHLIST={}".format(pathlst))
-        assert len(pathlst) == 5
+        assert len(pathlst) == 4
         assert self.tmpPath in pathlst
-        assert '/work' in pathlst
         assert self.m13_tstfyl in pathlst
         assert '/images/JADES/NONE.fits' not in pathlst
         assert self.empty_tstfyl not in pathlst

@@ -8,9 +8,9 @@ from pytest import approx
 from astropy import wcs
 from astropy.io import fits
 
-from config.settings import TEST_DIR
 import imdtk.exceptions as errors
 import imdtk.tasks.oc_calc_utils as utils
+from tests import TEST_DIR
 
 
 class TestOcCalcUtils(object):

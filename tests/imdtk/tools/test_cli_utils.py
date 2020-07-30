@@ -4,10 +4,9 @@
 #
 import argparse
 import pytest
-import os
 
 import imdtk.tools.cli_utils as utils
-from config.settings import TEST_DIR
+from tests import TEST_DIR
 
 TOOL_NAME = 'TEST_CLI_UTILS'
 VERSION = '0.10.0'

@@ -11,7 +11,7 @@ from astropy.time.core import Time
 from astropy.io import fits
 
 import imdtk.core.fits_utils as utils
-from config.settings import TEST_DIR
+from tests import TEST_DIR
 
 
 class TestFitsUtils(object):
