@@ -4,6 +4,7 @@ LABEL maintainer="Tom Hicks hickst@email.arizona.edu"
 
 ARG TESTS=notests
 
+ENV RUNNING_IN_CONTAINER True
 ENV INSTALL_PATH /imdtk
 
 RUN mkdir -p $INSTALL_PATH /catalogs /images /work
