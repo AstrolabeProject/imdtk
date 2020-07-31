@@ -1,6 +1,6 @@
 # Tests of the FITS specific utilities module.
 #   Written by: Tom Hicks. 4/7/2020.
-#   Last Modified: Add test for table_to_JSON.
+#   Last Modified: Update to reduce PEP8 issues.
 #
 import json
 import pytest
@@ -16,10 +16,10 @@ from tests import TEST_DIR
 
 class TestFitsUtils(object):
 
-    empty_tstfyl  = "{}/resources/empty.txt".format(TEST_DIR)
-    m13_tstfyl    = "{}/resources/m13.fits".format(TEST_DIR)
+    empty_tstfyl = "{}/resources/empty.txt".format(TEST_DIR)
+    m13_tstfyl = "{}/resources/m13.fits".format(TEST_DIR)
     mdkeys_tstfyl = "{}/resources/mdkeys.txt".format(TEST_DIR)
-    table_tstfyl  = "{}/resources/small_table.fits".format(TEST_DIR)
+    table_tstfyl = "{}/resources/small_table.fits".format(TEST_DIR)
     resources_tstdir = "{}/resources".format(TEST_DIR)
 
 
@@ -124,7 +124,7 @@ class TestFitsUtils(object):
     def test_get_header_fields_badindex(self):
         hdrs = None
         with fits.open(self.m13_tstfyl) as hdus:
-            hdrs = utils.get_header_fields(hdus, 1) # no HDU at index 1
+            hdrs = utils.get_header_fields(hdus, 1)  # no HDU at index 1
         assert hdrs is None
 
 
@@ -219,57 +219,57 @@ class TestFitsUtils(object):
 
     def test_is_catalog_file(self):
         with fits.open(self.table_tstfyl) as hdus:
-            assert utils.is_catalog_file(hdus) == True
+            assert utils.is_catalog_file(hdus) is True
 
 
     def test_is_catalog_file_good_hdu(self):
         with fits.open(self.table_tstfyl) as hdus:
-            assert utils.is_catalog_file(hdus, which_hdu=1) == True
+            assert utils.is_catalog_file(hdus, which_hdu=1) is True
 
 
     def test_is_catalog_file_no_cat(self):
         with fits.open(self.m13_tstfyl) as hdus:
-            assert utils.is_catalog_file(hdus) == False
+            assert utils.is_catalog_file(hdus) is False
 
 
     def test_is_catalog_file_bad_low_hdu(self):
         with fits.open(self.table_tstfyl) as hdus:
-            assert utils.is_catalog_file(hdus, which_hdu=0) == False
+            assert utils.is_catalog_file(hdus, which_hdu=0) is False
 
 
     def test_is_catalog_file_bad_high_hdu(self):
         with fits.open(self.table_tstfyl) as hdus:
-            assert utils.is_catalog_file(hdus, which_hdu=2) == False
+            assert utils.is_catalog_file(hdus, which_hdu=2) is False
 
 
 
 
     def test_is_fits_file(self):
-        assert utils.is_fits_file('m13.fits') == True
-        assert utils.is_fits_file('m13.fits.gz') == True
-        assert utils.is_fits_file('/usr/dummy/m13.fits') == True
-        assert utils.is_fits_file('/usr/dummy/m13.fits.gz') == True
+        assert utils.is_fits_file('m13.fits') is True
+        assert utils.is_fits_file('m13.fits.gz') is True
+        assert utils.is_fits_file('/usr/dummy/m13.fits') is True
+        assert utils.is_fits_file('/usr/dummy/m13.fits.gz') is True
 
-        assert utils.is_fits_file('m13') == False
-        assert utils.is_fits_file('m13-fits') == False
-        assert utils.is_fits_file('m13.gz') == False
-        assert utils.is_fits_file('/usr/dummy/m13') == False
-        assert utils.is_fits_file('/usr/dummy/m13-fits') == False
-        assert utils.is_fits_file('/usr/dummy/m13.gz') == False
+        assert utils.is_fits_file('m13') is False
+        assert utils.is_fits_file('m13-fits') is False
+        assert utils.is_fits_file('m13.gz') is False
+        assert utils.is_fits_file('/usr/dummy/m13') is False
+        assert utils.is_fits_file('/usr/dummy/m13-fits') is False
+        assert utils.is_fits_file('/usr/dummy/m13.gz') is False
 
 
     def test_is_fits_filename(self):
-        assert utils.is_fits_filename('m13.fits') == True
-        assert utils.is_fits_filename('m13.fits.gz') == True
-        assert utils.is_fits_filename('/usr/dummy/m13.fits') == True
-        assert utils.is_fits_filename('/usr/dummy/m13.fits.gz') == True
+        assert utils.is_fits_filename('m13.fits') is True
+        assert utils.is_fits_filename('m13.fits.gz') is True
+        assert utils.is_fits_filename('/usr/dummy/m13.fits') is True
+        assert utils.is_fits_filename('/usr/dummy/m13.fits.gz') is True
 
-        assert utils.is_fits_filename('m13') == False
-        assert utils.is_fits_filename('m13.gz') == False
-        assert utils.is_fits_filename('m13-fits') == False
-        assert utils.is_fits_filename('/usr/dummy/m13') == False
-        assert utils.is_fits_filename('/usr/dummy/m13-fits') == False
-        assert utils.is_fits_filename('/usr/dummy/m13.gz') == False
+        assert utils.is_fits_filename('m13') is False
+        assert utils.is_fits_filename('m13.gz') is False
+        assert utils.is_fits_filename('m13-fits') is False
+        assert utils.is_fits_filename('/usr/dummy/m13') is False
+        assert utils.is_fits_filename('/usr/dummy/m13-fits') is False
+        assert utils.is_fits_filename('/usr/dummy/m13.gz') is False
 
 
 

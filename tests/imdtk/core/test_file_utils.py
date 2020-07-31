@@ -1,9 +1,8 @@
 # Tests for the file utilities module.
 #   Written by: Tom Hicks. 5/22/2020.
-#   Last Modified: Update to use test root relative resource files.
+#   Last Modified: Update to reduce PEP8 issues.
 #
 import os
-import pytest
 from pathlib import Path
 
 import imdtk.core.file_utils as utils
@@ -18,10 +17,10 @@ class TestFileUtils(object):
     fylPath = '/tmp/HiGhLy_UnLiKeLy'
     fylLink = '/tmp/linkToHiGhLy_UnLiKeLy'
 
-    empty_tstfyl  = "{}/resources/empty.txt".format(TEST_DIR)
-    m13_tstfyl    = "{}/resources/m13.fits".format(TEST_DIR)
+    empty_tstfyl = "{}/resources/empty.txt".format(TEST_DIR)
+    m13_tstfyl = "{}/resources/m13.fits".format(TEST_DIR)
     mdkeys_tstfyl = "{}/resources/mdkeys.txt".format(TEST_DIR)
-    table_tstfyl  = "{}/resources/small_table.fits".format(TEST_DIR)
+    table_tstfyl = "{}/resources/small_table.fits".format(TEST_DIR)
 
 
     def test_filename_core(self):
@@ -76,12 +75,12 @@ class TestFileUtils(object):
 
     def test_good_dir_path_write(self):
         # also tests is_writable
-        assert utils.good_dir_path('dummy', True) == False
-        assert utils.good_dir_path(self.fylPath, True) == False
-        assert utils.good_dir_path(self.dirPath, True) == False
+        assert utils.good_dir_path('dummy', True) is False
+        assert utils.good_dir_path(self.fylPath, True) is False
+        assert utils.good_dir_path(self.dirPath, True) is False
 
-        assert utils.good_dir_path('.', True) == True
-        assert utils.good_dir_path(self.tmpPath, True) == True
+        assert utils.good_dir_path('.', True) is True
+        assert utils.good_dir_path(self.tmpPath, True) is True
 
         try:
             # setup directories and links
@@ -90,10 +89,10 @@ class TestFileUtils(object):
             dlnk = Path(self.dirLink)
             dlnk.symlink_to(dirp)
 
-            assert utils.good_dir_path(self.dirPath) == True
-            assert utils.good_dir_path(self.dirPath, True) == True
-            assert utils.good_dir_path(self.dirLink) == True
-            assert utils.good_dir_path(self.dirLink, True) == True
+            assert utils.good_dir_path(self.dirPath) is True
+            assert utils.good_dir_path(self.dirPath, True) is True
+            assert utils.good_dir_path(self.dirLink) is True
+            assert utils.good_dir_path(self.dirLink, True) is True
 
         finally:
             # cleanup directories and links
@@ -103,12 +102,12 @@ class TestFileUtils(object):
 
     def test_good_file_path(self):
         # also tests is_readable
-        assert utils.good_file_path('.') == False
-        assert utils.good_file_path('/') == False
-        assert utils.good_file_path(self.tmpPath) == False
-        assert utils.good_file_path('dummy') == False
-        assert utils.good_file_path('/dummy') == False
-        assert utils.good_file_path('/images/JADES/NONE.fits') == False
+        assert utils.good_file_path('.') is False
+        assert utils.good_file_path('/') is False
+        assert utils.good_file_path(self.tmpPath) is False
+        assert utils.good_file_path('dummy') is False
+        assert utils.good_file_path('/dummy') is False
+        assert utils.good_file_path('/images/JADES/NONE.fits') is False
 
         # setup files and links
         fylp = Path(self.fylPath)
@@ -116,8 +115,8 @@ class TestFileUtils(object):
         flnk = Path(self.fylLink)
         flnk.symlink_to(fylp)               # ln -s fylPath fylLink
 
-        assert utils.good_file_path(self.fylPath) == True
-        assert utils.good_file_path(self.fylLink) == True
+        assert utils.good_file_path(self.fylPath) is True
+        assert utils.good_file_path(self.fylLink) is True
 
         # cleanup directories and links
         os.remove(self.fylPath)
@@ -126,12 +125,12 @@ class TestFileUtils(object):
 
     def test_good_file_path_write(self):
         # also tests is_writable
-        assert utils.good_file_path('.', True) == False
-        assert utils.good_file_path('/', True) == False
-        assert utils.good_file_path('dummy') == False
-        assert utils.good_file_path(self.tmpPath, True) == False
-        assert utils.good_file_path(self.fylPath) == False
-        assert utils.good_file_path(self.fylLink) == False
+        assert utils.good_file_path('.', True) is False
+        assert utils.good_file_path('/', True) is False
+        assert utils.good_file_path('dummy') is False
+        assert utils.good_file_path(self.tmpPath, True) is False
+        assert utils.good_file_path(self.fylPath) is False
+        assert utils.good_file_path(self.fylLink) is False
 
         # setup files and links
         fylp = Path(self.fylPath)
@@ -139,8 +138,8 @@ class TestFileUtils(object):
         flnk = Path(self.fylLink)
         flnk.symlink_to(fylp)               # ln -s fylPath fylLink
 
-        assert utils.good_file_path(self.fylPath) == True
-        assert utils.good_file_path(self.fylLink) == True
+        assert utils.good_file_path(self.fylPath) is True
+        assert utils.good_file_path(self.fylLink) is True
 
         # cleanup directories and links
         os.remove(self.fylPath)
@@ -149,51 +148,51 @@ class TestFileUtils(object):
 
     def test_is_acceptable_filename(self):
         FITS_EXTS = ['.fits', '.fits.gz']
-        assert utils.is_acceptable_filename('.fits', FITS_EXTS) == True
-        assert utils.is_acceptable_filename('.fits.fits', FITS_EXTS) == True
-        assert utils.is_acceptable_filename('x.fits', FITS_EXTS) == True
-        assert utils.is_acceptable_filename('X.Y.fits', FITS_EXTS) == True
-        assert utils.is_acceptable_filename('XXX-YYY_.fits', FITS_EXTS) == True
-        assert utils.is_acceptable_filename('.fits.gz', FITS_EXTS) == True
-        assert utils.is_acceptable_filename('.fits.fits.gz', FITS_EXTS) == True
-        assert utils.is_acceptable_filename('x.fits.gz', FITS_EXTS) == True
-        assert utils.is_acceptable_filename('X.Y.fits.gz', FITS_EXTS) == True
-        assert utils.is_acceptable_filename('XXX-YYY_.fits.gz', FITS_EXTS) == True
+        assert utils.is_acceptable_filename('.fits', FITS_EXTS) is True
+        assert utils.is_acceptable_filename('.fits.fits', FITS_EXTS) is True
+        assert utils.is_acceptable_filename('x.fits', FITS_EXTS) is True
+        assert utils.is_acceptable_filename('X.Y.fits', FITS_EXTS) is True
+        assert utils.is_acceptable_filename('XXX-YYY_.fits', FITS_EXTS) is True
+        assert utils.is_acceptable_filename('.fits.gz', FITS_EXTS) is True
+        assert utils.is_acceptable_filename('.fits.fits.gz', FITS_EXTS) is True
+        assert utils.is_acceptable_filename('x.fits.gz', FITS_EXTS) is True
+        assert utils.is_acceptable_filename('X.Y.fits.gz', FITS_EXTS) is True
+        assert utils.is_acceptable_filename('XXX-YYY_.fits.gz', FITS_EXTS) is True
 
-        assert utils.is_acceptable_filename('.', FITS_EXTS) == False
-        assert utils.is_acceptable_filename('.fitsy', FITS_EXTS) == False
-        assert utils.is_acceptable_filename('.fits.fitsy', FITS_EXTS) == False
-        assert utils.is_acceptable_filename('fits', FITS_EXTS) == False
-        assert utils.is_acceptable_filename('fits.gz', FITS_EXTS) == False
-        assert utils.is_acceptable_filename('X.fit', FITS_EXTS) == False
-        assert utils.is_acceptable_filename('X.fitsgz', FITS_EXTS) == False
-        assert utils.is_acceptable_filename('bad.fits_gz', FITS_EXTS) == False
-        assert utils.is_acceptable_filename('yyy.exe', FITS_EXTS) == False
-        assert utils.is_acceptable_filename('YYY.EXE', FITS_EXTS) == False
-        assert utils.is_acceptable_filename('BAD.ONE', FITS_EXTS) == False
-        assert utils.is_acceptable_filename('BAD.ONE.gz', FITS_EXTS) == False
+        assert utils.is_acceptable_filename('.', FITS_EXTS) is False
+        assert utils.is_acceptable_filename('.fitsy', FITS_EXTS) is False
+        assert utils.is_acceptable_filename('.fits.fitsy', FITS_EXTS) is False
+        assert utils.is_acceptable_filename('fits', FITS_EXTS) is False
+        assert utils.is_acceptable_filename('fits.gz', FITS_EXTS) is False
+        assert utils.is_acceptable_filename('X.fit', FITS_EXTS) is False
+        assert utils.is_acceptable_filename('X.fitsgz', FITS_EXTS) is False
+        assert utils.is_acceptable_filename('bad.fits_gz', FITS_EXTS) is False
+        assert utils.is_acceptable_filename('yyy.exe', FITS_EXTS) is False
+        assert utils.is_acceptable_filename('YYY.EXE', FITS_EXTS) is False
+        assert utils.is_acceptable_filename('BAD.ONE', FITS_EXTS) is False
+        assert utils.is_acceptable_filename('BAD.ONE.gz', FITS_EXTS) is False
 
 
     def test_path_has_dots(self):
-        assert utils.path_has_dots('.') == True
-        assert utils.path_has_dots('..') == True
-        assert utils.path_has_dots('./..') == True
-        assert utils.path_has_dots('./usr/dummy/') == True
-        assert utils.path_has_dots('../usr/dummy/') == True
-        assert utils.path_has_dots('/usr/dummy/./smarty') == True
-        assert utils.path_has_dots('/usr/dummy/../smarty') == True
-        assert utils.path_has_dots('/usr/dummy/.') == True
-        assert utils.path_has_dots('/usr/dummy/..') == True
+        assert utils.path_has_dots('.') is True
+        assert utils.path_has_dots('..') is True
+        assert utils.path_has_dots('./..') is True
+        assert utils.path_has_dots('./usr/dummy/') is True
+        assert utils.path_has_dots('../usr/dummy/') is True
+        assert utils.path_has_dots('/usr/dummy/./smarty') is True
+        assert utils.path_has_dots('/usr/dummy/../smarty') is True
+        assert utils.path_has_dots('/usr/dummy/.') is True
+        assert utils.path_has_dots('/usr/dummy/..') is True
 
-        assert utils.path_has_dots(None) == False
-        assert utils.path_has_dots('') == False
-        assert utils.path_has_dots('dummy') == False
-        assert utils.path_has_dots('dummy.txt') == False
-        assert utils.path_has_dots('dummy.file.txt') == False
-        assert utils.path_has_dots('/') == False
-        assert utils.path_has_dots('/dummy') == False
-        assert utils.path_has_dots('/usr/dummy') == False
-        assert utils.path_has_dots('/usr/dummy/') == False
+        assert utils.path_has_dots(None) is False
+        assert utils.path_has_dots('') is False
+        assert utils.path_has_dots('dummy') is False
+        assert utils.path_has_dots('dummy.txt') is False
+        assert utils.path_has_dots('dummy.file.txt') is False
+        assert utils.path_has_dots('/') is False
+        assert utils.path_has_dots('/dummy') is False
+        assert utils.path_has_dots('/usr/dummy') is False
+        assert utils.path_has_dots('/usr/dummy/') is False
 
 
     def test_validate_path_strings(self):
