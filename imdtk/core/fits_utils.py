@@ -4,7 +4,6 @@
 #   Last Modified: Add method to dump FITS table as JSON.
 #
 import fnmatch
-import json
 from collections import OrderedDict
 
 from astropy import wcs
@@ -32,7 +31,7 @@ FITS_MIME_TYPE = 'image/fits'
 
 # FITS data type code to name translation table
 PIXTYPE_TABLE = {
-     8:  'byte',  16: 'short',   32:  'int',  64:  'long',  -32:  'float',  -64:  'double',
+    8: 'byte', 16: 'short', 32: 'int', 64: 'long', -32: 'float', -64: 'double',
     '8': 'byte', '16': 'short', '32': 'int', '64': 'long', '-32': 'float', '-64': 'double',
 }
 

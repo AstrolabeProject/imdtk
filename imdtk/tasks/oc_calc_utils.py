@@ -3,8 +3,6 @@
 #   Written by: Tom Hicks. 6/11/2020.
 #   Last Modified: Revamp error handling.
 #
-import sys
-
 import imdtk.exceptions as errors
 import imdtk.core.fits_utils as fits_utils
 import imdtk.tasks.metadata_utils as md_utils
@@ -28,10 +26,10 @@ def calc_corners (wcs_info, calculations):
     """
     corners = fits_utils.get_image_corners(wcs_info)
     if (len(corners) == 4):
-        set_corner_field(calculations, 'im_ra1', 'im_dec1', corners[0]) # LowerLeft
-        set_corner_field(calculations, 'im_ra2', 'im_dec2', corners[1]) # UpperLeft
-        set_corner_field(calculations, 'im_ra3', 'im_dec3', corners[2]) # UpperRight
-        set_corner_field(calculations, 'im_ra4', 'im_dec4', corners[3]) # LowerRight
+        set_corner_field(calculations, 'im_ra1', 'im_dec1', corners[0])  # LowerLeft
+        set_corner_field(calculations, 'im_ra2', 'im_dec2', corners[1])  # UpperLeft
+        set_corner_field(calculations, 'im_ra3', 'im_dec3', corners[2])  # UpperRight
+        set_corner_field(calculations, 'im_ra4', 'im_dec4', corners[3])  # LowerRight
 
     # now use the corners to calculate the min/max spatial limits of the image
     calc_spatial_limits(corners, calculations)
@@ -100,19 +98,19 @@ def calc_wcs_coordinates (wcs_info, calculations):
     This method assumes that neither s_ra nor s_dec fields have a value yet and it will
     overwrite current values for both s_ra and s_dec if that assumption is not valid.
     """
-    if (('s_ra' in calculations) and ('s_dec' in calculations)): # avoid repetition
+    if (('s_ra' in calculations) and ('s_dec' in calculations)):  # avoid repetition
         return                          # exit out now
 
     crval = list(wcs_info.wcs.crval)
     ctype = list(wcs_info.wcs.ctype)
 
     if ((len(crval) > 1) and (len(ctype) > 1)):
-        if (ctype[0].startswith('RA')):      # if CRVAL1 has the RA value
-            calculations['s_ra']  = crval[0] # put CRVAL1 value into s_ra
-            calculations['s_dec'] = crval[1] # put CRVAL2 value into s_dec
-        elif (ctype[0].startswith('DEC')):   # else if CRVAL1 has the DEC value
-            calculations['s_dec'] = crval[0] # put CRVAL1 value into s_dec
-            calculations['s_ra']  = crval[1] # put CRVAL2 value into s_ra
+        if (ctype[0].startswith('RA')):        # if CRVAL1 has the RA value
+            calculations['s_ra'] = crval[0]    # put CRVAL1 value into s_ra
+            calculations['s_dec'] = crval[1]   # put CRVAL2 value into s_dec
+        elif (ctype[0].startswith('DEC')):     # else if CRVAL1 has the DEC value
+            calculations['s_dec'] = crval[0]   # put CRVAL1 value into s_dec
+            calculations['s_ra'] = crval[1]    # put CRVAL2 value into s_ra
         else:
             errMsg = "(calc_wcs_coords) Unable to assign RA/DEC axes from ctype={}".format(ctype)
             raise errors.ProcessingError(errMsg)

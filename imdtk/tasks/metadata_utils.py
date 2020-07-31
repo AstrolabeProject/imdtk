@@ -3,7 +3,6 @@
 #   Written by: Tom Hicks. 6/13/2020.
 #   Last Modified: Remove unused import.
 #
-import sys
 
 
 def get_aliased (metadata):

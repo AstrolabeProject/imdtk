@@ -155,7 +155,7 @@ class IImdTask ():
         time_now = datetime.datetime.now()
         now_str = time_now.strftime("%Y%m%d_%H%M%S-%f")
         fname = file_utils.filename_core(file_path)
-        tname = '_'+task_name if task_name else ''
+        tname = '_' + task_name if task_name else ''
         return "{0}/{1}{2}_{3}.{4}".format(out_dir, fname, tname, now_str, extension)
 
 
@@ -178,7 +178,7 @@ class IImdTask ():
         Jsonify and write the given data structure to the given file path,
         standard output, or standard error.
         """
-        if ((file_path is None) or (file_path == sys.stdout)): # if writing to standard output
+        if ((file_path is None) or (file_path == sys.stdout)):  # if writing to standard output
             json.dump(data, sys.stdout, indent=2)
             sys.stdout.write('\n')
 

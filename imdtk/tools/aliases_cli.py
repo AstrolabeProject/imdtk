@@ -52,11 +52,11 @@ def main (argv=None):
 
     # if input file path given, check the file path for validity
     input_file = args.get('input_file')
-    cli_utils.check_input_file(input_file, TOOL_NAME) # may exit here and not return!
+    cli_utils.check_input_file(input_file, TOOL_NAME)  # may exit here and not return!
 
     # if aliases file path given, check the file path for validity
     alias_file = args.get('alias_file')
-    cli_utils.check_alias_file(alias_file, TOOL_NAME) # may exit here and not return!
+    cli_utils.check_alias_file(alias_file, TOOL_NAME)  # may exit here and not return!
 
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME

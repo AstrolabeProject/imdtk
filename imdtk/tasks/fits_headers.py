@@ -10,7 +10,7 @@ from astropy.io import fits
 
 import imdtk.exceptions as errors
 import imdtk.core.fits_utils as fits_utils
-from imdtk.tasks.i_task import IImdTask, STDOUT_NAME
+from imdtk.tasks.i_task import IImdTask
 
 
 class FitsHeadersSourceTask (IImdTask):

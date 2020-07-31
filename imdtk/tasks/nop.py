@@ -5,6 +5,7 @@
 #
 from imdtk.tasks.i_task import IImdTask
 
+
 class NopTask (IImdTask):
     """ Class to pass through the input to the output unchanged. """
 

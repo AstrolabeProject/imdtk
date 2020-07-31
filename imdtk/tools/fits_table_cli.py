@@ -58,7 +58,7 @@ def main (argv=None):
 
     # check the required FITS file path for validity
     fits_file = args.get('fits_file')
-    cli_utils.check_fits_file(fits_file, TOOL_NAME) # may system exit here and not return!
+    cli_utils.check_fits_file(fits_file, TOOL_NAME)  # may system exit here and not return!
 
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME

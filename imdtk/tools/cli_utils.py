@@ -94,7 +94,7 @@ def add_fits_file_arguments (parser, tool_name, version):
         '-ff', '--fits-file', dest='fits_file', required=True, metavar='filepath',
         help='Path to a readable FITS image file from which to extract metadata [required]'
     )
-    add_hdu_arguments(parser, tool_name, version) # now add HDU argument
+    add_hdu_arguments(parser, tool_name, version)  # now add HDU argument
 
 
 def add_hdu_arguments (parser, tool_name, version):

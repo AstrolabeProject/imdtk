@@ -54,7 +54,7 @@ class PickleSink (IImdTask):
 
     def output_pickle (self, data, file_path, protocol=None):
         """ Pickle the given data and write it to the given output file. """
-        if ((file_path is None) or (file_path == sys.stdout)): # if trying standard output
+        if ((file_path is None) or (file_path == sys.stdout)):  # if trying standard output
             return                          # exit out now
         else:                               # else file path was given
             with open(file_path, 'wb') as outfile:

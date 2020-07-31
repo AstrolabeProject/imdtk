@@ -6,7 +6,6 @@
 import abc
 import configparser
 
-import imdtk.core.fits_utils as fits_utils
 
 class IFitsFileProcessor (abc.ABC):
 

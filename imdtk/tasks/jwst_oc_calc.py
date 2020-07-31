@@ -73,9 +73,9 @@ class JWST_ObsCoreCalcTask (IObsCoreCalcTask):
 
         # try to produce values for each of the desired result fields
         calculated = self.calculate_results(wcs_info, metadata)
-        metadata['calculated'] = calculated # add calculations to metadata
+        metadata['calculated'] = calculated  # add calculations to metadata
 
-        return metadata                     # return the results of processing
+        return metadata                      # return the results of processing
 
 
     def calc_access_url (self, metadata, calculations):

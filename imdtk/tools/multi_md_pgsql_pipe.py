@@ -70,7 +70,7 @@ def main (argv=None):
 
     # check the required image directory path for validity
     input_dir = args.get('input_dir')
-    cli_utils.check_input_dir(input_dir, TOOL_NAME) # may system exit here and not return!
+    cli_utils.check_input_dir(input_dir, TOOL_NAME)  # may system exit here and not return!
 
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME
@@ -102,7 +102,7 @@ def main (argv=None):
                     jwst_oc_calcTask.process(
                         fields_infoTask.process(
                             aliasesTask.process(
-                                fits_headersTask.process(None)))))) # metadata source
+                                fits_headersTask.process(None))))))  # metadata source
 
             proc_count += 1                       # increment count of processed files
 

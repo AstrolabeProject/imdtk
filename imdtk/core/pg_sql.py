@@ -4,7 +4,7 @@
 #   Last Modified: Add key/val match checks for hybrid insertions.
 #
 import sys
-from string import Template
+# from string import Template
 
 import psycopg2
 
