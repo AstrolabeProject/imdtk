@@ -16,13 +16,14 @@ TARG=/imdtk
 TSTIMG=imdtk:test
 
 
-.PHONY: help bash cleanwork docker dockert down exec run runit runtc runte stop up watch
+.PHONY: help bash cleancache cleanwork docker dockert down exec run runit runtc runte stop up watch
 
 help:
-	@echo "Make what? Try: bash, cleanwork, docker, dockert, down, run, runit, runt1, runtc, runtep, stop, up, watch"
+	@echo "Make what? Try: bash, cleancache, cleanwork, docker, dockert, down, run, runit, runt1, runtc, runtep, stop, up, watch"
 	@echo '  where:'
 	@echo '     help      - show this help message'
 	@echo '     bash      - run Bash in a ${PROG} container (for development)'
+	@echo '     cleancache - REMOVE ALL __pycache__ dirs from the project directory!'
 	@echo '     cleanwork - REMOVE ALL input and output files from the work directory!'
 	@echo '     docker    - build a production container image'
 	@echo '     dockert   - build a container image with tests (for testing)'
@@ -39,6 +40,9 @@ help:
 
 bash:
 	docker run -it --rm --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work  -v ${RUN}:/imdtk/runit --entrypoint /bin/bash ${TSTIMG}
+
+cleancache:
+	find . -name __pycache__ -print | grep -v .venv | xargs rm -rf
 
 cleanwork:
 	@rm ${WORKDIR}/*.json ${WORKDIR}/*.pickle ${WORKDIR}/*.sql ${WORKDIR}/*.csv
