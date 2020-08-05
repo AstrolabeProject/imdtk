@@ -1,9 +1,7 @@
 # Tests for the metata utilities module.
 #   Written by: Tom Hicks. 7/16/2020.
-#   Last Modified: Correct the class name.
+#   Last Modified: Add tests for get_column_names and get_column_formats.
 #
-import pytest
-
 import imdtk.tasks.metadata_utils as utils
 
 
@@ -72,6 +70,33 @@ class TestMetadataUtils(object):
         }
     }
 
+    cat_md = {
+        "column_info": {
+            "name": [
+                "ID",
+                "RA",
+                "DEC",
+                "redshift",
+                "x",
+                "y",
+                "a",
+                "b",
+                "kron_flag"
+            ],
+            "format": [
+                "K",
+                "D",
+                "D",
+                "D",
+                "D",
+                "D",
+                "D",
+                "D",
+                "K"
+            ]
+        }
+    }
+
 
     def test_get_aliased (self):
         data = utils.get_aliased(self.metadata)
@@ -132,3 +157,27 @@ class TestMetadataUtils(object):
         assert 'SIMPLE' in data
         assert 'NAXIS' in data
         assert 'COMMENT' not in data
+
+
+    def test_get_column_names (self):
+        data = utils.get_column_names(self.cat_md)
+        print(data)
+        assert data is not None
+        assert len(data) > 1
+        assert 'ID' in data
+        assert 'RA' in data
+        assert 'DEC' in data
+        assert 'kron_flag' in data
+        assert 'COMMENT' not in data
+        assert 'name' not in data
+
+
+    def test_get_column_formats (self):
+        data = utils.get_column_formats(self.cat_md)
+        print(data)
+        assert data is not None
+        assert len(data) > 1
+        assert 'K' in data
+        assert 'D' in data
+        assert 'C' not in data
+        assert 'Q' not in data
