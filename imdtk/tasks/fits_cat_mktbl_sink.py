@@ -1,7 +1,7 @@
 #
 # Class to create a new database table from the metadata of a FITS catalog file.
 #   Written by: Tom Hicks. 7/22/2020.
-#   Last Modified: WIP: begin to implement table creation.
+#   Last Modified: Consistent arguments to create and write table methods.
 #
 import sys
 
@@ -51,9 +51,9 @@ class FitsCatalogMakeTableSink (ISQLSink):
         # Decide whether we are creating a table in the DB or just outputting SQL statements.
         sql_only = self.args.get('sql_only')
         if (sql_only):                      # if just outputting SQL
-            self.write_table(dbconfig, metadata, file_info)
+            self.write_table(catalog_table, dbconfig, metadata, file_info)
         else:                               # else creating the table in the database
-            self.create_table(dbconfig, metadata, file_info)
+            self.create_table(catalog_table, dbconfig, metadata, file_info)
 
 
     #
@@ -65,7 +65,7 @@ class FitsCatalogMakeTableSink (ISQLSink):
         return catalog_table in pg_sql.list_catalog_tables(self.args, dbconfig, catalog_table)
 
 
-    def create_table (self, dbconfig, catalog_table, metadata, file_info):
+    def create_table (self, catalog_table, dbconfig, metadata, file_info):
         if (self._DEBUG):
             print("({}): Creating table: '{}'".format(self.TOOL_NAME, catalog_table), file=sys.stderr)
 
@@ -76,10 +76,10 @@ class FitsCatalogMakeTableSink (ISQLSink):
             print("({}): Database table '{}' created.".format(self.TOOL_NAME, catalog_table), file=sys.stderr)
 
 
-    def write_table (self, dbconfig, metadata, file_info):
+    def write_table (self, catalog_table, dbconfig, metadata, file_info):
         """ Generate and output SQL that would create a new catalog table. """
         if (self._DEBUG):
-            print("({}.write_table): '{}'".format(self.TOOL_NAME), file=sys.stderr)
+            print("({}.write_table): '{}'".format(self.TOOL_NAME, catalog_table), file=sys.stderr)
 
         genfile = self.args.get('gen_file_path')
         outfile = self.args.get('output_file')
