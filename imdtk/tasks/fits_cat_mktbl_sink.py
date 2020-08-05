@@ -1,9 +1,8 @@
 #
 # Class to create a new database table from the metadata of a FITS catalog file.
 #   Written by: Tom Hicks. 7/22/2020.
-#   Last Modified: Continue task development. Rename task. Use refactored SQL generation/output methods.
+#   Last Modified: WIP: begin to implement table creation.
 #
-import psycopg2
 import sys
 
 from config.settings import DEFAULT_DBCONFIG_FILEPATH
@@ -52,9 +51,9 @@ class FitsCatalogMakeTableSink (ISQLSink):
         # Decide whether we are creating a table in the DB or just outputting SQL statements.
         sql_only = self.args.get('sql_only')
         if (sql_only):                      # if just outputting SQL
-            self.write_table(catalog_table, metadata, file_info)
+            self.write_table(dbconfig, metadata, file_info)
         else:                               # else creating the table in the database
-            self.create_table(dbconfig, catalog_table, metadata, file_info)
+            self.create_table(dbconfig, metadata, file_info)
 
 
     #
@@ -71,34 +70,34 @@ class FitsCatalogMakeTableSink (ISQLSink):
             print("({}): Creating table: '{}'".format(self.TOOL_NAME, catalog_table), file=sys.stderr)
 
         # open database connection and create the specified table
-        pg_sql.create_table(dbconfig, metadata, catalog_table)
+        pg_sql.create_table(self.args, dbconfig, metadata)
 
         if (self._VERBOSE):
             print("({}): Database table '{}' created.".format(self.TOOL_NAME, catalog_table), file=sys.stderr)
 
 
-    def write_table (self, catalog_table, metadata, file_info):
+    def write_table (self, dbconfig, metadata, file_info):
         """ Generate and output SQL that would create a new catalog table. """
         if (self._DEBUG):
-            print("({}.write_table): '{}'".format(self.TOOL_NAME, catalog_table), file=sys.stderr)
+            print("({}.write_table): '{}'".format(self.TOOL_NAME), file=sys.stderr)
 
         genfile = self.args.get('gen_file_path')
         outfile = self.args.get('output_file')
         if (genfile):                       # if generating the output filename/path
             fname = file_info.get('file_name') if file_info else "NO_FILENAME"
             outfile = self.gen_output_file_path(fname, SQL_EXTENSION, self.TOOL_NAME)
-            self.write_SQL(catalog_table, metadata, file_info, outfile)
+            self.write_SQL(dbconfig, metadata, file_info, outfile)
         elif (outfile is not None):         # else if using the given filepath
-            self.write_SQL(catalog_table, metadata, file_info, outfile)
+            self.write_SQL(dbconfig, metadata, file_info, outfile)
         else:                               # else using standard output
-            self.write_SQL(catalog_table, metadata, file_info)
+            self.write_SQL(dbconfig, metadata, file_info)
 
         if (self._VERBOSE):
             out_dest = outfile if (outfile) else STDOUT_NAME
             print("({}): SQL output to '{}'".format(self.TOOL_NAME, out_dest), file=sys.stderr)
 
 
-    def write_SQL (self, catalog_table, metadata, file_info, file_path=None):
+    def write_SQL (self, dbconfig, metadata, file_info, file_path=None):
         """
         Generate and output SQL commands which would create the specified table
         in the database, using the given database configuration.
@@ -108,5 +107,5 @@ class FitsCatalogMakeTableSink (ISQLSink):
         Note: the generated SQL strings are for debugging only and ARE NOT SQL-INJECTION safe.
         """
         comment = self.sql_file_info_comment_str(file_info)
-        create_str = pg_sql.sql_create_table_str(metadata, catalog_table)
+        create_str = pg_sql.sql_create_table_str(self.args, dbconfig, metadata)
         self.output_SQL(create_str, comment=comment, file_path=file_path)

@@ -85,7 +85,7 @@ class ISQLSink (IImdTask):
 
         Note: the given SQL strings are assumed to be valid and safe and are not vetted.
         """
-        if ((file_path is None) or (file_path == sys.stdout)): # if writing to standard output
+        if ((file_path is None) or (file_path == sys.stdout)):  # if writing to standard output
             if (comment is not None):
                 sys.stdout.write(comment)
                 sys.stdout.write('\n')
