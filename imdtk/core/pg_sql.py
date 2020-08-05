@@ -1,16 +1,17 @@
 #
 # Module to interact with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: WIP: begin to implement table creation.
+#   Last Modified: WIP: continue developing create_table methods.
 #
 import sys
 # from string import Template
 
 import psycopg2
 
+from config.settings import SQL_FIELDS_HYBRID
+import imdtk.exceptions as errors
 import imdtk.core.fits_pg_sql as fpg_sql
 import imdtk.tasks.metadata_utils as md_utils
-from config.settings import SQL_FIELDS_HYBRID
 from imdtk.core.misc_utils import to_JSON
 
 
@@ -102,29 +103,42 @@ def sql_create_table (args, dbconfig, metadata):
     """
     Create a new table with the given table name, columns, and types as specified by
     the given catalog metadata dictionary using the given DB parameters.
+    Returns None if the column name or format vectors are not present in the input OR
+    if the vectors are not the same size.
     """
-    combo_args = args.copy()
-    combo_args.update(dbconfig.copy())
     col_names = md_utils.get_column_names(metadata)
     col_fmts = md_utils.get_column_formats(metadata)
-    # TODO: IMPLEMENT the following statement. What should it return?
-    # fpg_sql.make_table_sql(combo_args, dbconfig, col_names, col_fmts)
+    if (col_names and col_fmts and (len(col_names) == len(col_fmts))):
+        combo_args = args.copy()
+        combo_args.update(dbconfig.copy())
+        # TODO: IMPLEMENT the following statement. What should it return?
+        # fpg_sql.make_table_sql(combo_args, dbconfig, col_names, col_fmts)
+        return "-- Creating table '{}'".format(args.get('catalog_table'))
+    else:
+        errMsg = 'Catalog metadata is missing column name and format vectors or they are not the same length.'
+        raise errors.ProcessingError(errMsg)
 
 
 def sql_create_table_str (args, dbconfig, metadata):
     """
     Return an SQL string to create a new table with the given table name, columns,
-    and types specified by the given catalog metadata dictionary.
+    and types specified by the given catalog metadata dictionary. Returns None if
+    the column name or format vectors are not present in the input OR if the vectors
+    are not the same size.
 
     Note: the returned string is for debugging only and IS NOT SQL-INJECTION safe.
     """
-    combo_args = args.copy()
-    combo_args.update(dbconfig.copy())
     col_names = md_utils.get_column_names(metadata)
     col_fmts = md_utils.get_column_formats(metadata)
-    sql_list = fpg_sql.make_table_sql_str(combo_args, dbconfig, col_names, col_fmts)
-    sql = '\n'.join(sql_list)
-    return sql
+    if (col_names and col_fmts and (len(col_names) == len(col_fmts))):
+        combo_args = args.copy()
+        combo_args.update(dbconfig.copy())
+        sql_list = fpg_sql.make_table_sql_str(combo_args, dbconfig, col_names, col_fmts)
+        sql = '\n'.join(sql_list)
+        return sql
+    else:
+        errMsg = 'Catalog metadata is missing column name and format vectors or they are not the same length.'
+        raise errors.ProcessingError(errMsg)
 
 
 def sql_insert_str (datadict, table_name):

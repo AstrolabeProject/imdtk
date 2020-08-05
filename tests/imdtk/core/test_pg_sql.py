@@ -1,18 +1,47 @@
 # Tests for the PostgreSQL interface module.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Add tests for sql_insert_str, sql_insert_hybrid_str, sql4_hybrid_table_insert
-#                  and stubs for sql_create_table and sql_create_table_str.
+#   Last Modified: Update tests for implemented sql_create_table.
 #
+import pytest
+
 from config.settings import SQL_FIELDS_HYBRID
+import imdtk.exceptions as errors
 from tests.imdtk.sql_test_setup import load_test_dbconfig
 import imdtk.core.pg_sql as pgsql
 
 
 class TestPgSql(object):
 
-    args = { 'debug': True, 'verbose': True, 'TOOL_NAME': 'TestPgSql'}
+    args = { 'debug': True, 'verbose': True, 'TOOL_NAME': 'TestPgSql', 'catalog_table': 'myCatalog' }
     dbargs = load_test_dbconfig(tool_name='TestPgSql')
     print("TestPgSql:dbargs={}".format(dbargs))
+
+    cat_md = {
+        "column_info": {
+            "name": [
+                "ID",
+                "RA",
+                "DEC",
+                "redshift",
+                "x",
+                "y",
+                "a",
+                "b",
+                "kron_flag"
+            ],
+            "format": [
+                "K",
+                "D",
+                "D",
+                "D",
+                "D",
+                "D",
+                "D",
+                "D",
+                "K"
+            ]
+        }
+    }
 
     datad = {
         "SIMPLE": True,
@@ -113,29 +142,35 @@ class TestPgSql(object):
 
 
     def test_sql_create_table_empty (self):
-        tbl = pgsql.sql_create_table(self.dbargs, dict(), 'new_tbl')
-        assert tbl is not None
-        assert tbl == "-- Creating table 'new_tbl'"
+        self.args['catalog_table'] = 'new_tbl'
+        with pytest.raises(errors.ProcessingError):
+            pgsql.sql_create_table(self.args, self.dbargs, dict())
 
 
     def test_sql_create_table (self):
-        tbl = pgsql.sql_create_table(self.dbargs, dict(), 'new_tbl')
+        self.args['catalog_table'] = 'new_tbl'
+        tbl = pgsql.sql_create_table(self.args, self.dbargs, self.cat_md)
         assert tbl is not None
         assert tbl == "-- Creating table 'new_tbl'"
 
 
 
     def test_sql_create_table_str_empty (self):
-        tbl = pgsql.sql_create_table_str(dict(), 'NEWTBL')
-        assert tbl is not None
-        assert tbl == "-- SQL string for creating table 'NEWTBL'"
+        self.args['catalog_table'] = 'NEWTBL'
+        with pytest.raises(errors.ProcessingError):
+            pgsql.sql_create_table_str(self.args, self.dbargs, dict())
 
 
     def test_sql_create_table_str (self):
-        tbl = pgsql.sql_create_table_str(self.dbargs, 'NEWTBL')
+        self.args['catalog_table'] = 'NEWTBL'
+        tbl = pgsql.sql_create_table_str(self.args, self.dbargs, self.cat_md)
         assert tbl is not None
-        assert tbl == "-- SQL string for creating table 'NEWTBL'"
-
+        assert 'CREATE TABLE' in tbl
+        assert 'NEWTBL' in tbl
+        assert 'SET search_path' in tbl
+        assert 'ID bigint' in tbl
+        assert 'RA double precision' in tbl
+        assert 'DEC double precision' in tbl
 
 
     def test_sql_insert_str_empty (self):
