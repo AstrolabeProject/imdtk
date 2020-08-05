@@ -1,10 +1,11 @@
 #
 # Utilities to the various metadata components in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/2020.
-#   Last Modified: Remove unused import.
+#   Last Modified: Add some getters for the catalog metadata structure.
 #
 
-
+# Getters for the Image Metadata structure
+#
 def get_aliased (metadata):
     """ Accessor for the aliased dictionary embedded in the given metadata structure. """
     return metadata.get('aliased')
@@ -33,3 +34,15 @@ def get_file_info (metadata):
 def get_headers (metadata):
     """ Accessor for the headers dictionary embedded in the given metadata structure. """
     return metadata.get('headers')
+
+
+# Getters for the Catalog Metadata structure
+#
+def get_column_names (metadata):
+    """ Accessor for the name array embedded in the given catalog metadata structure. """
+    return metadata.get('column_info').get('name')
+
+
+def get_column_formats (metadata):
+    """ Accessor for the name array embedded in the given catalog metadata structure. """
+    return metadata.get('column_info').get('format')
