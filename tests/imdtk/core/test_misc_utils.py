@@ -1,14 +1,16 @@
 # Tests for the misc utilities module.
 #   Written by: Tom Hicks. 5/22/2020.
-#   Last Modified: Add test of to_JSON for json.dumps keywords.
+#   Last Modified: Add test of keep method.
 #
-import os
-import pytest
-
 import imdtk.core.misc_utils as mutils
 
 
 class TestMiscUtils(object):
+
+    testdict = {'a': True, 'b': False, 'c': 0, 'd': 1, 'e': {}, 'f': {1: 1},
+                'g': [], 'h': [1], 'i': None, 'j': 'Jstr', 'k': 99.9}
+    testvec = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
+
 
     def test_get_in (self):
         nester = { 'a': 'a',
@@ -42,6 +44,17 @@ class TestMiscUtils(object):
         assert mutils.get_in(nester, ['L1', 'L2', 'badval', 'nosuchkey']) is None
 
 
+    def test_keep_empty_dict (self):
+        empty = dict()
+        vec = mutils.keep(empty.get, self.testvec)
+        assert vec == []
+
+
+    def test_keep_dict (self):
+        vec = mutils.keep(self.testdict.get, self.testvec)
+        print(vec)
+        assert vec == [True, False, 0, 1, {}, {1: 1}, [], [1], 'Jstr', 99.9]
+
 
     def test_remove_entries_default (self):
         hdrs = {
@@ -50,7 +63,7 @@ class TestMiscUtils(object):
             'comment': 'A comment', 'history': 'again'
         }
         old_len = len (hdrs)
-        mutils.remove_entries(hdrs) # modifies by side-effect
+        mutils.remove_entries(hdrs)  # modifies by side-effect
         print(hdrs)
         assert len(hdrs) == old_len
         assert 'HISTORY' in hdrs
@@ -66,7 +79,7 @@ class TestMiscUtils(object):
             'comment': 'A comment', 'history': 'again'
         }
         old_len = len (hdrs)
-        mutils.remove_entries(hdrs, ignore=['AAA', 'pikey']) # modifies by side-effect
+        mutils.remove_entries(hdrs, ignore=['AAA', 'pikey'])  # modifies by side-effect
         print(hdrs)
         assert len(hdrs) == old_len
         assert 'AA' in hdrs
@@ -82,7 +95,7 @@ class TestMiscUtils(object):
             'comment': 'A comment', 'history': 'again'
         }
         old_len = len (hdrs)
-        mutils.remove_entries(hdrs, ignore=[]) # modifies by side-effect
+        mutils.remove_entries(hdrs, ignore=[])  # modifies by side-effect
         print(hdrs)
         assert len(hdrs) == old_len
         assert 'AA' in hdrs

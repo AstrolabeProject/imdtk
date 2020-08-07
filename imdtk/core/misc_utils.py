@@ -1,7 +1,7 @@
 #
 # Miscellaneous Utility Methods.
 #   Written by: Tom Hicks. 5/22/2020.
-#   Last Modified: Enhance JSON dumps method to take all json keywords.
+#   Last Modified: Add keep method (ala Clojure).
 #
 import json
 
@@ -22,6 +22,14 @@ def get_in (a_dictionary, keys):
             dic = val
         else:
             return None
+
+
+def keep (fn, collection):
+    """
+    Returns a list of the non-None results of (fn item). Note, this means False
+    return values will be included. The function should be free of side-effects.
+    """
+    return list(filter(lambda x: x is not None, map(fn, collection)))
 
 
 def remove_entries (a_dictionary, ignore=[]):
