@@ -1,22 +1,25 @@
 #
-# Class to add aliases (fields) for the header fields in a FITS-derived metadata structure.
+# Class to add aliases (fields) for the header fields in a FITS-derived image metadata structure.
 #   Written by: Tom Hicks. 5/29/2020.
-#   Last Modified: Revamp error handling.
+#   Last Modified: Update for separate alias utilities and renamed alias file path.
 #
-import configparser
 import sys
 
-from config.settings import DEFAULT_ALIASES_FILEPATH
+from config.settings import DEFAULT_IMD_ALIASES_FILEPATH
+import imdtk.core.alias_utils as alias_utils
 import imdtk.tasks.metadata_utils as md_utils
 from imdtk.tasks.i_task import IImdTask
 
 
 class AliasesTask (IImdTask):
-    """ Class which adds aliases for the header fields of a metadata structure. """
+    """
+    Class which adds aliases for the header fields of an image metadata structure.
+    """
 
     def __init__(self, args):
         """
-        Constructor for class which adds aliases for the header fields of a metadata structure.
+        Constructor for class which adds aliases for the header fields of an
+        image metadata structure.
         """
         super().__init__(args)
 
@@ -34,42 +37,10 @@ class AliasesTask (IImdTask):
             print("({}.process): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
 
         # load the FITS field name aliases from a given file path or a default resource path
-        alias_file = self.args.get('alias_file') or DEFAULT_ALIASES_FILEPATH
-        aliases = self.load_aliases(alias_file)
+        alias_file = self.args.get('alias_file') or DEFAULT_IMD_ALIASES_FILEPATH
+        aliases = alias_utils.load_aliases(alias_file, self._DEBUG, tool_name=self.TOOL_NAME)
 
-        self.copy_aliased_headers(aliases, metadata) # add aliased fields
+        headers = md_utils.get_headers(metadata)
+        metadata['aliased'] = alias_utils.copy_aliased_headers(aliases, headers)
 
         return metadata                     # return the results of processing
-
-
-    #
-    # Non-interface and/or task-specific Methods
-    #
-
-    def copy_aliased_headers (self, aliases, metadata):
-        """
-        Copy each header card whose key is in aliases, replacing the header key with the alias.
-        """
-        copied = dict()
-        headers = md_utils.get_headers(metadata)
-        if (headers is not None):
-            for hdr_key, hdr_val in headers.items():
-                a_key = aliases.get(hdr_key)
-                if (a_key is not None):
-                    copied[a_key] = hdr_val
-        metadata['aliased'] = copied        # add copied aliases dictionary to metadata
-
-
-    def load_aliases (self, alias_file):
-        """ Load field name aliases from the given alias filepath. """
-        if (self._DEBUG):
-            print("({}): Loading from aliases file '{}'".format(self.TOOL_NAME, alias_file), file=sys.stderr)
-
-        config = configparser.ConfigParser(strict=False, empty_lines_in_values=False)
-        config.optionxform = lambda option: option
-        config.read(alias_file)
-        aliases = config['aliases']
-
-        if (self._DEBUG):
-            print("({}): Read {} field name aliases.".format(self.TOOL_NAME, len(aliases)), file=sys.stderr)
-        return dict(aliases)
