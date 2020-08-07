@@ -1,11 +1,12 @@
 #
 # Module with utilities to add aliases (fields) for existing fields in a metadata structure.
 #   Written by: Tom Hicks. 8/6/2020.
-#   Last Modified: Initial creation as module.
+#   Last Modified: Handle errors in load_aliases.
 #
 import configparser
 import sys
 
+import imdtk.exceptions as errors
 from imdtk.core.misc_utils import keep
 
 
@@ -34,10 +35,19 @@ def load_aliases (alias_file, debug=False, tool_name=''):
     if (debug):
         print("({}): Loading from aliases file '{}'".format(tool_name, alias_file), file=sys.stderr)
 
-    config = configparser.ConfigParser(strict=False, empty_lines_in_values=False)
-    config.optionxform = lambda option: option
-    config.read(alias_file)
-    aliases = config['aliases']
+    try:
+        config = configparser.ConfigParser(strict=False, empty_lines_in_values=False)
+        config.optionxform = lambda option: option
+        config.read_file(open(alias_file))
+    except FileNotFoundError:
+        errMsg = "Aliases file '{}' not found or not readable.".format(alias_file)
+        raise errors.ProcessingError(errMsg)
+
+    try:
+        aliases = config['aliases']
+    except KeyError:
+        errMsg = "No 'aliases' section found in aliases file '{}'.".format(alias_file)
+        raise errors.ProcessingError(errMsg)
 
     if (debug):
         print("({}): Read {} field name aliases.".format(tool_name, len(aliases)), file=sys.stderr)
