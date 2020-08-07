@@ -1,12 +1,12 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Add/use exit code constants. Add catalog table args & check catalog table methods.
+#   Last Modified: Update for renamed alias file path.
 #
 import argparse
 import sys
 
-from config.settings import DEFAULT_ALIASES_FILEPATH, DEFAULT_DBCONFIG_FILEPATH
+from config.settings import DEFAULT_IMD_ALIASES_FILEPATH, DEFAULT_DBCONFIG_FILEPATH
 from config.settings import DEFAULT_FIELDS_FILEPATH, DEFAULT_METADATA_TABLE_NAME
 from imdtk.core.file_utils import good_dir_path, good_file_path, validate_file_path
 from imdtk.core.fits_utils import FITS_EXTENTS
@@ -24,7 +24,7 @@ FIELDS_FILE_EXIT_CODE = 32
 INPUT_FILE_EXIT_CODE = 33
 
 
-def add_aliases_arguments (parser, tool_name, version, default_msg=DEFAULT_ALIASES_FILEPATH):
+def add_aliases_arguments (parser, tool_name, version, default_msg=DEFAULT_IMD_ALIASES_FILEPATH):
     """ Add the argument(s) related to parsing information from aliases files
         to the given argparse parser object. """
     parser.add_argument(

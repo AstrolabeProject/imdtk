@@ -6,7 +6,7 @@ APP_ROOT = '/imdtk'
 CONFIG_DIR = "{}/config".format(APP_ROOT)
 
 # Default resource file for header keyword aliases.
-DEFAULT_ALIASES_FILEPATH = "{}/jwst-aliases.ini".format(CONFIG_DIR)
+DEFAULT_IMD_ALIASES_FILEPATH = "{}/jwst-imd-aliases.ini".format(CONFIG_DIR)
 
 # Default config file for database configuration.
 DEFAULT_DBCONFIG_FILEPATH = "{}/jwst-dbconfig.ini".format(CONFIG_DIR)
