@@ -1,8 +1,12 @@
 # Tests for the alias utilities module.
 #   Written by: Tom Hicks. 8/6/2020.
-#   Last Modified: Add tests for copy_aliased_headers.
+#   Last Modified: Add tests for load_aliases.
 #
+import pytest
+
+import imdtk.exceptions as errors
 import imdtk.core.alias_utils as utils
+from tests import TEST_DIR
 
 
 class TestAliasUtils(object):
@@ -32,45 +36,46 @@ class TestAliasUtils(object):
         "DEC": "s_dec"
     }
 
+    aliases_tstfyl = "{}/resources/test-aliases.ini".format(TEST_DIR)
+    empty_tstfyl = "{}/resources/empty.txt".format(TEST_DIR)
+    nosuch_tstfyl = "/tests/resources/NOSUCHFILE"
 
-    def test_keep_aliased_fields_empty_dict (self):
+
+    def test_keep_aliased_fields_empty_dict(self):
         empty = dict()
         vec = utils.keep_aliased_fields(empty, self.alfavec)
         assert vec == []
 
 
-    def test_keep_aliased_fields_dict (self):
+    def test_keep_aliased_fields_dict(self):
         vec = utils.keep_aliased_fields(self.alfadic, self.alfavec)
         print(vec)
         assert vec == [True, False, 0, 1, {}, {1: 1}, [], [1], 'Jstr', 99.9]
 
 
 
-    def test_copy_aliased_headers_empty (self):
+    def test_copy_aliased_headers_empty(self):
         empty = dict()
         newdic = utils.copy_aliased_headers(empty, empty)
         print(newdic)
         assert newdic == {}
-        assert len(newdic) == 0
 
 
-    def test_copy_aliased_headers_nohdrs (self):
+    def test_copy_aliased_headers_nohdrs(self):
         empty = dict()
         newdic = utils.copy_aliased_headers(self.aliases, empty)
         print(newdic)
         assert newdic == {}
-        assert len(newdic) == 0
 
 
-    def test_copy_aliased_headers_noalias (self):
+    def test_copy_aliased_headers_noalias(self):
         empty = dict()
         newdic = utils.copy_aliased_headers(empty, self.testhdrs)
         print(newdic)
         assert newdic == {}
-        assert len(newdic) == 0
 
 
-    def test_copy_aliased_headers (self):
+    def test_copy_aliased_headers(self):
         newdic = utils.copy_aliased_headers(self.aliases, self.testhdrs)
         print(newdic)
         assert newdic is not None
@@ -86,3 +91,23 @@ class TestAliasUtils(object):
         assert "NAXIS2" not in newdic
         assert "RA" not in newdic
         assert "DEC" not in newdic
+
+
+    def test_load_aliases_bad(self):
+        with pytest.raises(errors.ProcessingError, match='not found or not readable'):
+            utils.load_aliases(self.nosuch_tstfyl, debug=True)
+
+
+    def test_load_aliases_empty(self):
+        with pytest.raises(errors.ProcessingError, match='No .* section found in aliases'):
+            utils.load_aliases(self.empty_tstfyl, debug=True)
+
+
+    def test_load_aliases(self):
+        als = utils.load_aliases(self.aliases_tstfyl, debug=True)
+        assert als is not None
+        assert len(als) >= 6               # specific to this test file
+        assert "RA" in als
+        assert "DEC" in als
+        assert "s_ra" not in als
+        assert "s_dec" not in als
