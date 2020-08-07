@@ -1,6 +1,6 @@
 # Tests for the exceptions module.
 #   Written by: Tom Hicks. 7/20/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Add tests of __str__ method.
 #
 import pytest
 
@@ -26,6 +26,10 @@ class TestExceptions(object):
         petup = pe.to_tuple()
         assert petup[0] == self.EMSG
         assert petup[1] == xcpt.ProcessingError.ERROR_CODE
+        pestr = str(pe)
+        print(pestr)
+        assert str(xcpt.ProcessingError.ERROR_CODE) in pestr
+        assert 'wrong' in pestr
 
 
     def test_pe_code (self):
@@ -56,6 +60,10 @@ class TestExceptions(object):
         utetup = ute.to_tuple()
         assert utetup[0] == self.EMSG
         assert utetup[1] == xcpt.UnsupportedTypeError.ERROR_CODE
+        utestr = str(ute)
+        print(utestr)
+        assert str(xcpt.UnsupportedTypeError.ERROR_CODE) in utestr
+        assert 'wrong' in utestr
 
 
     def test_ute_code (self):
