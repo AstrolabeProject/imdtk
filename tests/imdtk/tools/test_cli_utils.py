@@ -18,7 +18,6 @@ class TestCliUtils(object):
     m13_tstfyl    = "{}/resources/m13.fits".format(TEST_DIR)
     # alias_tstfyl  = "{}/resources/aliases.yaml".format(TEST_DIR)
     # dbconf_tstfyl = "{}/resources/test-dbconfig.ini".format(TEST_DIR)
-    # fields_tstfyl = "{}/resources/test-fields.txt".format(TEST_DIR)
     # text_tstfyl   = "{}/resources/mdkeys.txt".format(TEST_DIR)
     resources_tstdir = "{}/resources".format(TEST_DIR)
 

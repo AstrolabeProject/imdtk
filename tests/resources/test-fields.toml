@@ -1,0 +1,23 @@
+# Comments should be ignored.
+# Blank lines should be ignored.
+
+	
+      
+#  Format: dictionary of dictionaries with format:
+#          key => { required, default }
+
+# all fields given
+dataproduct_type = { required = true, default = "image" }
+calib_level = { required = true, default = 3 }
+
+# has no-default field
+target_name = { required = true }
+
+
+# some more real values.
+#
+is_public = { required = true, default = 0 }
+equinox = { required = false, default = 2000.0 }
+radesys = { required = false, default = "ICRS" }
+filter = { required = false }
+pupil = { required = false, default = "CLEAR" }
