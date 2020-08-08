@@ -10,6 +10,7 @@ setup(
     entry_points={
         'console_scripts': [
             'aliases         = imdtk.tools.aliases_cli:main',
+            'cat_aliases     = imdtk.tools.cat_aliases_cli:main',
             'csv_sink        = imdtk.tools.csv_sink_cli:main',
             'fields_info     = imdtk.tools.fields_info_cli:main',
             'fits_cat_maketable = imdtk.tools.fits_cat_mktbl_sink_cli:main',
