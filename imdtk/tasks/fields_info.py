@@ -1,12 +1,13 @@
 #
 # Class to add information about desired fields to the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/2020.
-#   Last Modified: Remove unused import.
+#   Last Modified: Handle errors in load_fields_info.
 #
 import toml
 import sys
 
 from config.settings import DEFAULT_FIELDS_FILEPATH
+import imdtk.exceptions as errors
 from imdtk.tasks.i_task import IImdTask
 
 
@@ -59,7 +60,12 @@ class FieldsInfoTask (IImdTask):
         Load the fields info dictionary from the given filepath and return it.
         The fields info file is assumed to define a single dictionary in TOML format.
         """
-        return toml.load(fields_file)       # load fields info file as a dictionary
+        try:
+            return toml.load(fields_file)       # load fields info file as a dictionary
+        except Exception:
+            errMsg = "Field Information file '{}' not found or not readable.".format(fields_file)
+            raise errors.ProcessingError(errMsg)
+
 
 
     def extract_defaults (self, fields_info):
