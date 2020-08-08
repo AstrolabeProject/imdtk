@@ -1,6 +1,6 @@
 # Tests for the alias utilities module.
 #   Written by: Tom Hicks. 8/6/2020.
-#   Last Modified: Add tests for load_aliases.
+#   Last Modified: Add tests for substitute_aliases.
 #
 import pytest
 
@@ -39,19 +39,6 @@ class TestAliasUtils(object):
     aliases_tstfyl = "{}/resources/test-aliases.ini".format(TEST_DIR)
     empty_tstfyl = "{}/resources/empty.txt".format(TEST_DIR)
     nosuch_tstfyl = "/tests/resources/NOSUCHFILE"
-
-
-    def test_keep_aliased_fields_empty_dict(self):
-        empty = dict()
-        vec = utils.keep_aliased_fields(empty, self.alfavec)
-        assert vec == []
-
-
-    def test_keep_aliased_fields_dict(self):
-        vec = utils.keep_aliased_fields(self.alfadic, self.alfavec)
-        print(vec)
-        assert vec == [True, False, 0, 1, {}, {1: 1}, [], [1], 'Jstr', 99.9]
-
 
 
     def test_copy_aliased_headers_empty(self):
@@ -93,6 +80,25 @@ class TestAliasUtils(object):
         assert "DEC" not in newdic
 
 
+
+    def test_keep_aliased_fields_empty_dict(self):
+        empty = dict()
+        vec = utils.keep_aliased_fields(empty, self.alfavec)
+        assert vec == []
+
+
+    def test_keep_aliased_fields_empty_fields(self):
+        vec = utils.keep_aliased_fields(self.alfadic, [])
+        assert vec == []
+
+
+    def test_keep_aliased_fields_dict(self):
+        vec = utils.keep_aliased_fields(self.alfadic, self.alfavec)
+        print(vec)
+        assert vec == [True, False, 0, 1, {}, {1: 1}, [], [1], 'Jstr', 99.9]
+
+
+
     def test_load_aliases_bad(self):
         with pytest.raises(errors.ProcessingError, match='not found or not readable'):
             utils.load_aliases(self.nosuch_tstfyl, debug=True)
@@ -111,3 +117,32 @@ class TestAliasUtils(object):
         assert "DEC" in als
         assert "s_ra" not in als
         assert "s_dec" not in als
+
+
+
+    def test_substitute_aliases_empty_dict(self):
+        empty = dict()
+        vec = utils.substitute_aliases(empty, self.alfavec)
+        assert vec == self.alfavec
+
+
+    def test_substitute_aliases_empty_fields(self):
+        vec = utils.substitute_aliases(self.alfadic, [])
+        assert vec == []
+
+
+    def test_substitute_aliases_allsubst(self):
+        vec = utils.substitute_aliases(self.alfadic, self.alfavec)
+        print(vec)
+        assert vec == list(self.alfadic.values())  # all aliases were substituted
+
+
+    def test_substitute_aliases(self):
+        fields = list(self.testhdrs.keys())  # make sample field list
+        vec = utils.substitute_aliases(self.aliases, fields)
+        print(vec)
+        assert len(vec) == len(fields)
+        for fld in list(self.aliases.keys()):  # these should have been replaced
+            assert fld not in vec
+        for fld in list(self.aliases.values()):  # these should be the replacements
+            assert fld in vec

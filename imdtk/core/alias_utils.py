@@ -1,20 +1,13 @@
 #
 # Module with utilities to add aliases (fields) for existing fields in a metadata structure.
 #   Written by: Tom Hicks. 8/6/2020.
-#   Last Modified: Handle errors in load_aliases.
+#   Last Modified: Add method to substitute aliases in list.
 #
 import configparser
 import sys
 
 import imdtk.exceptions as errors
 from imdtk.core.misc_utils import keep
-
-
-def keep_aliased_fields (aliases, fields):
-    """
-    Copy each field whose key is in the aliases dictionary, replacing the field with the alias value.
-    """
-    return keep(aliases.get, fields)
 
 
 def copy_aliased_headers (aliases, headers):
@@ -28,6 +21,14 @@ def copy_aliased_headers (aliases, headers):
             if (a_key is not None):
                 copied[a_key] = hdr_val
     return copied
+
+
+def keep_aliased_fields (aliases, fields):
+    """
+     each field whose key is in the aliases dictionary, replacing the field
+    with the dictionary value (i.e. the alias).
+    """
+    return keep(aliases.get, fields)
 
 
 def load_aliases (alias_file, debug=False, tool_name=''):
@@ -53,3 +54,11 @@ def load_aliases (alias_file, debug=False, tool_name=''):
         print("({}): Read {} field name aliases.".format(tool_name, len(aliases)), file=sys.stderr)
 
     return dict(aliases)
+
+
+def substitute_aliases (aliases, fields):
+    """
+    Copy the given fields list, replacing each field whose key is in the aliases dictionary
+    with the value (i.e., the alias).
+    """
+    return [ aliases.get(fld, fld) for fld in fields ]
