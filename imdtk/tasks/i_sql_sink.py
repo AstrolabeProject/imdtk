@@ -1,7 +1,7 @@
 #
 # Class defining interface methods to store incoming data to an SQL database.
 #   Written by: Tom Hicks. 6/21/2020.
-#   Last Modified: Refactor method to output commented line of SQL here. Rename SQL comment method.
+#   Last Modified: Handle errors in load_sql_db_config.
 #
 import configparser
 import sys
@@ -59,17 +59,24 @@ class ISQLSink (IImdTask):
         if (self._DEBUG):
             print("({}): Reading DB configuration file '{}'".format(self.TOOL_NAME, dbconfig_file), file=sys.stderr)
 
-        config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation(),
-                                           strict=False, empty_lines_in_values=False)
-        config.read(dbconfig_file)
-        dbconfig = dict(config['db_properties'])
+        try:
+            config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation(),
+                                               strict=False, empty_lines_in_values=False)
+            config.read_file(open(dbconfig_file))  # try to read the DB config file
+        except FileNotFoundError:
+            errMsg = "DB configuration file '{}' not found or not readable.".format(dbconfig_file)
+            raise errors.ProcessingError(errMsg)
 
-        if (not dbconfig):
-            errMsg = 'DB storage specified but no database configuration parameters found.'
+        try:
+            dbconfig = dict(config['db_properties'])  # try to fetch DB properties
+        except KeyError:
+            e1 = 'DB storage specified but no database parameters (db_properties) found'
+            errMsg = "{} in DB configuration file '{}'.".format(e1, dbconfig_file)
             raise errors.ProcessingError(errMsg)
 
         if (dbconfig.get('db_uri') is None):
-            errMsg = 'DB storage specified but no database URI (db_uri) parameter found.'
+            e1 = 'DB storage specified but no database URI (db_uri) parameter found'
+            errMsg = "{} in DB configuration file '{}'.".format(e1, dbconfig_file)
             raise errors.ProcessingError(errMsg)
 
         if (self._DEBUG):
