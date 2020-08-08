@@ -1,7 +1,7 @@
 #
 # Utilities to the various metadata components in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/2020.
-#   Last Modified: More robust getters for the catalog metadata structure.
+#   Last Modified: Add getter for the aliases column names list in catalog metadata.
 #
 from imdtk.core.misc_utils import get_in
 
@@ -41,10 +41,17 @@ def get_headers (metadata):
 # Getters for the Catalog Metadata structure
 #
 def get_column_names (metadata):
-    """ Accessor for the name array embedded in the given catalog metadata structure. """
+    """ Accessor for the column name list embedded in the given catalog metadata structure. """
     return get_in(metadata, ['column_info', 'name'])
 
 
 def get_column_formats (metadata):
-    """ Accessor for the name array embedded in the given catalog metadata structure. """
+    """ Accessor for the column format list embedded in the given catalog metadata structure. """
     return get_in(metadata, ['column_info', 'format'])
+
+
+def get_aliased_column_names (metadata):
+    """
+    Accessor for the aliased column names list embedded in the given catalog metadata structure.
+    """
+    return metadata.get('aliased')
