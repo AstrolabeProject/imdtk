@@ -1,7 +1,7 @@
 #
 # Module with utilities to add aliases (fields) for existing fields in a metadata structure.
 #   Written by: Tom Hicks. 8/6/2020.
-#   Last Modified: Add method to substitute aliases in list.
+#   Last Modified: Fix documentation for the keep method.
 #
 import configparser
 import sys
@@ -25,8 +25,8 @@ def copy_aliased_headers (aliases, headers):
 
 def keep_aliased_fields (aliases, fields):
     """
-     each field whose key is in the aliases dictionary, replacing the field
-    with the dictionary value (i.e. the alias).
+    Return a list of aliases for the given fields. For each field whose key is in the
+    aliases dictionary, replacing the field with the dictionary value (i.e. the alias).
     """
     return keep(aliases.get, fields)
 
