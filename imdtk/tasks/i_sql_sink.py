@@ -1,7 +1,7 @@
 #
 # Class defining interface methods to store incoming data to an SQL database.
 #   Written by: Tom Hicks. 6/21/2020.
-#   Last Modified: Handle errors in load_sql_db_config.
+#   Last Modified: Better formatting in file_info_to_comment_string.
 #
 import configparser
 import sys
@@ -41,13 +41,13 @@ class ISQLSink (IImdTask):
         """
         Return an SQL comment string containing the given file information.
         """
-        buf = self.SQL_COMMENT + ' '    # generating an SQL comment line
+        buf = self.SQL_COMMENT              # generating an SQL comment line
         if (file_name is not None):
-            buf += file_name + ' '
+            buf += ' ' + file_name
         if (file_size is not None):
-            buf += str(file_size) + ' '
+            buf += ' ' + str(file_size)
         if (file_path is not None):
-            buf += file_path
+            buf += ' ' + file_path
         return buf                          # return formatted comment line
 
 

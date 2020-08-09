@@ -1,6 +1,6 @@
 # Tests for the ISQLSink.
 #   Written by: Tom Hicks. 8/8/2020.
-#   Last Modified: Initial creation: test load_sql_db_config only.
+#   Last Modified: Add tests for file_info_to_comment_string.
 #
 import pytest
 
@@ -18,6 +18,42 @@ class TestISQLSink(object):
     nosuch_tstfyl = '/tests/resources/NOSUCHFILE'
 
     args = { 'debug': True, 'verbose': True, 'TOOL_NAME': 'TestISQLSink' }
+
+
+    def test_file_info_to_comment_string_no_fi(self):
+        task = isql.ISQLSink(self.args)
+        fics = task.file_info_to_comment_string(None, None, None)
+        assert fics is not None
+        assert fics == task.SQL_COMMENT
+
+
+    def test_file_info_to_comment_string_fname(self):
+        task = isql.ISQLSink(self.args)
+        fics = task.file_info_to_comment_string('file-name', None, None)
+        assert fics is not None
+        assert fics == task.SQL_COMMENT + ' file-name'
+
+
+    def test_file_info_to_comment_string_fsize(self):
+        task = isql.ISQLSink(self.args)
+        fics = task.file_info_to_comment_string(None, 888, None)
+        assert fics is not None
+        assert fics == task.SQL_COMMENT + ' 888'
+
+
+    def test_file_info_to_comment_string_fpath(self):
+        task = isql.ISQLSink(self.args)
+        fics = task.file_info_to_comment_string(None, None, '/tmp/file-name')
+        assert fics is not None
+        assert fics == task.SQL_COMMENT + ' /tmp/file-name'
+
+
+    def test_file_info_to_comment_string(self):
+        task = isql.ISQLSink(self.args)
+        fics = task.file_info_to_comment_string('file-name', 999, '/path/file-name')
+        assert fics is not None
+        assert fics == task.SQL_COMMENT + ' file-name 999 /path/file-name'
+
 
 
     def test_load_sql_db_config_bad(self):
