@@ -1,20 +1,24 @@
 # Tests for the PostgreSQL interface module.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Update tests for implemented sql_create_table.
+#   Last Modified: Update for removal of sql_test_setup module.
 #
 import pytest
 
 from config.settings import SQL_FIELDS_HYBRID
 import imdtk.exceptions as errors
-from tests.imdtk.sql_test_setup import load_test_dbconfig
 import imdtk.core.pg_sql as pgsql
+import imdtk.tasks.i_sql_sink as isql
+from tests import TEST_DBCONFIG_FILEPATH
 
 
 class TestPgSql(object):
 
     args = { 'debug': True, 'verbose': True, 'TOOL_NAME': 'TestPgSql', 'catalog_table': 'myCatalog' }
-    dbargs = load_test_dbconfig(tool_name='TestPgSql')
-    print("TestPgSql:dbargs={}".format(dbargs))
+
+    # load DB test configuration parameters
+    task = isql.ISQLSink(args)
+    dbconfig = task.load_sql_db_config(TEST_DBCONFIG_FILEPATH)
+    print("TestPgSql:dbconfig={}".format(dbconfig))
 
     cat_md = {
         "column_info": {
@@ -70,7 +74,7 @@ class TestPgSql(object):
 
 
     def test_list_table_names_schema (self):
-        tbls = pgsql.list_table_names(self.args, self.dbargs, db_schema='sia')
+        tbls = pgsql.list_table_names(self.args, self.dbconfig, db_schema='sia')
         print(tbls)
         assert tbls is not None
         assert len(tbls) > 0
@@ -84,7 +88,7 @@ class TestPgSql(object):
 
 
     def test_list_table_names (self):
-        tbls = pgsql.list_table_names(self.args, self.dbargs)
+        tbls = pgsql.list_table_names(self.args, self.dbconfig)
         print(tbls)
         assert tbls is not None
         assert len(tbls) > 0
@@ -98,7 +102,7 @@ class TestPgSql(object):
 
 
     def test_list_table_names_bad_schema (self):
-        tbls = pgsql.list_table_names(self.args, self.dbargs, db_schema='nosuch')
+        tbls = pgsql.list_table_names(self.args, self.dbconfig, db_schema='nosuch')
         print(tbls)
         assert tbls is not None
         assert len(tbls) == 0
@@ -106,7 +110,7 @@ class TestPgSql(object):
 
 
     def test_list_catalog_tables_schema (self):
-        cats = pgsql.list_catalog_tables(self.args, self.dbargs, db_schema='sia')
+        cats = pgsql.list_catalog_tables(self.args, self.dbconfig, db_schema='sia')
         print(cats)
         assert cats is not None
         assert len(cats) > 0
@@ -120,7 +124,7 @@ class TestPgSql(object):
 
 
     def test_list_catalog_tables (self):
-        cats = pgsql.list_catalog_tables(self.args, self.dbargs)
+        cats = pgsql.list_catalog_tables(self.args, self.dbconfig)
         print(cats)
         assert cats is not None
         assert len(cats) > 0
@@ -134,7 +138,7 @@ class TestPgSql(object):
 
 
     def test_list_catalog_tables_bad_schema (self):
-        cats = pgsql.list_catalog_tables(self.args, self.dbargs, db_schema='nosuch')
+        cats = pgsql.list_catalog_tables(self.args, self.dbconfig, db_schema='nosuch')
         print(cats)
         assert cats is not None
         assert len(cats) == 0
@@ -144,12 +148,12 @@ class TestPgSql(object):
     def test_sql_create_table_empty (self):
         self.args['catalog_table'] = 'new_tbl'
         with pytest.raises(errors.ProcessingError):
-            pgsql.sql_create_table(self.args, self.dbargs, dict())
+            pgsql.sql_create_table(self.args, self.dbconfig, dict())
 
 
     def test_sql_create_table (self):
         self.args['catalog_table'] = 'new_tbl'
-        tbl = pgsql.sql_create_table(self.args, self.dbargs, self.cat_md)
+        tbl = pgsql.sql_create_table(self.args, self.dbconfig, self.cat_md)
         assert tbl is not None
         assert tbl == "-- Creating table 'new_tbl'"
 
@@ -158,12 +162,12 @@ class TestPgSql(object):
     def test_sql_create_table_str_empty (self):
         self.args['catalog_table'] = 'NEWTBL'
         with pytest.raises(errors.ProcessingError):
-            pgsql.sql_create_table_str(self.args, self.dbargs, dict())
+            pgsql.sql_create_table_str(self.args, self.dbconfig, dict())
 
 
     def test_sql_create_table_str (self):
         self.args['catalog_table'] = 'NEWTBL'
-        tbl = pgsql.sql_create_table_str(self.args, self.dbargs, self.cat_md)
+        tbl = pgsql.sql_create_table_str(self.args, self.dbconfig, self.cat_md)
         assert tbl is not None
         assert 'CREATE TABLE' in tbl
         assert 'NEWTBL' in tbl
