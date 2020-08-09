@@ -1,6 +1,6 @@
 # Tests for the ISQLSink.
 #   Written by: Tom Hicks. 8/8/2020.
-#   Last Modified: Add tests for file_info_to_comment_string.
+#   Last Modified: Add tests for sql_file_info_comment_str.
 #
 import pytest
 
@@ -87,3 +87,51 @@ class TestISQLSink(object):
         print(dbconf)
         assert dbconf is not None
         assert len(dbconf) >= 7               # specific to this test file
+
+
+
+    def test_sql_file_info_comment_str_no_fi(self):
+        task = isql.ISQLSink(self.args)
+        fics = task.sql_file_info_comment_str(None)
+        assert fics is not None
+        assert fics == task.SQL_COMMENT + ' NO_FILENAME 0'
+
+
+    def test_sql_file_info_comment_str_empty_fi(self):
+        task = isql.ISQLSink(self.args)
+        finfo = dict()
+        fics = task.sql_file_info_comment_str(finfo)
+        assert fics is not None
+        assert fics == task.SQL_COMMENT + ' NO_FILENAME 0'
+
+
+    def test_sql_file_info_comment_str_fname(self):
+        task = isql.ISQLSink(self.args)
+        finfo = { 'file_name': 'file-name' }
+        fics = task.sql_file_info_comment_str(finfo)
+        assert fics is not None
+        assert fics == task.SQL_COMMENT + ' file-name'
+
+
+    def test_sql_file_info_comment_str_fsize(self):
+        task = isql.ISQLSink(self.args)
+        finfo = { 'file_size': 888 }
+        fics = task.sql_file_info_comment_str(finfo)
+        assert fics is not None
+        assert fics == task.SQL_COMMENT + ' 888'
+
+
+    def test_sql_file_info_comment_str_fpath(self):
+        task = isql.ISQLSink(self.args)
+        finfo = { 'file_path': '/tmp/file-name' }
+        fics = task.sql_file_info_comment_str(finfo)
+        assert fics is not None
+        assert fics == task.SQL_COMMENT + ' /tmp/file-name'
+
+
+    def test_sql_file_info_comment_str(self):
+        task = isql.ISQLSink(self.args)
+        finfo = { 'file_name': 'file-name', 'file_size': 999, 'file_path': '/path/file-name' }
+        fics = task.sql_file_info_comment_str(finfo)
+        assert fics is not None
+        assert fics == task.SQL_COMMENT + ' file-name 999 /path/file-name'
