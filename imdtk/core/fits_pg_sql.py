@@ -1,9 +1,11 @@
 #
 # Module to curate FITS data with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/24/2020.
-#   Last Modified: WIP: begin to implement table creation.
+#   Last Modified: WIP: use passed column names and formats.
 #
 from string import Template
+
+import imdtk.exceptions as errors
 
 
 UNSUPPORTED = 'UNSUPPORTED'
@@ -13,39 +15,38 @@ UNSUPPORTED = 'UNSUPPORTED'
 # Format
 # Code     Description                     8-bit bytes
 # ------   -----------                     -----------
-# L        logical (Boolean)               1
-# X        bit                             *
+# A        character                       1
 # B        Unsigned byte                   1
+# C        single precision complex        8
+# D        double precision floating point 8
+# E        single precision floating point 4
+# F        single precision floating point 4
 # I        16-bit integer                  2
 # J        32-bit integer                  4
 # K        64-bit integer                  8
-# A        character                       1
-# E        single precision floating point 4
-# D        double precision floating point 8
-# C        single precision complex        8
+# L        logical (Boolean)               1
 # M        double precision complex        16
 # P        array descriptor                8
 # Q        array descriptor                16
+# X        bit                             *
+# Z        hexadecimal integer             1
 #
 _FITS_FORMAT_TO_SQL = {
     'A': 'text',
     'D': 'double precision',
     'E': 'real',
+    'F': 'real',
     'I': 'smallint',
     'J': 'integer',
     'K': 'bigint',
     'L': 'boolean',
     'X': 'bit',
-    # 'B': 'Unsigned byte',
-    # 'C': 'single precision complex',
-    # 'M': 'double precision complex',
-    # 'P': 'array descriptor',
-    # 'Q': 'array descriptor',
-    'B': UNSUPPORTED,
-    'C': UNSUPPORTED,
-    'M': UNSUPPORTED,
-    'P': UNSUPPORTED,
-    'Q': UNSUPPORTED
+    'Z': 'bytea',
+    'B': UNSUPPORTED,  # 'Unsigned byte',
+    'C': UNSUPPORTED,  # 'single precision complex',
+    'M': UNSUPPORTED,  # 'double precision complex',
+    'P': UNSUPPORTED,  # 'array descriptor',
+    'Q': UNSUPPORTED,  # 'array descriptor'
 }
 
 
@@ -59,36 +60,33 @@ def fits_format_to_sql (tform):
     """
     fmt_code = tform
     if (len(tform) > 1):
-        pass
-        # TODO: fmt_code = (parse fmt_code letter from format field)
+        fmt_code = tform[0:1]
 
     sql_decl = _FITS_FORMAT_TO_SQL.get(fmt_code, UNSUPPORTED)
     if (sql_decl != UNSUPPORTED):
         return sql_decl
     else:
-        errMsg = "(fits_format_to_sql): FITS column format {} is not supported.".format(tform)
-        raise TypeError(errMsg)
+        errMsg = "FITS data column format '{}' is not supported.".format(tform)
+        raise errors.ProcessingError(errMsg)
 
 
-def gen_column_decls_sql (col_names, col_fmts):
+def gen_column_decls_sql (column_names, column_formats):
     """
     Generate the SQL column declarations for a table, given lists of column names
     and FITS format specs.
 
-    :param col_names: a list of column name strings
-    :param col_fmts: a list of FITS format specifiers strings
+    :param column_names: a list of column name strings
+    :param column_formats: a list of FITS format specifiers strings
 
     :return a list of SQL declaration strings for the table columns (no trailing commas!)
     :raises ValueError if the supplied argument lists are not the same size
     """
-    num_names = len(col_names)
-    num_fmts = len(col_fmts)
-    if (num_names != num_fmts):
-        errMsg = "(make_table_sql): the number of column names and column formats must be equal ({0} != {1}".format(num_names, num_fmts)
-        raise ValueError(errMsg)
+    if (len(column_names) != len(column_formats)):
+        errMsg = "Column name and format lists must be the same length."
+        raise errors.ProcessingError(errMsg)
 
-    col_types = [ fits_format_to_sql(fmt) for fmt in col_fmts ]
-    return [ "{0} {1}".format(n, t) for n, t in zip(col_names, col_types) ]
+    col_types = [fits_format_to_sql(fmt) for fmt in column_formats]
+    return ["{0} {1}".format(n, t) for n, t in zip(column_names, col_types)]
 
 
 def gen_create_table_sql (col_decls, args):
@@ -113,22 +111,23 @@ def gen_create_table_sql (col_decls, args):
     return sql                              # return list of SQL strings
 
 
-def gen_search_path_sql (args):
-    return [ Template('SET search_path TO ${db_schema_name}, public;').substitute(args) ]
+def gen_search_path_sql (dbconfig):
+    """ Set the SQL search path to include the database schema from the given database parameters. """
+    return [ Template('SET search_path TO ${db_schema_name}, public;').substitute(dbconfig) ]
 
 
-def gen_table_indices_sql (col_names, args):
+def gen_table_indices_sql (column_names, args):
     """
     Generate and return a list of SQL statements to create indices for a table.
 
-    :param col_names: a list of column name strings
+    :param column_names: a list of column name strings
     :param args: dictionary containing database arguments used by this method:
                  verbose, db_owner, db_schema_name, catalog_table
     """
     sql = []
 
     # create index on s_ra and s_dec and cluster table by that index
-    if ('s_ra' in col_names and 's_dec' in col_names):
+    if ('s_ra' in column_names and 's_dec' in column_names):
         sql.append(
             Template('CREATE INDEX ${catalog_table}_q3c_idx on ${db_schema_name}.${catalog_table} USING btree (public.q3c_ang2ipix(s_ra, s_dec));').substitute(args)
         )
@@ -137,19 +136,19 @@ def gen_table_indices_sql (col_names, args):
         )
 
     # create index on the id field
-    if ('id' in col_names):
+    if ('id' in column_names):
         sql.append(
             Template('CREATE INDEX ${catalog_table}_id_idx on ${db_schema_name}.${catalog_table} USING btree (id);').substitute(args)
         )
 
     # create index on the s_dec field
-    if ('s_dec' in col_names):
+    if ('s_dec' in column_names):
         sql.append(
             Template('CREATE INDEX ${catalog_table}_s_dec_idx on ${db_schema_name}.${catalog_table} USING btree (s_dec);').substitute(args)
         )
 
     # create index on the s_ra field
-    if ('s_ra' in col_names):
+    if ('s_ra' in column_names):
         sql.append(
             Template('CREATE INDEX ${catalog_table}_s_ra_idx on ${db_schema_name}.${catalog_table} USING btree (s_ra);').substitute(args)
         )
@@ -157,22 +156,23 @@ def gen_table_indices_sql (col_names, args):
     return sql                              # return list of SQL strings
 
 
-def make_table_sql_str (args, dbconfig, col_names, col_fmts):
+def make_table_sql_str (args, dbconfig, column_names, column_formats):
     """
     Generate the SQL for creating a table, given column names, FITS format specs, and
     general arguments.
 
-    :param col_names: a list of column name strings
-    :param col_fmts: a list of FITS format specifiers strings
-    :param args: dictionary containing database and command line arguments
+    :param column_names: a list of column name strings
+    :param column_formats: a list of FITS format specifiers strings
+    :param args: dictionary containing command line arguments
+    :param dbconfig: dictionary containing database parameters
 
     :return a list of SQL declaration strings for the table columns (no trailing commas!)
     :raises ValueError if the supplied argument lists are not the same size
     """
-    col_decls = gen_column_decls_sql(col_names, col_fmts)
+    col_decls = gen_column_decls_sql(column_names, column_formats)
 
     sql = []
-    sql.extend(gen_search_path_sql(args))
+    sql.extend(gen_search_path_sql(dbconfig))
     sql.extend(gen_create_table_sql(col_decls, args))
-    sql.extend(gen_table_indices_sql(col_names, args))
+    sql.extend(gen_table_indices_sql(column_names, args))
     return sql

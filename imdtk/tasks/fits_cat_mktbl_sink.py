@@ -1,7 +1,7 @@
 #
 # Class to create a new database table from the metadata of a FITS catalog file.
 #   Written by: Tom Hicks. 7/22/2020.
-#   Last Modified: Consistent arguments to create and write table methods.
+#   Last Modified: WIP: get/pass column names and formats down to create_table methods.
 #
 import sys
 
@@ -70,7 +70,9 @@ class FitsCatalogMakeTableSink (ISQLSink):
             print("({}): Creating table: '{}'".format(self.TOOL_NAME, catalog_table), file=sys.stderr)
 
         # open database connection and create the specified table
-        pg_sql.create_table(self.args, dbconfig, metadata)
+        col_names = md_utils.get_aliased_column_names(metadata) or md_utils.get_column_names(metadata)
+        col_fmts = md_utils.get_column_formats(metadata)
+        pg_sql.create_table(self.args, dbconfig, col_names, col_fmts)
 
         if (self._VERBOSE):
             print("({}): Database table '{}' created.".format(self.TOOL_NAME, catalog_table), file=sys.stderr)
@@ -107,5 +109,7 @@ class FitsCatalogMakeTableSink (ISQLSink):
         Note: the generated SQL strings are for debugging only and ARE NOT SQL-INJECTION safe.
         """
         comment = self.sql_file_info_comment_str(file_info)
-        create_str = pg_sql.sql_create_table_str(self.args, dbconfig, metadata)
+        col_names = md_utils.get_aliased_column_names(metadata) or md_utils.get_column_names(metadata)
+        col_fmts = md_utils.get_column_formats(metadata)
+        create_str = pg_sql.sql_create_table_str(self.args, dbconfig, col_names, col_fmts)
         self.output_SQL(create_str, comment=comment, file_path=file_path)

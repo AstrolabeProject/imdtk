@@ -1,6 +1,6 @@
 # Tests for the PostgreSQL interface module.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Update for removal of sql_test_setup module.
+#   Last Modified: Update for passing column names and formats.
 #
 import pytest
 
@@ -20,32 +20,28 @@ class TestPgSql(object):
     dbconfig = task.load_sql_db_config(TEST_DBCONFIG_FILEPATH)
     print("TestPgSql:dbconfig={}".format(dbconfig))
 
-    cat_md = {
-        "column_info": {
-            "name": [
-                "ID",
-                "RA",
-                "DEC",
-                "redshift",
-                "x",
-                "y",
-                "a",
-                "b",
-                "kron_flag"
-            ],
-            "format": [
-                "K",
-                "D",
-                "D",
-                "D",
-                "D",
-                "D",
-                "D",
-                "D",
-                "K"
-            ]
-        }
-    }
+    cat_names = [
+        "ID",
+        "RA",
+        "DEC",
+        "redshift",
+        "x",
+        "y",
+        "a",
+        "b",
+        "kron_flag"
+    ]
+    cat_formats = [
+        "K",
+        "D",
+        "D",
+        "D",
+        "D",
+        "D",
+        "D",
+        "D",
+        "K"
+    ]
 
     datad = {
         "SIMPLE": True,
@@ -148,12 +144,12 @@ class TestPgSql(object):
     def test_sql_create_table_empty (self):
         self.args['catalog_table'] = 'new_tbl'
         with pytest.raises(errors.ProcessingError):
-            pgsql.sql_create_table(self.args, self.dbconfig, dict())
+            pgsql.sql_create_table(self.args, self.dbconfig, [], [])
 
 
     def test_sql_create_table (self):
         self.args['catalog_table'] = 'new_tbl'
-        tbl = pgsql.sql_create_table(self.args, self.dbconfig, self.cat_md)
+        tbl = pgsql.sql_create_table(self.args, self.dbconfig, self.cat_names, self.cat_formats)
         assert tbl is not None
         assert tbl == "-- Creating table 'new_tbl'"
 
@@ -162,12 +158,12 @@ class TestPgSql(object):
     def test_sql_create_table_str_empty (self):
         self.args['catalog_table'] = 'NEWTBL'
         with pytest.raises(errors.ProcessingError):
-            pgsql.sql_create_table_str(self.args, self.dbconfig, dict())
+            pgsql.sql_create_table_str(self.args, self.dbconfig, [], [])
 
 
     def test_sql_create_table_str (self):
         self.args['catalog_table'] = 'NEWTBL'
-        tbl = pgsql.sql_create_table_str(self.args, self.dbconfig, self.cat_md)
+        tbl = pgsql.sql_create_table_str(self.args, self.dbconfig, self.cat_names, self.cat_formats)
         assert tbl is not None
         assert 'CREATE TABLE' in tbl
         assert 'NEWTBL' in tbl

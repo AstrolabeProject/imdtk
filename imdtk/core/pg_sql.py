@@ -1,7 +1,7 @@
 #
 # Module to interact with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: WIP: continue developing create_table methods.
+#   Last Modified: WIP: get/pass column names and formats down in create_table methods.
 #
 import sys
 # from string import Template
@@ -11,7 +11,6 @@ import psycopg2
 from config.settings import SQL_FIELDS_HYBRID
 import imdtk.exceptions as errors
 import imdtk.core.fits_pg_sql as fpg_sql
-import imdtk.tasks.metadata_utils as md_utils
 from imdtk.core.misc_utils import to_JSON
 
 
@@ -99,27 +98,25 @@ def list_table_names (args, dbconfig, db_schema=None):
     return tables
 
 
-def sql_create_table (args, dbconfig, metadata):
+def sql_create_table (args, dbconfig, column_names, column_formats):
     """
     Create a new table with the given table name, columns, and types as specified by
     the given catalog metadata dictionary using the given DB parameters.
     Returns None if the column name or format vectors are not present in the input OR
     if the vectors are not the same size.
     """
-    col_names = md_utils.get_column_names(metadata)
-    col_fmts = md_utils.get_column_formats(metadata)
-    if (col_names and col_fmts and (len(col_names) == len(col_fmts))):
-        combo_args = args.copy()
-        combo_args.update(dbconfig.copy())
+    if (column_names and column_formats and (len(column_names) == len(column_formats))):
+        # combo_args = args.copy()
+        # combo_args.update(dbconfig.copy())
         # TODO: IMPLEMENT the following statement. What should it return?
-        # fpg_sql.make_table_sql(combo_args, dbconfig, col_names, col_fmts)
+        # fpg_sql.make_table_sql(combo_args, dbconfig, column_names, column_formats)
         return "-- Creating table '{}'".format(args.get('catalog_table'))
     else:
-        errMsg = 'Catalog metadata is missing column name and format vectors or they are not the same length.'
+        errMsg = 'Column name and format lists must be the same length.'
         raise errors.ProcessingError(errMsg)
 
 
-def sql_create_table_str (args, dbconfig, metadata):
+def sql_create_table_str (args, dbconfig, column_names, column_formats):
     """
     Return an SQL string to create a new table with the given table name, columns,
     and types specified by the given catalog metadata dictionary. Returns None if
@@ -128,16 +125,14 @@ def sql_create_table_str (args, dbconfig, metadata):
 
     Note: the returned string is for debugging only and IS NOT SQL-INJECTION safe.
     """
-    col_names = md_utils.get_column_names(metadata)
-    col_fmts = md_utils.get_column_formats(metadata)
-    if (col_names and col_fmts and (len(col_names) == len(col_fmts))):
+    if (column_names and column_formats and (len(column_names) == len(column_formats))):
         combo_args = args.copy()
         combo_args.update(dbconfig.copy())
-        sql_list = fpg_sql.make_table_sql_str(combo_args, dbconfig, col_names, col_fmts)
+        sql_list = fpg_sql.make_table_sql_str(combo_args, dbconfig, column_names, column_formats)
         sql = '\n'.join(sql_list)
         return sql
     else:
-        errMsg = 'Catalog metadata is missing column name and format vectors or they are not the same length.'
+        errMsg = 'Column name and format lists must be the same length.'
         raise errors.ProcessingError(errMsg)
 
 
