@@ -1,7 +1,7 @@
 #
 # Module to curate FITS data with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/24/2020.
-#   Last Modified: Rename some generation methods, for consistency.
+#   Last Modified: Minor resort of method.
 #
 from string import Template
 
@@ -106,6 +106,16 @@ def gen_column_decls_sql (column_names, column_formats):
     return ["{0} {1}".format(n, t) for n, t in zip(column_names, col_types)]
 
 
+def gen_search_path_sql (dbconfig):
+    """
+    Set the SQL search path to include the database schema from the given database parameters.
+
+    :param dbconfig: dictionary containing database arguments used by this method:
+                   db_schema_name
+    """
+    return [ Template('SET search_path TO ${db_schema_name}, public;').substitute(dbconfig) ]
+
+
 def gen_table_sql (argmix, dbconfig, col_decls):
     """
     Generate and return a list of SQL statements to create a table.
@@ -126,16 +136,6 @@ def gen_table_sql (argmix, dbconfig, col_decls):
     )
 
     return sql                              # return list of SQL strings
-
-
-def gen_search_path_sql (dbconfig):
-    """
-    Set the SQL search path to include the database schema from the given database parameters.
-
-    :param dbconfig: dictionary containing database arguments used by this method:
-                   db_schema_name
-    """
-    return [ Template('SET search_path TO ${db_schema_name}, public;').substitute(dbconfig) ]
 
 
 def gen_table_indices_sql (argmix, dbconfig, column_names):
