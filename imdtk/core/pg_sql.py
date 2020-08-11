@@ -1,7 +1,7 @@
 #
 # Module to interact with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: WIP: get/pass column names and formats down in create_table methods.
+#   Last Modified: Remove use of combined argument dictionaries at this level.
 #
 import sys
 # from string import Template
@@ -106,10 +106,8 @@ def sql_create_table (args, dbconfig, column_names, column_formats):
     if the vectors are not the same size.
     """
     if (column_names and column_formats and (len(column_names) == len(column_formats))):
-        # combo_args = args.copy()
-        # combo_args.update(dbconfig.copy())
         # TODO: IMPLEMENT the following statement. What should it return?
-        # fpg_sql.make_table_sql(combo_args, dbconfig, column_names, column_formats)
+        # fpg_sql.make_table_sql(args, dbconfig, column_names, column_formats)
         return "-- Creating table '{}'".format(args.get('catalog_table'))
     else:
         errMsg = 'Column name and format lists must be the same length.'
@@ -126,9 +124,7 @@ def sql_create_table_str (args, dbconfig, column_names, column_formats):
     Note: the returned string is for debugging only and IS NOT SQL-INJECTION safe.
     """
     if (column_names and column_formats and (len(column_names) == len(column_formats))):
-        combo_args = args.copy()
-        combo_args.update(dbconfig.copy())
-        sql_list = fpg_sql.make_table_sql_str(combo_args, dbconfig, column_names, column_formats)
+        sql_list = fpg_sql.make_table_sql_str(args, dbconfig, column_names, column_formats)
         sql = '\n'.join(sql_list)
         return sql
     else:

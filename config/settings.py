@@ -33,8 +33,14 @@ IMAGE_FETCH_PREFIX = 'https://hector.cyverse.org/cuts/image_fetch?path='
 # Name of this program: used programmatically so keeping it lower case.
 PROGRAM_NAME = 'imdtk'
 
-# Resource information (currently unused)
-# RESOURCE_PKG = 'imdtk.resources'
+# Set of possible field names which will contain declination values:
+DEC_ALIASES = [ 'DEC', 'dec', 's_dec' ]
+
+# Set of possible field names which will contain unique ID values:
+ID_ALIASES = [ 'ID', 'id', 's_obs_id', 'galaxy_id' ]
+
+# Set of possible field names which will contain right ascension values:
+RA_ALIASES = [ 'RA', 'ra', 's_ra' ]
 
 # List of required SQL fields in the hybrid PG/JSON database table (excluding JSON fields):
 SQL_FIELDS_HYBRID = [ 's_dec', 's_ra', 'obs_collection', 'is_public' ]
