@@ -1,7 +1,7 @@
 #
 # Module to curate FITS data with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/24/2020.
-#   Last Modified: Add db parameter checking. Document error handling. Remove redundant code.
+#   Last Modified: Rename some generation methods, for consistency.
 #
 from string import Template
 
@@ -106,7 +106,7 @@ def gen_column_decls_sql (column_names, column_formats):
     return ["{0} {1}".format(n, t) for n, t in zip(column_names, col_types)]
 
 
-def gen_create_table_sql (argmix, dbconfig, col_decls):
+def gen_table_sql (argmix, dbconfig, col_decls):
     """
     Generate and return a list of SQL statements to create a table.
 
@@ -196,7 +196,7 @@ def gen_table_indices_sql (argmix, dbconfig, column_names):
     return sql                              # return list of SQL strings
 
 
-def make_table_sql_str (args, dbconfig, column_names, column_formats):
+def gen_create_table_sql_str (args, dbconfig, column_names, column_formats):
     """
     Generate the SQL for creating a table, given column names, FITS format specs, and
     general arguments.
@@ -220,7 +220,7 @@ def make_table_sql_str (args, dbconfig, column_names, column_formats):
 
     col_decls = gen_column_decls_sql(column_names, column_formats)
     sql.extend(gen_search_path_sql(dbconfig))
-    sql.extend(gen_create_table_sql(argmix, dbconfig, col_decls))
+    sql.extend(gen_table_sql(argmix, dbconfig, col_decls))
     sql.extend(gen_table_indices_sql(argmix, dbconfig, column_names))
 
     return sql

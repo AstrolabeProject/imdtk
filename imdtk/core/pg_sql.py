@@ -1,7 +1,7 @@
 #
 # Module to interact with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Update for rename of make table module.
+#   Last Modified: Update for "make table" method renames.
 #
 import sys
 
@@ -123,7 +123,7 @@ def sql_create_table_str (args, dbconfig, column_names, column_formats):
     Note: the returned string is for debugging only and IS NOT SQL-INJECTION safe.
     """
     if (column_names and column_formats and (len(column_names) == len(column_formats))):
-        sql_list = pgmt_sql.make_table_sql_str(args, dbconfig, column_names, column_formats)
+        sql_list = pgmt_sql.gen_create_table_sql_str(args, dbconfig, column_names, column_formats)
         sql = '\n'.join(sql_list)
         return sql
     else:
