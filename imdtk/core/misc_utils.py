@@ -1,7 +1,7 @@
 #
 # Miscellaneous Utility Methods.
 #   Written by: Tom Hicks. 5/22/2020.
-#   Last Modified: Add keep method (ala Clojure).
+#   Last Modified: Add missing_entries method.
 #
 import json
 
@@ -30,6 +30,15 @@ def keep (fn, collection):
     return values will be included. The function should be free of side-effects.
     """
     return list(filter(lambda x: x is not None, map(fn, collection)))
+
+
+def missing_entries (a_dictionary, required=[]):
+    """
+    Look up each of the keys in the required key list and return a list of keys
+    missing from the given dictionary.
+    """
+    missing = [ rkey for rkey in required if (rkey not in a_dictionary) ]
+    return None if (len(missing) < 1) else missing
 
 
 def remove_entries (a_dictionary, ignore=[]):

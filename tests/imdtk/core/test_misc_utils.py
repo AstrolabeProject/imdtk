@@ -1,6 +1,6 @@
 # Tests for the misc utilities module.
 #   Written by: Tom Hicks. 5/22/2020.
-#   Last Modified: Add test of keep method.
+#   Last Modified: Add tests for missing_entries.
 #
 import imdtk.core.misc_utils as mutils
 
@@ -54,6 +54,40 @@ class TestMiscUtils(object):
         vec = mutils.keep(self.testdict.get, self.testvec)
         print(vec)
         assert vec == [True, False, 0, 1, {}, {1: 1}, [], [1], 'Jstr', 99.9]
+
+
+
+    def test_missing_entries_noreq(self):
+        miss = mutils.missing_entries(self.testdict, [])
+        print(miss)
+        assert miss is None
+
+
+    def test_missing_entries_keys(self):
+        miss = mutils.missing_entries(self.testdict, list(self.testdict.keys()))
+        print(miss)
+        assert miss is None
+
+
+    def test_missing_entries_1(self):
+        miss = mutils.missing_entries(self.testdict, ['nosuchkey'])
+        print(miss)
+        assert miss is not None
+        assert len(miss) == 1
+        assert miss[0] == 'nosuchkey'
+
+
+    def test_missing_entries(self):
+        miss = mutils.missing_entries(self.testdict, ['a', 'aa', 'b', 'bb', 'c', 'ccc'])
+        print(miss)
+        assert miss is not None
+        assert len(miss) == 3
+        assert 'a' not in miss
+        assert 'b' not in miss
+        assert 'c' not in miss
+        assert 'aa' in miss
+        assert 'bb' in miss
+        assert 'ccc' in miss
 
 
     def test_remove_entries_default (self):
