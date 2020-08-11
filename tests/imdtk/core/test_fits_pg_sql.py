@@ -1,10 +1,9 @@
 # Tests for the FITS-specific PostgreSQL interface module.
 #   Written by: Tom Hicks. 8/10/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Add tests for check_dbconfig_parameters and gen_search_path_sql.
 #
 import pytest
 
-from config.settings import DEC_ALIASES, ID_ALIASES, RA_ALIASES
 import imdtk.exceptions as errors
 import imdtk.core.fits_pg_sql as fpg
 import imdtk.tasks.i_sql_sink as isql
@@ -57,6 +56,33 @@ class TestFitsPgSql(object):
         'X': 'bit',
         'Z': 'bytea'
     }
+
+
+    def test_check_dbconfig_parameters_noreq(self):
+        miss = fpg.check_dbconfig_parameters(self.dbconfig, [])
+        assert miss is None
+
+
+    def test_check_dbconfig_parameters_nomiss(self):
+        has_params = ['db_uri', 'db_schema_name', 'db_user']
+        miss = fpg.check_dbconfig_parameters(self.dbconfig, has_params)
+        assert miss is None
+
+
+    def test_check_dbconfig_parameters_miss(self):
+        bad_params = ['db_db', 'dba', 'bb', 'CCC']
+        emsg = f'Missing required .* {bad_params}'
+        with pytest.raises(errors.ProcessingError, match=emsg):
+            fpg.check_dbconfig_parameters(self.dbconfig, bad_params)
+
+
+    def test_check_dbconfig_parameters_mixed(self):
+        mix_params = ['db_uri', 'dba', 'bb', 'db_user', 'CCC', 'db_name']
+        bad_params = ['dba', 'bb', 'CCC']
+        emsg = f'Missing required .* {bad_params}'
+        with pytest.raises(errors.ProcessingError, match=emsg):
+            fpg.check_dbconfig_parameters(self.dbconfig, mix_params)
+
 
 
     def test_fits_format_to_sql_unsup(self):
@@ -113,3 +139,17 @@ class TestFitsPgSql(object):
         assert sql[5] == 'y integer'
         assert sql[8] == 'ccc bit'
         assert sql[9] == 'kron_flag bytea'
+
+
+    def test_gen_search_path_sql_bad(self):
+        with pytest.raises(KeyError):
+            fpg.gen_search_path_sql(dict())
+
+
+    def test_gen_search_path_sql(self):
+        schema = self.dbconfig.get('DB_SCHEMA_NAME') or 'sia'
+        sql = fpg.gen_search_path_sql(self.dbconfig)
+        print(sql)
+        assert sql is not None
+        assert len(sql) > 0
+        assert "SET search_path TO {}".format(schema) in sql[0]
