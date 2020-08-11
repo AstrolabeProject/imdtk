@@ -1,12 +1,13 @@
 #
 # Module to curate FITS data with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/24/2020.
-#   Last Modified: Index creation for multiple field types. Mix arguments where needed.
+#   Last Modified: Add db parameter checking. Document error handling. Remove redundant code.
 #
 from string import Template
 
 from config.settings import DEC_ALIASES, ID_ALIASES, RA_ALIASES
 import imdtk.exceptions as errors
+from imdtk.core.misc_utils import missing_entries
 
 
 UNSUPPORTED = 'UNSUPPORTED'
@@ -50,6 +51,21 @@ _FITS_FORMAT_TO_SQL = {
     'Q': UNSUPPORTED,  # 'array descriptor'
 }
 
+# Database parameters required within this module and child modules.
+REQUIRED_DB_PARAMETERS = [ 'db_schema_name', 'db_user' ]
+
+
+def check_dbconfig_parameters (dbconfig, required=REQUIRED_DB_PARAMETERS):
+    """
+    Check the given configuration dictionary for all database parameters required by this module.
+
+    :raises ProcessingError if a required database parameter is missing.
+    """
+    missing = missing_entries(dbconfig, required)
+    if (missing):
+        errMsg = "Missing required database parameters: {}".format(missing)
+        raise errors.ProcessingError(errMsg)
+
 
 def fits_format_to_sql (tform):
     """
@@ -57,7 +73,7 @@ def fits_format_to_sql (tform):
 
     :param tform: a FITS columnn format field for translation.
     :return an SQL type declaration string, corresponding to the given FITS format code.
-    :raises TypeError if tform specifies a type not supported by the database.
+    :raises ProcessingError if tform specifies a type not supported by the database.
     """
     fmt_code = tform
     if (tform and len(tform) > 1):
@@ -80,7 +96,7 @@ def gen_column_decls_sql (column_names, column_formats):
     :param column_formats: a list of FITS format specifiers strings
 
     :return a list of SQL declaration strings for the table columns (no trailing commas!)
-    :raises ValueError if the supplied argument lists are not the same size
+    :raises ProcessingError if the given column name and format lists are not the same size.
     """
     if (len(column_names) != len(column_formats)):
         errMsg = "Column name and format lists must be the same length."
@@ -113,7 +129,12 @@ def gen_create_table_sql (argmix, dbconfig, col_decls):
 
 
 def gen_search_path_sql (dbconfig):
-    """ Set the SQL search path to include the database schema from the given database parameters. """
+    """
+    Set the SQL search path to include the database schema from the given database parameters.
+
+    :param dbconfig: dictionary containing database arguments used by this method:
+                   db_schema_name
+    """
     return [ Template('SET search_path TO ${db_schema_name}, public;').substitute(dbconfig) ]
 
 
@@ -123,7 +144,7 @@ def gen_table_indices_sql (argmix, dbconfig, column_names):
 
     :param column_names: a list of column name strings
     :param argmix: dictionary containing both CLI and database arguments used by this method:
-                   verbose, db_owner, db_schema_name, catalog_table
+                   verbose, db_schema_name, catalog_table
     """
     sql = []
 
@@ -144,9 +165,6 @@ def gen_table_indices_sql (argmix, dbconfig, column_names):
 
     first_dec = dec_names[0] if (len(dec_names) > 0) else None
     first_ra = ra_names[0] if (len(ra_names) > 0) else None
-
-    if (len(ra_names) > 0):
-        first_ra = ra_names[0]
 
     # create index on first RA and first DEC and cluster the table by that index
     if (first_dec and first_ra):
@@ -189,16 +207,20 @@ def make_table_sql_str (args, dbconfig, column_names, column_formats):
     :param dbconfig: dictionary containing database parameters
 
     :return a list of SQL declaration strings for the table columns (no trailing commas!)
-    :raises ValueError if the supplied argument lists are not the same size
+    :raises ProcessingError if any database parameters required by this module are missing.
     """
+    # raise error is any required database parameters are missing
+    check_dbconfig_parameters(dbconfig)
+
     # combine CLI and DB arguments for easy use with templates
     argmix = args.copy()
     argmix.update(dbconfig)
 
-    col_decls = gen_column_decls_sql(column_names, column_formats)
-
     sql = []
+
+    col_decls = gen_column_decls_sql(column_names, column_formats)
     sql.extend(gen_search_path_sql(dbconfig))
     sql.extend(gen_create_table_sql(argmix, dbconfig, col_decls))
     sql.extend(gen_table_indices_sql(argmix, dbconfig, column_names))
+
     return sql
