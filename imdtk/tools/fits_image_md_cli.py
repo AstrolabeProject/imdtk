@@ -2,7 +2,7 @@
 #
 # Module to extract image metadata from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 5/21/2020.
-#   Last Modified: Remove version.
+#   Last Modified: Update for renames.
 #
 import argparse
 import sys
@@ -10,11 +10,11 @@ import sys
 import imdtk.exceptions as errors
 import imdtk.tools.cli_utils as cli_utils
 from imdtk.core.fits_utils import FITS_IGNORE_KEYS
-from imdtk.tasks.fits_headers import FitsHeadersSourceTask
+from imdtk.tasks.fits_image_md import FitsImageMetadataTask
 
 
 # Program name for this tool.
-TOOL_NAME = 'fits_headers'
+TOOL_NAME = 'fits_image_md'
 
 
 def main (argv=None):
@@ -66,7 +66,7 @@ def main (argv=None):
         print("({}): Processing FITS file '{}'.".format(TOOL_NAME, fits_file), file=sys.stderr)
 
     try:
-        task = FitsHeadersSourceTask(args)
+        task = FitsImageMetadataTask(args)
         task.process_and_output()
 
     except errors.UnsupportedTypeError as ute:

@@ -3,7 +3,7 @@
 # Module to add aliases (fields) for the column name fields in an Astropy-derived
 # catalog information metadata structure.
 #   Written by: Tom Hicks. 8/7/2020.
-#   Last Modified: Remove version.
+#   Last Modified: Update for renames.
 #
 import argparse
 import sys
@@ -11,11 +11,11 @@ import sys
 from config.settings import DEFAULT_CAT_ALIASES_FILEPATH
 import imdtk.exceptions as errors
 import imdtk.tools.cli_utils as cli_utils
-from imdtk.tasks.cat_aliases import CatAliasesTask
+from imdtk.tasks.catalog_aliases import CatalogAliasesTask
 
 
 # Program name for this tool.
-TOOL_NAME = 'cat_aliases'
+TOOL_NAME = 'catalog_aliases'
 
 
 def main (argv=None):
@@ -62,7 +62,7 @@ def main (argv=None):
 
     # call the task layer to process the given, validated input file
     try:
-        task = CatAliasesTask(args)
+        task = CatalogAliasesTask(args)
         task.input_process_output()
 
     except errors.ProcessingError as pe:

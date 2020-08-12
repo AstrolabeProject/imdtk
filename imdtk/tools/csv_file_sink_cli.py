@@ -2,18 +2,18 @@
 #
 # Module to output incoming data to a CSV file.
 #   Written by: Tom Hicks. 6/26/20.
-#   Last Modified: Remove version.
+#   Last Modified: Update for renames.
 #
 import argparse
 import sys
 
 import imdtk.exceptions as errors
 import imdtk.tools.cli_utils as cli_utils
-from imdtk.tasks.csv_sink import CSVSink
+from imdtk.tasks.csv_file_sink import CSVFileSink
 
 
 # Program name for this tool.
-TOOL_NAME = 'csv_sink'
+TOOL_NAME = 'csv_file_sink'
 
 
 def main (argv=None):
@@ -55,7 +55,7 @@ def main (argv=None):
 
     # call the task layer to process the given, validated input file
     try:
-        task = CSVSink(args)
+        task = CSVFileSink(args)
         task.input_process_output()
 
     except errors.ProcessingError as pe:

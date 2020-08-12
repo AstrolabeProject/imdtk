@@ -3,7 +3,7 @@
 # Python pipeline to extract image metadata from each FITS images in a directory, storing
 # the metadata into a Hybrid PostreSQL/JSON database.
 #   Written by: Tom Hicks. 7/20/2020.
-#   Last Modified: Remove version.
+#   Last Modified: Update for renames.
 #
 import argparse
 import sys
@@ -12,9 +12,9 @@ from config.settings import DEFAULT_HYBRID_TABLE_NAME
 import imdtk.exceptions as errors
 import imdtk.tools.cli_utils as cli_utils
 from imdtk.core.fits_utils import FITS_IGNORE_KEYS, gen_fits_file_paths
-from imdtk.tasks.aliases import AliasesTask
 from imdtk.tasks.fields_info import FieldsInfoTask
-from imdtk.tasks.fits_headers import FitsHeadersSourceTask
+from imdtk.tasks.fits_image_md import FitsImageMetadataTask
+from imdtk.tasks.image_aliases import ImageAliasesTask
 from imdtk.tasks.jwst_oc_calc import JWST_ObsCoreCalcTask
 from imdtk.tasks.jwst_pghybrid_sink import JWST_HybridPostgreSQLSink
 from imdtk.tasks.miss_report import MissingFieldsTask
@@ -74,8 +74,8 @@ def main (argv=None):
     args['TOOL_NAME'] = TOOL_NAME
 
     # instantiate the tasks which form the pipeline
-    fits_headersTask = FitsHeadersSourceTask(args)
-    aliasesTask = AliasesTask(args)
+    fits_image_mdTask = FitsImageMetadataTask(args)
+    image_aliasesTask = ImageAliasesTask(args)
     fields_infoTask = FieldsInfoTask(args)
     jwst_oc_calcTask = JWST_ObsCoreCalcTask(args)
     miss_reportTask = MissingFieldsTask(args)
@@ -98,8 +98,8 @@ def main (argv=None):
                 miss_reportTask.process(          # report: passes data through
                     jwst_oc_calcTask.process(
                         fields_infoTask.process(
-                            aliasesTask.process(
-                                fits_headersTask.process(None))))))  # metadata source
+                            image_aliasesTask.process(
+                                fits_image_mdTask.process(None))))))  # metadata source
 
             proc_count += 1                       # increment count of processed files
 

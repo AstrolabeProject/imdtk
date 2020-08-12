@@ -1,7 +1,7 @@
 #
 # Class to sink incoming data to a CSV file.
 #   Written by: Tom Hicks. 6/26/2020.
-#   Last Modified: Add/use primary field in output field list.
+#   Last Modified: Update for renames.
 #
 import csv
 import sys
@@ -14,7 +14,7 @@ from imdtk.tasks.i_task import IImdTask, STDOUT_NAME
 CSV_EXTENSION = 'csv'                       # Note: no dot in extension
 
 
-class CSVSink (IImdTask):
+class CSVFileSink (IImdTask):
     """ Class to sink incoming data to a CSV file. """
 
     # Name of output field which must be listed first. If no first field, use None.

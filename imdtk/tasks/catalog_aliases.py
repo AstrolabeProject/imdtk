@@ -2,7 +2,7 @@
 # Class to add aliases (fields) for the column name fields in an Astropy-derived
 # catalog information metadata structure.
 #   Written by: Tom Hicks. 8/7/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Update for renames.
 #
 import sys
 
@@ -12,7 +12,7 @@ import imdtk.tasks.metadata_utils as md_utils
 from imdtk.tasks.i_task import IImdTask
 
 
-class CatAliasesTask (IImdTask):
+class CatalogAliasesTask (IImdTask):
     """
     Class which adds aliases for the column information fields of a catalog metadata structure.
     """

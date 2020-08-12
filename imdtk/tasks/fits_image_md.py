@@ -1,7 +1,7 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: Revamp error handling.
+#   Last Modified: Update for renames.
 #
 import os
 import sys
@@ -13,7 +13,7 @@ import imdtk.core.fits_utils as fits_utils
 from imdtk.tasks.i_task import IImdTask
 
 
-class FitsHeadersSourceTask (IImdTask):
+class FitsImageMetadataTask (IImdTask):
     """ Class for extracting header information from FITS files. """
 
     def __init__(self, args):

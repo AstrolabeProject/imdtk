@@ -2,18 +2,18 @@
 #
 # Module to create a new database table from the metadata of a FITS catalog file.
 #   Written by: Tom Hicks. 7/22/2020.
-#   Last Modified: Remove version.
+#   Last Modified: Update for renames.
 #
 import argparse
 import sys
 
 import imdtk.exceptions as errors
 import imdtk.tools.cli_utils as cli_utils
-from imdtk.tasks.fits_cat_mktbl_sink import FitsCatalogMakeTableSink
+from imdtk.tasks.fits_catalog_mktbl_sink import FitsCatalogMakeTableSink
 
 
 # Program name for this tool.
-TOOL_NAME = 'fits_cat_mktbl_sink'
+TOOL_NAME = 'fits_catalog_mktbl_sink'
 
 
 def main (argv=None):

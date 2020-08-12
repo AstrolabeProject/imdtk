@@ -1,7 +1,7 @@
 #
 # Class to add aliases (fields) for the header fields in a FITS-derived image metadata structure.
 #   Written by: Tom Hicks. 5/29/2020.
-#   Last Modified: Update for separate alias utilities and renamed alias file path.
+#   Last Modified: Update for renames.
 #
 import sys
 
@@ -11,7 +11,7 @@ import imdtk.tasks.metadata_utils as md_utils
 from imdtk.tasks.i_task import IImdTask
 
 
-class AliasesTask (IImdTask):
+class ImageAliasesTask (IImdTask):
     """
     Class which adds aliases for the header fields of an image metadata structure.
     """
