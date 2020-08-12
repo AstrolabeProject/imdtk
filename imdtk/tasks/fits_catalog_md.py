@@ -1,7 +1,7 @@
 #
-# Class to extract image table metadata from a FITS file and output it as JSON.
+# Class to extract catalog metadata from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 7/6/2020.
-#   Last Modified: Revamp error handling.
+#   Last Modified: Update for rename.
 #
 import os
 import sys
@@ -13,12 +13,12 @@ import imdtk.core.fits_utils as fits_utils
 from imdtk.tasks.i_task import IImdTask
 
 
-class FitsTableSourceTask (IImdTask):
-    """ Class to extract image table metadata from a FITS file and output it as JSON. """
+class FitsCatalogMetadataTask (IImdTask):
+    """ Class to extract catalog metadata from a FITS file and output it as JSON. """
 
     def __init__(self, args):
         """
-        Constructor for the class to extract image table metadta from a FITS file and output it as JSON.
+        Constructor for the class to extract catalog metadata from a FITS file and output it as JSON.
         """
         super().__init__(args)
 
@@ -52,7 +52,7 @@ class FitsTableSourceTask (IImdTask):
                 cinfo = fits_utils.get_column_info(hdus_list, table_hdu)
 
         except OSError as oserr:
-            errMsg = "Unable to read table metadata from FITS file '{}': {}.".format(fits_file, oserr)
+            errMsg = "Unable to read catalog metadata from FITS file '{}': {}.".format(fits_file, oserr)
             raise errors.ProcessingError(errMsg)
 
         metadata = self.make_context()      # create overall metadata structure

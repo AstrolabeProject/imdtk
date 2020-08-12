@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 #
-# Module to extract an image table from a FITS file and output it as JSON.
+# Module to extract catalog metadata from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 7/6/2020.
-#   Last Modified: Remove version.
+#   Last Modified: Update for rename.
 #
 import argparse
 import sys
 
 import imdtk.exceptions as errors
 import imdtk.tools.cli_utils as cli_utils
-from imdtk.tasks.fits_table import FitsTableSourceTask
+from imdtk.tasks.fits_catalog_md import FitsCatalogMetadataTask
 
 
 # Program name for this tool.
-TOOL_NAME = 'fits_table'
+TOOL_NAME = 'fits_catalog_md'
 
 
 def main (argv=None):
@@ -42,7 +42,7 @@ def main (argv=None):
     parser.add_argument(
         '-thdu', '--table_hdu', dest='table_hdu', metavar='HDU_index',
         default=1,
-        help='Index of HDU containing the table data [default: 1 (the second)]'
+        help='Index of HDU containing the data table [default: 1 (the second)]'
     )
 
     # actually parse the arguments from the command line
@@ -65,7 +65,7 @@ def main (argv=None):
         print("({}): Processing FITS file '{}'.".format(TOOL_NAME, fits_file), file=sys.stderr)
 
     try:
-        task = FitsTableSourceTask(args)
+        task = FitsCatalogMetadataTask(args)
         task.process_and_output()
 
     except errors.UnsupportedTypeError as ute:

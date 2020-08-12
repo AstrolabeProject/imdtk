@@ -15,7 +15,7 @@
 # csv_sink -d --version
 # fields_info -d --version
 # fits_headers -d --version
-# fits_table -d --version
+# fits_cat_md -d --version
 # jwst_oc_calc -d --version
 # jwst_pghybrid_sink -d --version
 # jwst_pgsql_sink -d --version
@@ -52,7 +52,7 @@
 # echo "--------------------------------------------"
 # jwst_pghybrid_sink --help
 # echo "--------------------------------------------"
-# fits_table --help
+# fits_cat_md --help
 
 # echo "============================================"
 # echo "Headers only, verbose, to STANDARD OUTPUT:"
@@ -248,9 +248,9 @@
 
 # multi_md_pgsql_pipe -idir /tmp/NOSUCH -g -v
 
-# fits_table -ff /images/BAD.fits -g -v
-# fits_table -ff /images/m13.fits -g -v
-# fits_table -ff /images/NOSUCH.fits -g -v
+# fits_cat_md -ff /images/BAD.fits -g -v
+# fits_cat_md -ff /images/m13.fits -g -v
+# fits_cat_md -ff /images/NOSUCH.fits -g -v
 
 
 # echo "============================================"
@@ -307,14 +307,13 @@
 echo "============================================"
 echo "Current development:"
 echo "--------------------------------------------"
-# fits_table -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -d -g
-# fits_table -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -of /work/ez_cat.json
-# fits_table -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -g
-# fits_table -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -d -g
-# fits_table -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -v -of /work/photo_cat.json
-# fits_table -v -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -v -g
+# fits_cat_md -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -d -g
+# fits_cat_md -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -of /work/ez_cat.json
+# fits_cat_md -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -g
+# fits_cat_md -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -d -g
+# fits_cat_md -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -v -of /work/photo_cat.json
+# fits_cat_md -v -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -v -g
 
-# fits_table -v -ff /catalogs/small_table.fits | fits_cat_maketable -ct noalias -sql -g -v
-# fits_table -v -ff /catalogs/small_table.fits | cat_aliases -v -g
-# fits_table -v -ff /catalogs/small_table.fits | fits_cat_maketable -ct test_tbl -sql -g -v
-# fits_table -v -ff /catalogs/small_table.fits | cat_aliases -v | fits_cat_maketable -ct test_tbl -sql -g -v
+# fits_cat_md -v -ff /catalogs/small_table.fits | cat_aliases -v -g
+fits_cat_md -v -ff /catalogs/small_table.fits | fits_cat_maketable -ct noalias -sql -g -v
+fits_cat_md -v -ff /catalogs/small_table.fits | cat_aliases -v | fits_cat_maketable -ct test_tbl -sql -g -v
