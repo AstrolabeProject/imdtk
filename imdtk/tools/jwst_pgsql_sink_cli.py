@@ -2,7 +2,7 @@
 #
 # Module to store incoming data in an ObsCore PostgreSQL database.
 #   Written by: Tom Hicks. 6/21/20.
-#   Last Modified: Rename variable to task.
+#   Last Modified: Remove version.
 #
 import argparse
 import sys
@@ -14,9 +14,6 @@ from imdtk.tasks.jwst_pgsql_sink import JWST_ObsCorePostgreSQLSink
 
 # Program name for this tool.
 TOOL_NAME = 'jwst_pgsql_sink'
-
-# Version of this tool.
-VERSION = '0.11.1'
 
 
 def main (argv=None):
@@ -37,10 +34,10 @@ def main (argv=None):
         description='Save the incoming data to a ObsCore PostgreSQL database'
     )
 
-    cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_input_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_database_arguments(parser, TOOL_NAME, VERSION)
+    cli_utils.add_shared_arguments(parser, TOOL_NAME)
+    cli_utils.add_output_arguments(parser, TOOL_NAME)
+    cli_utils.add_input_arguments(parser, TOOL_NAME)
+    cli_utils.add_database_arguments(parser, TOOL_NAME)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))
@@ -60,7 +57,6 @@ def main (argv=None):
 
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME
-    args['VERSION'] = VERSION
 
     # call the task layer to process the given, validated input file
     try:

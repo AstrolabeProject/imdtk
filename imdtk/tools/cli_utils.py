@@ -1,13 +1,14 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Update for renamed alias file path.
+#   Last Modified: Remove version argument: read from file.
 #
 import argparse
 import sys
 
 from config.settings import DEFAULT_IMD_ALIASES_FILEPATH, DEFAULT_DBCONFIG_FILEPATH
 from config.settings import DEFAULT_FIELDS_FILEPATH, DEFAULT_METADATA_TABLE_NAME
+from imdtk.version import VERSION
 from imdtk.core.file_utils import good_dir_path, good_file_path, validate_file_path
 from imdtk.core.fits_utils import FITS_EXTENTS
 
@@ -24,7 +25,7 @@ FIELDS_FILE_EXIT_CODE = 32
 INPUT_FILE_EXIT_CODE = 33
 
 
-def add_aliases_arguments (parser, tool_name, version, default_msg=DEFAULT_IMD_ALIASES_FILEPATH):
+def add_aliases_arguments (parser, tool_name, default_msg=DEFAULT_IMD_ALIASES_FILEPATH):
     """ Add the argument(s) related to parsing information from aliases files
         to the given argparse parser object. """
     parser.add_argument(
@@ -34,7 +35,7 @@ def add_aliases_arguments (parser, tool_name, version, default_msg=DEFAULT_IMD_A
     )
 
 
-def add_catalog_table_arguments (parser, tool_name, version, default_msg='no default'):
+def add_catalog_table_arguments (parser, tool_name, default_msg='no default'):
     """ Add the argument(s) related to naming a database table for a catalog
         to the given argparse parser object. """
     parser.add_argument(
@@ -43,7 +44,7 @@ def add_catalog_table_arguments (parser, tool_name, version, default_msg='no def
     )
 
 
-def add_collection_arguments (parser, tool_name, version, default_msg='no default'):
+def add_collection_arguments (parser, tool_name, default_msg='no default'):
     """ Add the argument(s) related to collection specification
         to the given argparse parser object. """
     parser.add_argument(
@@ -53,7 +54,7 @@ def add_collection_arguments (parser, tool_name, version, default_msg='no defaul
     )
 
 
-def add_database_arguments (parser, tool_name, version,
+def add_database_arguments (parser, tool_name,
                             default_msg=DEFAULT_DBCONFIG_FILEPATH,
                             table_msg=DEFAULT_METADATA_TABLE_NAME):
     """ Add the argument(s) related to parsing information from a database configuration file
@@ -77,7 +78,7 @@ def add_database_arguments (parser, tool_name, version,
     )
 
 
-def add_fields_info_arguments (parser, tool_name, version, default_msg=DEFAULT_FIELDS_FILEPATH):
+def add_fields_info_arguments (parser, tool_name, default_msg=DEFAULT_FIELDS_FILEPATH):
     """ Add the argument(s) related to parsing information from fields information files
         to the given argparse parser object. """
     parser.add_argument(
@@ -87,17 +88,17 @@ def add_fields_info_arguments (parser, tool_name, version, default_msg=DEFAULT_F
     )
 
 
-def add_fits_file_arguments (parser, tool_name, version):
+def add_fits_file_arguments (parser, tool_name):
     """ Add the argument(s) related to parsing information from FITS files
         to the given argparse parser object. """
     parser.add_argument(
         '-ff', '--fits-file', dest='fits_file', required=True, metavar='filepath',
         help='Path to a readable FITS image file from which to extract metadata [required]'
     )
-    add_hdu_arguments(parser, tool_name, version)  # now add HDU argument
+    add_hdu_arguments(parser, tool_name)  # now add HDU argument
 
 
-def add_hdu_arguments (parser, tool_name, version):
+def add_hdu_arguments (parser, tool_name):
     """ Add the argument(s) related to parsing information from HDUs of FITS files
         to the given argparse parser object. """
     parser.add_argument(
@@ -107,7 +108,7 @@ def add_hdu_arguments (parser, tool_name, version):
     )
 
 
-def add_input_arguments (parser, tool_name, version):
+def add_input_arguments (parser, tool_name):
     """ Add common input arguments to the given argparse parser object. """
     # parser.add_argument(
     #     '-ifmt', '--input-format', dest='input_format',
@@ -123,7 +124,7 @@ def add_input_arguments (parser, tool_name, version):
     )
 
 
-def add_input_dir_arguments (parser, tool_name, version):
+def add_input_dir_arguments (parser, tool_name):
     """ Add the argument(s) related to parsing information from a directory of input files
         to the given argparse parser object. """
     parser.add_argument(
@@ -132,7 +133,7 @@ def add_input_dir_arguments (parser, tool_name, version):
     )
 
 
-def add_output_arguments (parser, tool_name, version):
+def add_output_arguments (parser, tool_name):
     """ Add common output arguments to the given argparse parser object. """
     parser.add_argument(
         '-g', '--generate', dest='gen_file_path', action='store_true',
@@ -154,7 +155,7 @@ def add_output_arguments (parser, tool_name, version):
     # )
 
 
-def add_report_arguments (parser, tool_name, version):
+def add_report_arguments (parser, tool_name):
     # parser.add_argument(
     #     '-rf', '--report-file', dest='report_file', metavar='filepath',
     #     default=argparse.SUPPRESS,
@@ -169,10 +170,10 @@ def add_report_arguments (parser, tool_name, version):
     )
 
 
-def add_shared_arguments (parser, tool_name, version):
+def add_shared_arguments (parser, tool_name):
     """ Add the arguments shared by all tools to the given argparse parser object. """
     parser.add_argument(
-        '--version', action='version', version="{} version {}".format(tool_name, version),
+        '--version', action='version', version="{} version {}".format(tool_name, VERSION),
         help='Show version information and exit.'
     )
 

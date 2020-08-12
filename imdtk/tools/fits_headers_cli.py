@@ -2,7 +2,7 @@
 #
 # Module to extract image metadata from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 5/21/2020.
-#   Last Modified: Rename variable to task.
+#   Last Modified: Remove version.
 #
 import argparse
 import sys
@@ -15,9 +15,6 @@ from imdtk.tasks.fits_headers import FitsHeadersSourceTask
 
 # Program name for this tool.
 TOOL_NAME = 'fits_headers'
-
-# Version of this tool.
-VERSION = '0.11.1'
 
 
 def main (argv=None):
@@ -38,9 +35,9 @@ def main (argv=None):
         description='Extract image metadata from a FITS file and output it as JSON.'
     )
 
-    cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_fits_file_arguments(parser, TOOL_NAME, VERSION)
+    cli_utils.add_shared_arguments(parser, TOOL_NAME)
+    cli_utils.add_output_arguments(parser, TOOL_NAME)
+    cli_utils.add_fits_file_arguments(parser, TOOL_NAME)
 
     # add arguments specific to this module
     parser.add_argument(
@@ -63,7 +60,6 @@ def main (argv=None):
 
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME
-    args['VERSION'] = VERSION
 
     # call the task layer to process the given, validated FITS file
     if (args.get('verbose')):

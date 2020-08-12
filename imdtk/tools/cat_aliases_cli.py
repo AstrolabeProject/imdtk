@@ -3,7 +3,7 @@
 # Module to add aliases (fields) for the column name fields in an Astropy-derived
 # catalog information metadata structure.
 #   Written by: Tom Hicks. 8/7/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Remove version.
 #
 import argparse
 import sys
@@ -16,9 +16,6 @@ from imdtk.tasks.cat_aliases import CatAliasesTask
 
 # Program name for this tool.
 TOOL_NAME = 'cat_aliases'
-
-# Version of this tool.
-VERSION = '0.12.0'
 
 
 def main (argv=None):
@@ -39,10 +36,10 @@ def main (argv=None):
         description='Add aliases for column names of a catalog metadata structure and output it.'
     )
 
-    cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_input_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_aliases_arguments(parser, TOOL_NAME, VERSION, default_msg=DEFAULT_CAT_ALIASES_FILEPATH)
+    cli_utils.add_shared_arguments(parser, TOOL_NAME)
+    cli_utils.add_output_arguments(parser, TOOL_NAME)
+    cli_utils.add_input_arguments(parser, TOOL_NAME)
+    cli_utils.add_aliases_arguments(parser, TOOL_NAME, default_msg=DEFAULT_CAT_ALIASES_FILEPATH)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))
@@ -62,7 +59,6 @@ def main (argv=None):
 
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME
-    args['VERSION'] = VERSION
 
     # call the task layer to process the given, validated input file
     try:

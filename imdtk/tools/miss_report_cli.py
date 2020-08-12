@@ -2,7 +2,7 @@
 #
 # Module to report on the presence of missing fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/20.
-#   Last Modified: Rename variable to task.
+#   Last Modified: Remove version.
 #
 import argparse
 import sys
@@ -14,9 +14,6 @@ from imdtk.tasks.miss_report import MissingFieldsTask
 
 # Program name for this tool.
 TOOL_NAME = 'miss_report'
-
-# Version of this tool.
-VERSION = '0.11.1'
 
 
 def main (argv=None):
@@ -37,10 +34,10 @@ def main (argv=None):
         description='Report on missing fields in the incoming metadata structure but output it unchanged.'
     )
 
-    cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_input_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_report_arguments(parser, TOOL_NAME, VERSION)
+    cli_utils.add_shared_arguments(parser, TOOL_NAME)
+    cli_utils.add_output_arguments(parser, TOOL_NAME)
+    cli_utils.add_input_arguments(parser, TOOL_NAME)
+    cli_utils.add_report_arguments(parser, TOOL_NAME)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))
@@ -56,7 +53,6 @@ def main (argv=None):
 
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME
-    args['VERSION'] = VERSION
 
     # call the task layer to process the given, validated input file
     try:

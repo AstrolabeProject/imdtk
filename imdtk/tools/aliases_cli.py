@@ -2,7 +2,7 @@
 #
 # Module to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/30/2020.
-#   Last Modified: Rename variable to task.
+#   Last Modified: Remove version.
 #
 import argparse
 import sys
@@ -14,9 +14,6 @@ from imdtk.tasks.aliases import AliasesTask
 
 # Program name for this tool.
 TOOL_NAME = 'aliases'
-
-# Version of this tool.
-VERSION = '0.11.1'
 
 
 def main (argv=None):
@@ -37,10 +34,10 @@ def main (argv=None):
         description='Add aliases for headers of a metadata structure and output it.'
     )
 
-    cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_input_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_aliases_arguments(parser, TOOL_NAME, VERSION)
+    cli_utils.add_shared_arguments(parser, TOOL_NAME)
+    cli_utils.add_output_arguments(parser, TOOL_NAME)
+    cli_utils.add_input_arguments(parser, TOOL_NAME)
+    cli_utils.add_aliases_arguments(parser, TOOL_NAME)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))
@@ -60,7 +57,6 @@ def main (argv=None):
 
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME
-    args['VERSION'] = VERSION
 
     # call the task layer to process the given, validated input file
     try:

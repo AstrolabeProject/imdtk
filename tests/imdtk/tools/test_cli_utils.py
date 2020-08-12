@@ -1,6 +1,6 @@
 # Tests for the CLI utilities module.
 #   Written by: Tom Hicks. 7/15/2020.
-#   Last Modified: Add tests for add_catalog_table_arguments and check_catalog_table.
+#   Last Modified: Remove version.
 #
 import argparse
 import pytest
@@ -9,7 +9,6 @@ import imdtk.tools.cli_utils as utils
 from tests import TEST_DIR
 
 TOOL_NAME = 'TEST_CLI_UTILS'
-VERSION = '0.10.0'
 
 
 class TestCliUtils(object):
@@ -24,7 +23,7 @@ class TestCliUtils(object):
 
     def test_add_aliases_arguments(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_aliases_arguments(parser, TOOL_NAME, VERSION)
+        utils.add_aliases_arguments(parser, TOOL_NAME)
 
         args = vars(parser.parse_args([]))
         print(args)
@@ -41,7 +40,7 @@ class TestCliUtils(object):
 
     def test_add_catalog_table_arguments(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_catalog_table_arguments(parser, TOOL_NAME, VERSION)
+        utils.add_catalog_table_arguments(parser, TOOL_NAME)
 
         with pytest.raises(SystemExit) as se:
             args = vars(parser.parse_args([])) # catalog table name is required
@@ -58,7 +57,7 @@ class TestCliUtils(object):
 
     def test_add_collection_arguments(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_collection_arguments(parser, TOOL_NAME, VERSION)
+        utils.add_collection_arguments(parser, TOOL_NAME)
 
         args = vars(parser.parse_args([]))
         print(args)
@@ -75,7 +74,7 @@ class TestCliUtils(object):
 
     def test_add_database_arguments(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_database_arguments(parser, TOOL_NAME, VERSION)
+        utils.add_database_arguments(parser, TOOL_NAME)
 
         args = vars(parser.parse_args([]))
         print(args)
@@ -99,7 +98,7 @@ class TestCliUtils(object):
 
     def test_add_fields_info_arguments(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_fields_info_arguments(parser, TOOL_NAME, VERSION)
+        utils.add_fields_info_arguments(parser, TOOL_NAME)
 
         args = vars(parser.parse_args([]))
         print(args)
@@ -116,7 +115,7 @@ class TestCliUtils(object):
 
     def test_add_fits_file_arguments(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_fits_file_arguments(parser, TOOL_NAME, VERSION)
+        utils.add_fits_file_arguments(parser, TOOL_NAME)
 
         with pytest.raises(SystemExit) as se:
             args = vars(parser.parse_args([])) # fits-file is required
@@ -137,7 +136,7 @@ class TestCliUtils(object):
 
     def test_add_hdu_arguments(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_hdu_arguments(parser, TOOL_NAME, VERSION)
+        utils.add_hdu_arguments(parser, TOOL_NAME)
 
         args = vars(parser.parse_args([]))
         print(args)
@@ -152,7 +151,7 @@ class TestCliUtils(object):
 
     def test_add_input_arguments(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_input_arguments(parser, TOOL_NAME, VERSION)
+        utils.add_input_arguments(parser, TOOL_NAME)
 
         args = vars(parser.parse_args([]))
         print(args)
@@ -169,7 +168,7 @@ class TestCliUtils(object):
 
     def test_add_input_dir_arguments(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_input_dir_arguments(parser, TOOL_NAME, VERSION)
+        utils.add_input_dir_arguments(parser, TOOL_NAME)
 
         with pytest.raises(SystemExit) as se:
             args = vars(parser.parse_args([])) # input-dir is required
@@ -186,7 +185,7 @@ class TestCliUtils(object):
 
     def test_add_output_arguments(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_output_arguments(parser, TOOL_NAME, VERSION)
+        utils.add_output_arguments(parser, TOOL_NAME)
 
         args = vars(parser.parse_args([]))
         print(args)
@@ -206,7 +205,7 @@ class TestCliUtils(object):
 
     def test_add_report_arguments(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_report_arguments(parser, TOOL_NAME, VERSION)
+        utils.add_report_arguments(parser, TOOL_NAME)
 
         args = vars(parser.parse_args([]))
         print(args)
@@ -223,7 +222,7 @@ class TestCliUtils(object):
 
     def test_add_shared_arguments(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
+        utils.add_shared_arguments(parser, TOOL_NAME)
 
         args = vars(parser.parse_args([]))
         print(args)

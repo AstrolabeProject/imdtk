@@ -3,7 +3,7 @@
 # Python pipeline to extract image metadata from each FITS images in a directory, storing
 # the metadata into a PostreSQL database.
 #   Written by: Tom Hicks. 7/18/2020.
-#   Last Modified: Revamp error handling: info not error.
+#   Last Modified: Remove version.
 #
 import argparse
 import sys
@@ -21,9 +21,6 @@ from imdtk.tasks.miss_report import MissingFieldsTask
 
 # Program name for this tool.
 TOOL_NAME = 'multi_md_pgsql_pipe'
-
-# Version of this tool.
-VERSION = '0.11.0'
 
 
 def main (argv=None):
@@ -44,14 +41,14 @@ def main (argv=None):
         description='Pipeline to extract image metadata and store it into a PostreSQL database.'
     )
 
-    cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_input_dir_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_hdu_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_fields_info_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_collection_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_report_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_database_arguments(parser, TOOL_NAME, VERSION)
+    cli_utils.add_shared_arguments(parser, TOOL_NAME)
+    cli_utils.add_output_arguments(parser, TOOL_NAME)
+    cli_utils.add_input_dir_arguments(parser, TOOL_NAME)
+    cli_utils.add_hdu_arguments(parser, TOOL_NAME)
+    cli_utils.add_fields_info_arguments(parser, TOOL_NAME)
+    cli_utils.add_collection_arguments(parser, TOOL_NAME)
+    cli_utils.add_report_arguments(parser, TOOL_NAME)
+    cli_utils.add_database_arguments(parser, TOOL_NAME)
 
     # add arguments specific to this pipeline
     parser.add_argument(
@@ -74,7 +71,6 @@ def main (argv=None):
 
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME
-    args['VERSION'] = VERSION
 
     # instantiate the tasks which form the pipeline
     fits_headersTask = FitsHeadersSourceTask(args)

@@ -2,7 +2,7 @@
 #
 # Module to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/11/2020.
-#   Last Modified: Rename variable to task.
+#   Last Modified: Remove version.
 #
 import argparse
 import sys
@@ -14,9 +14,6 @@ from imdtk.tasks.jwst_oc_calc import JWST_ObsCoreCalcTask
 
 # Program name for this tool.
 TOOL_NAME = 'jwst_oc_calc'
-
-# Version of this tool.
-VERSION = '0.11.1'
 
 
 def main (argv=None):
@@ -37,11 +34,11 @@ def main (argv=None):
         description='Calculate values from incoming metadata, add the calculated fields to the metadata structure, and output it.'
     )
 
-    cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_input_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_fits_file_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_collection_arguments(parser, TOOL_NAME, VERSION)
+    cli_utils.add_shared_arguments(parser, TOOL_NAME)
+    cli_utils.add_output_arguments(parser, TOOL_NAME)
+    cli_utils.add_input_arguments(parser, TOOL_NAME)
+    cli_utils.add_fits_file_arguments(parser, TOOL_NAME)
+    cli_utils.add_collection_arguments(parser, TOOL_NAME)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))
@@ -61,7 +58,6 @@ def main (argv=None):
 
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME
-    args['VERSION'] = VERSION
 
     # call the task layer to process the given, validated files
     try:

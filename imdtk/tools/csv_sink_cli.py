@@ -2,7 +2,7 @@
 #
 # Module to output incoming data to a CSV file.
 #   Written by: Tom Hicks. 6/26/20.
-#   Last Modified: Note that Rename variable to task was already done.
+#   Last Modified: Remove version.
 #
 import argparse
 import sys
@@ -14,9 +14,6 @@ from imdtk.tasks.csv_sink import CSVSink
 
 # Program name for this tool.
 TOOL_NAME = 'csv_sink'
-
-# Version of this tool.
-VERSION = '0.11.1'
 
 
 def main (argv=None):
@@ -37,9 +34,9 @@ def main (argv=None):
         description='Save the incoming data structure to a file in Python pickle format.'
     )
 
-    cli_utils.add_shared_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_output_arguments(parser, TOOL_NAME, VERSION)
-    cli_utils.add_input_arguments(parser, TOOL_NAME, VERSION)
+    cli_utils.add_shared_arguments(parser, TOOL_NAME)
+    cli_utils.add_output_arguments(parser, TOOL_NAME)
+    cli_utils.add_input_arguments(parser, TOOL_NAME)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))
@@ -55,7 +52,6 @@ def main (argv=None):
 
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME
-    args['VERSION'] = VERSION
 
     # call the task layer to process the given, validated input file
     try:

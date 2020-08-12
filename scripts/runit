@@ -11,19 +11,19 @@
 # echo "============================================"
 # echo "All tools: show versions"
 # echo "--------------------------------------------"
-# fits_headers -d --version
-# aliases -d --version
-# fields_info -d --version
-# jwst_oc_calc -d --version
-# md_pgsql_pipe -d --version
-# miss_report -d --version
-# multi_md_pgsql_pipe -d --version
-# no_op -d --version
-# pickle_sink -d --version
-# jwst_pgsql_sink -d --version
-# csv_sink -d --version
-# jwst_pghybrid_sink -d --version
-# fits_table -d --version
+aliases -d --version
+csv_sink -d --version
+fields_info -d --version
+fits_headers -d --version
+fits_table -d --version
+jwst_oc_calc -d --version
+jwst_pghybrid_sink -d --version
+jwst_pgsql_sink -d --version
+md_pgsql_pipe -d --version
+miss_report -d --version
+multi_md_pgsql_pipe -d --version
+no_op -d --version
+pickle_sink -d --version
 
 # echo "============================================"
 # echo "All tools: show HELP"
@@ -316,4 +316,5 @@ echo "--------------------------------------------"
 
 # fits_table -v -ff /catalogs/small_table.fits | fits_cat_maketable -ct noalias -sql -g -v
 # fits_table -v -ff /catalogs/small_table.fits | cat_aliases -v -g
-fits_table -v -ff /catalogs/small_table.fits | cat_aliases -v | fits_cat_maketable -ct test_tbl -sql -g -v
+# fits_table -v -ff /catalogs/small_table.fits | fits_cat_maketable -ct test_tbl -sql -g -v
+# fits_table -v -ff /catalogs/small_table.fits | cat_aliases -v | fits_cat_maketable -ct test_tbl -sql -g -v
