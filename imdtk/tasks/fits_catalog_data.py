@@ -1,7 +1,7 @@
 #
-# Class to extract catalog metadata from a FITS file and output it as JSON.
-#   Written by: Tom Hicks. 7/6/2020.
-#   Last Modified: Minor doc cleanup.
+# Class to extract a catalog data table from a FITS file and output it as JSON.
+#   Written by: Tom Hicks. 8/12/2020.
+#   Last Modified: Initial creation.
 #
 import os
 import sys
@@ -13,12 +13,12 @@ import imdtk.core.fits_utils as fits_utils
 from imdtk.tasks.i_task import IImdTask
 
 
-class FitsCatalogMetadataTask (IImdTask):
-    """ Class to extract catalog metadata from a FITS file and output it as JSON. """
+class FitsCatalogDataTask (IImdTask):
+    """ Class to extract a catalog data table from a FITS file and output it as JSON. """
 
     def __init__(self, args):
         """
-        Constructor for the class to extract catalog metadata from a FITS file and output it as JSON.
+        Constructor for the class to a extract catalog data table from a FITS file and output it as JSON.
         """
         super().__init__(args)
 

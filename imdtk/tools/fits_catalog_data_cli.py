@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 #
-# Module to extract catalog metadata from a FITS file and output it as JSON.
-#   Written by: Tom Hicks. 7/6/2020.
-#   Last Modified: Minor doc cleanup.
+# Module to extract a catalog data table from a FITS file and output it as JSON.
+#   Written by: Tom Hicks. 8/12/2020.
+#   Last Modified: Initial creation.
 #
 import argparse
 import sys
 
 import imdtk.exceptions as errors
 import imdtk.tools.cli_utils as cli_utils
-from imdtk.tasks.fits_catalog_md import FitsCatalogMetadataTask
+from imdtk.tasks.fits_catalog_data import FitsCatalogDataTask
 
 
 # Program name for this tool.
-TOOL_NAME = 'fits_catalog_md'
+TOOL_NAME = 'fits_catalog_data'
 
 
 def main (argv=None):
@@ -31,7 +31,7 @@ def main (argv=None):
     parser = argparse.ArgumentParser(
         prog=TOOL_NAME,
         formatter_class=argparse.RawTextHelpFormatter,
-        description='Extract catalog metadata from a FITS file and output it as JSON.'
+        description='Extract a catalog data table from a FITS file and output it as JSON.'
     )
 
     cli_utils.add_shared_arguments(parser, TOOL_NAME)
@@ -65,7 +65,7 @@ def main (argv=None):
         print("({}): Processing FITS file '{}'.".format(TOOL_NAME, fits_file), file=sys.stderr)
 
     try:
-        task = FitsCatalogMetadataTask(args)
+        task = FitsCatalogDataTask(args)
         task.process_and_output()
 
     except errors.UnsupportedTypeError as ute:
