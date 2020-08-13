@@ -1,7 +1,7 @@
 #
 # Module to curate FITS data with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/24/2020.
-#   Last Modified: Minor resort of method.
+#   Last Modified: Add octal to TDISPn format code translation.
 #
 from string import Template
 
@@ -12,7 +12,7 @@ from imdtk.core.misc_utils import missing_entries
 
 UNSUPPORTED = 'UNSUPPORTED'
 
-# Map FITS format codes to PostgreSQL data type declarations.
+# Map FITS format codes (TDISPn keywords) to PostgreSQL data type declarations.
 #
 # Format
 # Code     Description                     8-bit bytes
@@ -28,6 +28,7 @@ UNSUPPORTED = 'UNSUPPORTED'
 # K        64-bit integer                  8
 # L        logical (Boolean)               1
 # M        double precision complex        16
+# O        octal integer                   1
 # P        array descriptor                8
 # Q        array descriptor                16
 # X        bit                             *
@@ -42,6 +43,7 @@ _FITS_FORMAT_TO_SQL = {
     'J': 'integer',
     'K': 'bigint',
     'L': 'boolean',
+    'O': 'bytea',
     'X': 'bit',
     'Z': 'bytea',
     'B': UNSUPPORTED,  # 'Unsigned byte',
