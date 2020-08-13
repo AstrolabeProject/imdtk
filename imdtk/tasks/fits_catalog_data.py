@@ -1,12 +1,13 @@
 #
 # Class to extract a catalog data table from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 8/12/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Read data, add to output structure, and write structure as JSON.
 #
 import os
 import sys
 
 from astropy.io import fits
+from numpyencoder import NumpyEncoder
 
 import imdtk.exceptions as errors
 import imdtk.core.fits_utils as fits_utils
@@ -47,18 +48,31 @@ class FitsCatalogDataTask (IImdTask):
                 if (not fits_utils.is_catalog_file(hdus_list)):
                     errMsg = "Skipping non-catalog FITS file '{}'".format(fits_file)
                     raise errors.UnsupportedTypeError(errMsg)
-
                 hdrs = fits_utils.get_header_fields(hdus_list, table_hdu, ignore_list)
                 cinfo = fits_utils.get_column_info(hdus_list, table_hdu)
 
+                table = hdus_list[table_hdu].data
+                meta = fits_utils.get_table_meta_attribute(table)
+                data = fits_utils.read_data(table)
+
         except OSError as oserr:
-            errMsg = "Unable to read catalog metadata from FITS file '{}': {}.".format(fits_file, oserr)
+            errMsg = "Unable to read catalog data from FITS file '{}': {}.".format(fits_file, oserr)
             raise errors.ProcessingError(errMsg)
 
-        metadata = self.make_context()      # create overall metadata structure
-        metadata['headers'] = hdrs          # add the headers to the metadata
-        metadata['column_info'] = cinfo     # add column metadata to the metadata
-        return metadata                     # return the results of processing
+        outdata = self.make_context()       # create overall metadata output structure
+        outdata['headers'] = hdrs           # add the headers to the output
+        outdata['meta'] = meta              # add extra table metadata to the output
+        outdata['column_info'] = cinfo      # add column metadata to the output
+        outdata['data'] = data              # add the data table to the output
+        return outdata                      # return the results of processing
+
+
+    def output_JSON (self, outdata, file_path=None, **json_keywords):
+        """
+        Override this method to add the numpy encoder class needed to
+        dump an astropy.table.Table.
+        """
+        super().output_JSON(outdata, file_path=file_path, cls=NumpyEncoder)
 
 
 
