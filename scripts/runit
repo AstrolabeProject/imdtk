@@ -310,17 +310,24 @@
 
 
 # echo "============================================"
-# echo "Current development:"
+# echo "Catalog Metadata:"
 # echo "--------------------------------------------"
 # fits_cat_md -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -d -g
 # fits_cat_md -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -of /work/ez_cat.json
 # fits_cat_md -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -g
+# echo "--------------------------------------------"
 # fits_cat_md -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -d -g
 # fits_cat_md -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -v -of /work/photo_cat.json
 # fits_cat_md -v -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -v -g
 
-# fits_cat_md -v -ff /catalogs/small_table.fits | cat_aliases -v -g
-fits_cat_md -v -ff /catalogs/small_table.fits | fits_cat_mktbl -ct noalias -sql -v -of /work/small_table_fits_cat_maketbl_noalias.sql
-fits_cat_md -v -ff /catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -sql -g -v
 
+# echo "============================================"
+# echo "Current development:"
+# echo "--------------------------------------------"
+# fits_cat_md -v -ff /catalogs/small_table.fits | cat_aliases -v -g
+# fits_cat_md -v -ff /catalogs/small_table.fits | fits_cat_mktbl -ct noalias -sql -v -of /work/small_table_fits_cat_maketbl_noalias.sql
+# fits_cat_md -v -ff /catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -sql -g -v
+
+fits_cat_data -v -ff /catalogs/small_table.fits -v -g
+# fits_cat_data -v -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -g
 # echo "============================================"
