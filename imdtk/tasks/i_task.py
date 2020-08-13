@@ -1,7 +1,7 @@
 #
 # Abstract class defining the interface for task components.
 #   Written by: Tom Hicks. 5/27/2020.
-#   Last Modified: Use default output format constant.
+#   Last Modified: Add JSON keywords to output_JSON.
 #
 import datetime
 import json
@@ -173,21 +173,21 @@ class IImdTask ():
         return metadata                     # return the results of processing
 
 
-    def output_JSON (self, data, file_path=None):
+    def output_JSON (self, data, file_path=None, **json_keywords):
         """
         Jsonify and write the given data structure to the given file path,
         standard output, or standard error.
         """
         if ((file_path is None) or (file_path == sys.stdout)):  # if writing to standard output
-            json.dump(data, sys.stdout, indent=2)
+            json.dump(data, sys.stdout, indent=2, **json_keywords)
             sys.stdout.write('\n')
 
         elif (file_path == sys.stderr):     # else if writing to standard error
-            json.dump(data, sys.stderr, indent=2)
+            json.dump(data, sys.stderr, indent=2, **json_keywords)
             sys.stderr.write('\n')
 
         else:                               # else file path was given
             outfile = open(file_path, 'w')
-            json.dump(data, outfile, indent=2)
+            json.dump(data, outfile, indent=2, **json_keywords)
             outfile.write('\n')
             outfile.close()
