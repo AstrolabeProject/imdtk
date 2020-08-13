@@ -1,7 +1,7 @@
 #
 # Module to provide FITS utility functions for Astrolabe code.
 #   Written by: Tom Hicks. 1/26/2020.
-#   Last Modified: Add get_table_meta_attribute and read_data. Replace table_to_JSON w/ pandas, comment it out.
+#   Last Modified: Remove unneeded import.
 #
 import fnmatch
 # import pandas
@@ -9,7 +9,6 @@ from astropy import wcs
 from astropy.time import Time
 from astropy.table import Table
 from astropy.wcs.utils import proj_plane_pixel_scales
-from numpyencoder import NumpyEncoder
 
 from imdtk.core.file_utils import gen_file_paths, validate_file_path
 from imdtk.core.misc_utils import to_JSON

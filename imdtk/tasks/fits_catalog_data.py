@@ -1,7 +1,7 @@
 #
 # Class to extract a catalog data table from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 8/12/2020.
-#   Last Modified: Read data, add to output structure, and write structure as JSON.
+#   Last Modified: Minor clarification to doc string.
 #
 import os
 import sys
@@ -70,7 +70,7 @@ class FitsCatalogDataTask (IImdTask):
     def output_JSON (self, outdata, file_path=None, **json_keywords):
         """
         Override this method to add the numpy encoder class needed to
-        dump an astropy.table.Table.
+        serialize astropy.io.fits.fitsrec.FITS_rec data (aka numpy recarray).
         """
         super().output_JSON(outdata, file_path=file_path, cls=NumpyEncoder)
 
