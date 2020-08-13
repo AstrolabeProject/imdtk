@@ -1,13 +1,13 @@
 #
 # Module to provide FITS utility functions for Astrolabe code.
 #   Written by: Tom Hicks. 1/26/2020.
-#   Last Modified: Add method to dump FITS table as JSON.
+#   Last Modified: Add get_table_meta_attribute and read_data. Replace table_to_JSON w/ pandas, comment it out.
 #
 import fnmatch
-from collections import OrderedDict
-
+# import pandas
 from astropy import wcs
 from astropy.time import Time
+from astropy.table import Table
 from astropy.wcs.utils import proj_plane_pixel_scales
 from numpyencoder import NumpyEncoder
 
@@ -122,6 +122,25 @@ def get_metadata_keys (args):
         return None
 
 
+def get_table_meta_attribute (table):
+    """
+    The table attribute 'meta', is a dictionary parsed from the given table's
+    headers by Astropy upon reading the table. If present, the "extra" metadata
+    usually contains information about the origin of the table.
+
+    This method returns an empty dictionary if no "extra" FITS headers were found
+    (i.e., there is no 'meta' attribute attached to the given table).
+
+    :param table: astropy.table.Table
+    """
+    try:
+        meta = table.meta                   # maybe no extra table metadata
+    except AttributeError:
+        meta = {}
+    finally:
+        return meta
+
+
 def get_WCS (ff_hdus_list, which_hdu=0):
     """
     Return a World Coordinate System structure from the header in the specified HDU
@@ -158,21 +177,19 @@ def lookup_pixtype (bitpix, default='UNKNOWN'):
     return PIXTYPE_TABLE.get(bitpix, default)
 
 
-def table_to_JSON (table, **json_kwargs):
+def read_data (data):
     """
-    Create a JSON string from the given astropy.table.Table object.
-    Written by: JHunkeler at StSci.
+    Return a list of rows for the given astropy.io.fits.fitsrec.FITS_rec data.
+    Each row in the returned list is a heterogeneous list of values for the row.
+    """
+    return [list(row) for row in data]
 
-    :param table: astropy.table.Table
-        The extra parameter, table.meta, if present, is expected to be
-        a dictionary of FITS keyword/value pairs.
-    :param json_kwargs: dictionary containing arguments to the json.dumps call.
-    :return a JSON string
-    """
-    outdata = {}                            # dictionary to be dumped as JSON
-    try:
-        outdata['header'] = table.meta      # table metadata is optional
-    except AttributeError:
-        pass
-    outdata['columns'] = OrderedDict((name, list(table[name])) for name in table.colnames)
-    return to_JSON(outdata, cls=NumpyEncoder)
+
+# def table_to_JSON (table, orient='values'):
+#     """
+#     Return a JSON string of table data from the given astropy.table.Table.
+#     The format of the table in the returned JSON is determined by the 'orient'
+#     parameter which is passed on to the pandas.to_json method. See:
+#     https://pandas.pydata.org/pandas-docs/stable/user_guide/io.html#orient-options
+#     """
+#     return table.to_pandas().to_json(orient=orient)
