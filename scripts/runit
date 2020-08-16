@@ -328,6 +328,13 @@
 # fits_cat_md -v -ff /catalogs/small_table.fits | fits_cat_mktbl -ct noalias -sql -v -of /work/small_table_fits_cat_maketbl_noalias.sql
 # fits_cat_md -v -ff /catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -sql -g -v
 
+# Smallest (~60k) data file (with meta):
 fits_cat_data -v -ff /catalogs/small_table.fits -v -g
+# Medium sized (~1M) data file:
 # fits_cat_data -v -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -g
+# Medium sized (~2.9M) data file:
+# fits_cat_data -v -ff /catalogs/DC_191217/Photometric_Catalog.F200W_kron_f80.fits -v -g
+# Largest (~4M) and most complex (nested fields) data file:
+# fits_cat_data -v -ff /catalogs/DC_191217/photometry_table_psf_matched_v5.0.fits -v -g
+
 # echo "============================================"
