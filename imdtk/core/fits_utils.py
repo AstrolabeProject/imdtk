@@ -1,7 +1,7 @@
 #
 # Module to provide FITS utility functions for Astrolabe code.
 #   Written by: Tom Hicks. 1/26/2020.
-#   Last Modified: Remove unneeded import.
+#   Last Modified: Rename method to rows_from_data.
 #
 import fnmatch
 # import pandas
@@ -176,7 +176,7 @@ def lookup_pixtype (bitpix, default='UNKNOWN'):
     return PIXTYPE_TABLE.get(bitpix, default)
 
 
-def read_data (data):
+def rows_from_data (data):
     """
     Return a list of rows for the given astropy.io.fits.fitsrec.FITS_rec data.
     Each row in the returned list is a heterogeneous list of values for the row.
@@ -190,5 +190,6 @@ def read_data (data):
 #     The format of the table in the returned JSON is determined by the 'orient'
 #     parameter which is passed on to the pandas.to_json method. See:
 #     https://pandas.pydata.org/pandas-docs/stable/user_guide/io.html#orient-options
+#     This method requires import of Pandas library.
 #     """
 #     return table.to_pandas().to_json(orient=orient)

@@ -1,12 +1,13 @@
 #
 # Class to extract a catalog data table from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 8/12/2020.
-#   Last Modified: Minor clarification to doc string.
+#   Last Modified: Cleanup table processing steps.
 #
 import os
 import sys
 
 from astropy.io import fits
+from astropy.table import Table
 from numpyencoder import NumpyEncoder
 
 import imdtk.exceptions as errors
@@ -51,9 +52,10 @@ class FitsCatalogDataTask (IImdTask):
                 hdrs = fits_utils.get_header_fields(hdus_list, table_hdu, ignore_list)
                 cinfo = fits_utils.get_column_info(hdus_list, table_hdu)
 
-                table = hdus_list[table_hdu].data
+                fits_rec = hdus_list[table_hdu].data
+                data = fits_utils.rows_from_data(fits_rec)
+                table = Table.read(hdus_list, hdu=table_hdu)
                 meta = fits_utils.get_table_meta_attribute(table)
-                data = fits_utils.read_data(table)
 
         except OSError as oserr:
             errMsg = "Unable to read catalog data from FITS file '{}': {}.".format(fits_file, oserr)
@@ -70,7 +72,7 @@ class FitsCatalogDataTask (IImdTask):
     def output_JSON (self, outdata, file_path=None, **json_keywords):
         """
         Override this method to add the numpy encoder class needed to
-        serialize astropy.io.fits.fitsrec.FITS_rec data (aka numpy recarray).
+        serialize astropy.io.fits.fitsrec.FITS_rec data.
         """
         super().output_JSON(outdata, file_path=file_path, cls=NumpyEncoder)
 
