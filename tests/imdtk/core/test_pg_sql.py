@@ -1,6 +1,6 @@
 # Tests for the PostgreSQL interface module.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Update for passing column names and formats.
+#   Last Modified: Minor cleanups while testing create_table*.
 #
 import pytest
 
@@ -150,6 +150,7 @@ class TestPgSql(object):
     def test_sql_create_table (self):
         self.args['catalog_table'] = 'new_tbl'
         tbl = pgsql.sql_create_table(self.args, self.dbconfig, self.cat_names, self.cat_formats)
+        print(tbl)
         assert tbl is not None
         assert tbl == "-- Creating table 'new_tbl'"
 
@@ -164,10 +165,11 @@ class TestPgSql(object):
     def test_sql_create_table_str (self):
         self.args['catalog_table'] = 'NEWTBL'
         tbl = pgsql.sql_create_table_str(self.args, self.dbconfig, self.cat_names, self.cat_formats)
+        print(tbl)
         assert tbl is not None
         assert 'CREATE TABLE' in tbl
         assert 'NEWTBL' in tbl
-        assert 'SET search_path' in tbl
+        assert 'SET search_path TO sia' in tbl
         assert 'ID bigint' in tbl
         assert 'RA double precision' in tbl
         assert 'DEC double precision' in tbl
