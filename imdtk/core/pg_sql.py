@@ -1,7 +1,7 @@
 #
 # Module to interact with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Add/use fetch_rows method.
+#   Last Modified: Make create table methods share common SQL generation.
 #
 import sys
 
@@ -9,8 +9,41 @@ import psycopg2
 
 from config.settings import SQL_FIELDS_HYBRID
 import imdtk.exceptions as errors
-import imdtk.core.pg_make_table_sql as pgmt_sql
+import imdtk.core.pg_make_table_sql as pg_mt
 from imdtk.core.misc_utils import to_JSON
+
+
+def create_table (args, dbconfig, column_names, column_formats):
+    """
+    Create a new table using the given command line arguments,
+    database parameters, and lists of column names and column formats.
+
+    Raises ProcessingError if the column name or format vectors are not present in
+    the input OR if the vectors are not the same size.
+    """
+    sql_list = sql4_table_create(args, dbconfig, column_names, column_formats)
+
+    db_uri = dbconfig.get('db_uri')
+    conn = psycopg2.connect(db_uri)
+    try:
+        with conn:
+            with conn.cursor() as cursor:
+                for ddl in sql_list:
+                    cursor.execute(ddl, [])
+    finally:
+        conn.close()
+
+
+def create_table_str (args, dbconfig, column_names, column_formats):
+    """
+    Return an SQL string to create a new table using the given command line arguments,
+    database parameters, and lists of column names and column formats.
+
+    Raises ProcessingError if the column name or format vectors are not present in
+    the input OR if the vectors are not the same size.
+    """
+    sql_list = sql4_table_create(args, dbconfig, column_names, column_formats)
+    return '\n'.join(sql_list)
 
 
 def execute_sql (dbconfig, sql_query_string, sql_values):
@@ -108,38 +141,16 @@ def list_table_names (args, dbconfig, db_schema=None):
     return tables
 
 
-def sql_create_table (args, dbconfig, column_names, column_formats):
-    """
-    Create a new table with the given table name, columns, and types as specified by
-    the given catalog metadata dictionary using the given DB parameters.
-    Returns None if the column name or format vectors are not present in the input OR
-    if the vectors are not the same size.
-    """
-    if (column_names and column_formats and (len(column_names) == len(column_formats))):
-        # TODO: IMPLEMENT the following statement. What should it return?
-        # pgmt_sql.make_table_sql(args, dbconfig, column_names, column_formats)
-        return "-- Creating table '{}'".format(args.get('catalog_table'))
-    else:
-        errMsg = 'Column name and format lists must be the same length.'
-        raise errors.ProcessingError(errMsg)
-
-
-def sql_create_table_str (args, dbconfig, column_names, column_formats):
+def create_table_str (args, dbconfig, column_names, column_formats):
     """
     Return an SQL string to create a new table with the given table name, columns,
-    and types specified by the given catalog metadata dictionary. Returns None if
-    the column name or format vectors are not present in the input OR if the vectors
-    are not the same size.
+    and types specified by the given catalog metadata dictionary.
 
-    Note: the returned string is for debugging only and IS NOT SQL-INJECTION safe.
+    Raises ProcessingError if the column name or format vectors are not present in
+    the input OR if the vectors are not the same size.
     """
-    if (column_names and column_formats and (len(column_names) == len(column_formats))):
-        sql_list = pgmt_sql.gen_create_table_sql_str(args, dbconfig, column_names, column_formats)
-        sql = '\n'.join(sql_list)
-        return sql
-    else:
-        errMsg = 'Column name and format lists must be the same length.'
-        raise errors.ProcessingError(errMsg)
+    sql_list = pg_mt.gen_create_table_sql(args, dbconfig, column_names, column_formats)
+    return '\n'.join(sql_list)
 
 
 def sql_insert_str (datadict, table_name):
@@ -174,6 +185,22 @@ def sql_insert_hybrid_str (datadict, table_name):
         return "insert into {0} ({1}) values ({2});".format(table_name, keys, values)
     else:                                   # there was a mismatch of keys and values
         return None                         # signal failure
+
+
+def sql4_table_create (args, dbconfig, column_names, column_formats):
+    """
+    Create a new table with the given table name, columns, and types as specified by
+    the given catalog metadata dictionary using the given DB parameters.
+
+    Returns a list of cleaned SQL strings to be executed to create the table
+    Raises ProcessingError if the column name or format vectors are not present in
+    the input OR if the vectors are not the same size.
+    """
+    if (column_names and column_formats and (len(column_names) == len(column_formats))):
+        return pg_mt.gen_create_table_sql(args, dbconfig, column_names, column_formats)
+    else:
+        errMsg = 'Column name and format lists must be the same length.'
+        raise errors.ProcessingError(errMsg)
 
 
 def sql4_table_insert (datadict, table_name):
