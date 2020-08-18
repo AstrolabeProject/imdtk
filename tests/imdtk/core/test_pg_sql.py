@@ -1,6 +1,6 @@
 # Tests for the PostgreSQL interface module.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Minor cleanups while testing create_table*.
+#   Last Modified: Update for update of PG SQL module.
 #
 import pytest
 
@@ -24,23 +24,25 @@ class TestPgSql(object):
         "ID",
         "RA",
         "DEC",
-        "redshift",
-        "x",
-        "y",
-        "a",
-        "b",
+        "Redshift",
+        "X",
+        "Y",
+        "A",
+        "BB",
+        "CCC",
         "kron_flag"
     ]
     cat_formats = [
+        "A",
+        "D",
+        "E",
+        "F",
+        "I",
+        "J",
         "K",
-        "D",
-        "D",
-        "D",
-        "D",
-        "D",
-        "D",
-        "D",
-        "K"
+        "L",
+        "X",
+        "Z"
     ]
 
     datad = {
@@ -67,6 +69,48 @@ class TestPgSql(object):
             "timesys": "UTC",
         }
     }
+
+
+    # def test_create_table_empty (self):
+    #     self.args['catalog_table'] = 'test_tbl'
+    #     pgsql.create_table(self.args, self.dbconfig, [], [])
+
+
+    # def test_create_table (self):
+    #     self.args['catalog_table'] = 'test_tbl2'
+    #     ret = pgsql.create_table(self.args, self.dbconfig, self.cat_names, self.cat_formats)
+
+
+    def test_create_table_str_empty (self):
+        self.args['catalog_table'] = 'NEWTBL'
+        tbl = pgsql.create_table_str(self.args, self.dbconfig, [], [])
+        print(tbl)
+        assert tbl is not None
+        assert 'CREATE TABLE' in tbl
+        assert 'NEWTBL' in tbl
+        assert 'SET search_path TO sia' in tbl
+
+        assert 'ID text' not in tbl
+        assert 'RA double precision' not in tbl
+        assert 'DEC real' not in tbl
+
+
+    def test_create_table_str (self):
+        self.args['catalog_table'] = 'NEWTBL'
+        tbl = pgsql.create_table_str(self.args, self.dbconfig, self.cat_names, self.cat_formats)
+        print(tbl)
+        assert tbl is not None
+        assert 'CREATE TABLE' in tbl
+        assert 'NEWTBL' in tbl
+        assert 'SET search_path TO sia' in tbl
+        assert 'ID text' in tbl
+        assert 'RA double precision' in tbl
+        assert 'DEC real' in tbl
+        assert 'Redshift real' in tbl
+        assert 'X smallint' in tbl
+        assert 'Y integer' in tbl
+        assert 'A bigint' in tbl
+
 
 
     def test_list_table_names_schema (self):
@@ -139,40 +183,6 @@ class TestPgSql(object):
         assert cats is not None
         assert len(cats) == 0
 
-
-
-    def test_sql_create_table_empty (self):
-        self.args['catalog_table'] = 'new_tbl'
-        with pytest.raises(errors.ProcessingError):
-            pgsql.sql_create_table(self.args, self.dbconfig, [], [])
-
-
-    def test_sql_create_table (self):
-        self.args['catalog_table'] = 'new_tbl'
-        tbl = pgsql.sql_create_table(self.args, self.dbconfig, self.cat_names, self.cat_formats)
-        print(tbl)
-        assert tbl is not None
-        assert tbl == "-- Creating table 'new_tbl'"
-
-
-
-    def test_sql_create_table_str_empty (self):
-        self.args['catalog_table'] = 'NEWTBL'
-        with pytest.raises(errors.ProcessingError):
-            pgsql.sql_create_table_str(self.args, self.dbconfig, [], [])
-
-
-    def test_sql_create_table_str (self):
-        self.args['catalog_table'] = 'NEWTBL'
-        tbl = pgsql.sql_create_table_str(self.args, self.dbconfig, self.cat_names, self.cat_formats)
-        print(tbl)
-        assert tbl is not None
-        assert 'CREATE TABLE' in tbl
-        assert 'NEWTBL' in tbl
-        assert 'SET search_path TO sia' in tbl
-        assert 'ID bigint' in tbl
-        assert 'RA double precision' in tbl
-        assert 'DEC double precision' in tbl
 
 
     def test_sql_insert_str_empty (self):

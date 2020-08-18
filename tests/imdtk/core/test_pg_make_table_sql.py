@@ -1,6 +1,6 @@
 # Tests for the FITS-specific PostgreSQL interface module.
 #   Written by: Tom Hicks. 8/10/2020.
-#   Last Modified: Update for rename of make table module.
+#   Last Modified: Update for update of make table module.
 #
 import pytest
 
@@ -142,7 +142,7 @@ class TestFitsPgSql(object):
 
 
     def test_gen_search_path_sql_bad(self):
-        with pytest.raises(KeyError):
+        with pytest.raises(errors.ProcessingError):
             pgmt.gen_search_path_sql(dict())
 
 
