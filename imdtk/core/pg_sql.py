@@ -1,7 +1,7 @@
 #
 # Module to interact with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Update for "make table" method renames.
+#   Last Modified: Add/use fetch_rows method.
 #
 import sys
 
@@ -13,22 +13,52 @@ import imdtk.core.pg_make_table_sql as pgmt_sql
 from imdtk.core.misc_utils import to_JSON
 
 
-def execute_sql (dbconfig, sql_format_string, sql_values):
+def execute_sql (dbconfig, sql_query_string, sql_values):
     """
     Open a database connection using the given DB configuration and execute the given SQL
     format string with the given SQL values FOR SIDE EFFECT (i.e. no values are returned).
 
     :param dbconfig: dictionary containing database parameters used by this method: db_uri
         Note: the given database configuration must contain a valid 'db_uri' string.
+    :param sql_query_string: a valid Psycopg2 query string. This is similar to a
+        standard python template string, BUT NOT THE SAME. See:
+        https://www.psycopg.org/docs/usage.html#passing-parameters-to-sql-queries
+    :param sql_value: a list of values to substitute into the query string.
     """
     db_uri = dbconfig.get('db_uri')
-    db_connection = psycopg2.connect(db_uri)
+    conn = psycopg2.connect(db_uri)
     try:
-        with db_connection as conn:
+        with conn:
             with conn.cursor() as cursor:
-                cursor.execute(sql_format_string, sql_values)
+                cursor.execute(sql_query_string, sql_values)
     finally:
-        db_connection.close()
+        conn.close()
+
+
+def fetch_rows (dbconfig, sql_query_string, sql_values):
+    """
+    Open a database connection using the given DB configuration and execute the given SQL
+    format string with the given SQL values, returning a list of tuples, which are the
+    rows of the query result.
+
+    :param dbconfig: dictionary containing database parameters used by this method: db_uri
+        Note: the given database configuration must contain a valid 'db_uri' string.
+    :param sql_query_string: a valid Psycopg2 query string. This is similar to a
+        standard python template string, BUT NOT THE SAME. See:
+        https://www.psycopg.org/docs/usage.html#passing-parameters-to-sql-queries
+    :param sql_value: a list of values to substitute into the query string.
+    """
+    db_uri = dbconfig.get('db_uri')
+    conn = psycopg2.connect(db_uri)
+    try:
+        with conn:
+            with conn.cursor() as cursor:
+                cursor.execute(sql_query_string, sql_values)
+                rows = cursor.fetchall()
+    finally:
+        conn.close()
+
+    return rows
 
 
 def list_catalog_tables (args, dbconfig, db_schema=None):
@@ -43,17 +73,8 @@ def list_catalog_tables (args, dbconfig, db_schema=None):
 
     catq = "SELECT table_name FROM tap_schema.tables WHERE schema_name = (%s);"
 
-    db_uri = dbconfig.get('db_uri')         # already checked and present
-    db_connection = psycopg2.connect(db_uri)
-    try:
-        with db_connection as conn:
-            with conn.cursor() as cursor:
-                cursor.execute(catq, [db_schema_name])
-                cats = cursor.fetchall()
-    finally:
-        db_connection.close()
-
-    catalogs = [cat[0] for cat in cats]     # extract names from wrappers
+    rows = fetch_rows(dbconfig, catq, [db_schema_name])
+    catalogs = [row[0] for row in rows]     # extract names from row tuples
 
     if (args.get('debug')):
         print("(list_catalog_tables): => '{}'".format(catalogs), file=sys.stderr)
@@ -79,18 +100,8 @@ def list_table_names (args, dbconfig, db_schema=None):
         ORDER by name;
     """
 
-    db_uri = dbconfig.get('db_uri')         # already checked and present
-    db_connection = psycopg2.connect(db_uri)
-    try:
-        with db_connection as conn:
-            with conn.cursor() as cursor:
-                cursor.execute(tblq, [db_schema_name])
-                tbls = cursor.fetchall()
-    finally:
-        db_connection.close()
-
-    tables = [tbl[0] for tbl in tbls]       # extract names from wrappers
-
+    rows = fetch_rows(dbconfig, tblq, [db_schema_name])
+    tables = [row[0] for row in rows]     # extract names from row tuples
     if (args.get('debug')):
         print("(pg_sql.list_table_names): => '{}'".format(tables), file=sys.stderr)
 

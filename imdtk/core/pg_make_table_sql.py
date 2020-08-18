@@ -1,7 +1,7 @@
 #
 # Module to curate FITS data with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/24/2020.
-#   Last Modified: Add octal to TDISPn format code translation.
+#   Last Modified: Cleanup calls to gen_create_table_sql children.
 #
 from string import Template
 
@@ -118,15 +118,17 @@ def gen_search_path_sql (dbconfig):
     return [ Template('SET search_path TO ${db_schema_name}, public;').substitute(dbconfig) ]
 
 
-def gen_table_sql (argmix, dbconfig, col_decls):
+def gen_table_sql (argmix, column_names, column_formats):
     """
     Generate and return a list of SQL statements to create a table.
 
-    :param col_decls: a list of SQL column declaration strings
     :param argmix: dictionary containing both CLI and database arguments used by this method:
                    db_schema_name, db_user, catalog_table
+    :param column_names: a list of column name strings.
+    :param column_formats: a list of FITS format specifiers strings.
     """
     sql = []
+    col_decls = gen_column_decls_sql(column_names, column_formats)
     columns = ',\n'.join(col_decls)
 
     tmpl = Template('CREATE TABLE ${db_schema_name}.${catalog_table} (${columns});')
@@ -140,13 +142,13 @@ def gen_table_sql (argmix, dbconfig, col_decls):
     return sql                              # return list of SQL strings
 
 
-def gen_table_indices_sql (argmix, dbconfig, column_names):
+def gen_table_indices_sql (argmix, column_names):
     """
     Generate and return a list of SQL statements to create indices for a table.
 
-    :param column_names: a list of column name strings
     :param argmix: dictionary containing both CLI and database arguments used by this method:
                    verbose, db_schema_name, catalog_table
+    :param column_names: a list of column name strings.
     """
     sql = []
 
@@ -203,10 +205,10 @@ def gen_create_table_sql_str (args, dbconfig, column_names, column_formats):
     Generate the SQL for creating a table, given column names, FITS format specs, and
     general arguments.
 
-    :param column_names: a list of column name strings
-    :param column_formats: a list of FITS format specifiers strings
-    :param args: dictionary containing command line arguments
-    :param dbconfig: dictionary containing database parameters
+    :param args: dictionary containing command line arguments.
+    :param dbconfig: dictionary containing database parameters.
+    :param column_names: a list of column name strings.
+    :param column_formats: a list of FITS format specifiers strings.
 
     :return a list of SQL declaration strings for the table columns (no trailing commas!)
     :raises ProcessingError if any database parameters required by this module are missing.
@@ -220,9 +222,8 @@ def gen_create_table_sql_str (args, dbconfig, column_names, column_formats):
 
     sql = []
 
-    col_decls = gen_column_decls_sql(column_names, column_formats)
     sql.extend(gen_search_path_sql(dbconfig))
-    sql.extend(gen_table_sql(argmix, dbconfig, col_decls))
-    sql.extend(gen_table_indices_sql(argmix, dbconfig, column_names))
+    sql.extend(gen_table_sql(argmix, column_names, column_formats))
+    sql.extend(gen_table_indices_sql(argmix, column_names))
 
     return sql
