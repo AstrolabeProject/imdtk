@@ -106,8 +106,6 @@ class FitsCatalogMakeTableSink (ISQLSink):
         in the database, using the given database configuration.
         Writes the SQL command strings to the given file path or to standard output,
         if no file path is given.
-
-        Note: the generated SQL strings are for debugging only and ARE NOT SQL-INJECTION safe.
         """
         comment = self.sql_file_info_comment_str(file_info)
         column_names = (md_utils.get_aliased_column_names(metadata) or
