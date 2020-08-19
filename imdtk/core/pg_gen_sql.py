@@ -1,12 +1,12 @@
 #
 # Module to curate FITS data with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/24/2020.
-#   Last Modified: Redo to clean and format fields at creation site.
+#   Last Modified: Implement clean_id method.
 #
 from config.settings import DEC_ALIASES, ID_ALIASES, RA_ALIASES, SQL_FIELDS_HYBRID
 import imdtk.exceptions as errors
-from imdtk.core.misc_utils import missing_entries
-from imdtk.core.misc_utils import to_JSON
+from imdtk.core.misc_utils import keep_characters, missing_entries, to_JSON
+from string import ascii_letters, digits
 
 
 UNSUPPORTED = 'UNSUPPORTED'
@@ -52,6 +52,9 @@ _FITS_FORMAT_TO_SQL = {
     'Q': UNSUPPORTED,  # 'array descriptor'
 }
 
+# Restricted set of characters allowed for database identifiers by cleaning function
+DB_ID_CHARS = set(ascii_letters + digits + '_')
+
 # Database parameters required within this module and child modules.
 REQUIRED_DB_PARAMETERS = [ 'db_schema_name', 'db_user' ]
 
@@ -68,15 +71,14 @@ def check_missing_parameters (config, required=REQUIRED_DB_PARAMETERS):
         raise errors.ProcessingError(errMsg)
 
 
-def clean_id (identifier):
+def clean_id (identifier, allowed=DB_ID_CHARS):
     """
     Clean the given SQL identifier to prevent SQL injection attacks.
     Note: that this method is specifically for simple SQL identifiers and is NOT
     a general solution which prevents SQL injection attacks.
     """
     if (identifier):
-        # TODO: IMPORTANT! IMPLEMENT LATER
-        return identifier
+        return keep_characters(identifier, allowed)
     else:
         errMsg = "Identifier to be cleaned cannot be empty or None."
         raise errors.ProcessingError(errMsg)

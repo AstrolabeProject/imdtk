@@ -1,6 +1,6 @@
 # Tests for the FITS-specific PostgreSQL interface module.
 #   Written by: Tom Hicks. 8/10/2020.
-#   Last Modified: Rename this test class and update for rename of SQL generator module.
+#   Last Modified: Add tests for clean_id.
 #
 import pytest
 
@@ -82,6 +82,43 @@ class TestFitsPgSql(object):
         emsg = f'Missing required .* {bad_params}'
         with pytest.raises(errors.ProcessingError, match=emsg):
             pg_gen.check_missing_parameters(self.dbconfig, mix_params)
+
+
+
+    def test_clean_id_empty(self):
+        with pytest.raises(errors.ProcessingError, match='cannot be empty or None'):
+            pg_gen.clean_id(None)
+
+        with pytest.raises(errors.ProcessingError, match='cannot be empty or None'):
+            pg_gen.clean_id('')
+
+        with pytest.raises(errors.ProcessingError, match='cannot be empty or None'):
+            pg_gen.clean_id('', '')
+
+
+    def test_clean_id(self):
+        assert pg_gen.clean_id('_') == '_'
+        assert pg_gen.clean_id('a') == 'a'
+        assert pg_gen.clean_id('_a_') == '_a_'
+        assert pg_gen.clean_id('_ABC_') == '_ABC_'
+        assert pg_gen.clean_id('abc_') == 'abc_'
+        assert pg_gen.clean_id('ABCxyz') == 'ABCxyz'
+
+
+    def test_clean_id_remove(self):
+        assert pg_gen.clean_id('ABC xyz') == 'ABCxyz'
+        assert pg_gen.clean_id('*ABC;xyz') == 'ABCxyz'
+        assert pg_gen.clean_id('*ABC;xyz') == 'ABCxyz'
+        assert pg_gen.clean_id('Robert;drop all tables;') == 'Robertdropalltables'
+
+
+    def test_clean_id_allow(self):
+        letvec = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
+        assert pg_gen.clean_id('ABC xyz', letvec) == ''
+        assert pg_gen.clean_id('xyz; ABC', letvec) == ''
+        assert pg_gen.clean_id('abc xyz', letvec) == 'abc'
+        assert pg_gen.clean_id('XYZ; abc', letvec) == 'abc'
+        assert pg_gen.clean_id('Robert;drop all tables;', letvec) == 'bedaabe'
 
 
 
