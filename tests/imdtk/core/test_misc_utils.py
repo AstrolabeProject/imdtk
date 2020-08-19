@@ -1,18 +1,24 @@
 # Tests for the misc utilities module.
 #   Written by: Tom Hicks. 5/22/2020.
-#   Last Modified: Add tests for missing_entries.
+#   Last Modified: Add tests for keep_characters.
 #
+import string
+
 import imdtk.core.misc_utils as mutils
 
 
 class TestMiscUtils(object):
+
+    ID_CHARS = set(string.ascii_letters + string.digits + '_')
+    geeks = "Ge;ek * s:fo ! r;_Ge *!@#$%^&*()-+={[}]|\\:;\"'<,>.?/ e*k:s_ !"
+    teststr = '*Nothing* [0]...is returned 2 U: (that is 4 sure) by DEFAULT!'
 
     testdict = {'a': True, 'b': False, 'c': 0, 'd': 1, 'e': {}, 'f': {1: 1},
                 'g': [], 'h': [1], 'i': None, 'j': 'Jstr', 'k': 99.9}
     testvec = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
 
 
-    def test_get_in (self):
+    def test_get_in(self):
         nester = { 'a': 'a',
                    'L1': { 'a': 'a',
                            'L2': { 'a': 'a',
@@ -44,13 +50,39 @@ class TestMiscUtils(object):
         assert mutils.get_in(nester, ['L1', 'L2', 'badval', 'nosuchkey']) is None
 
 
-    def test_keep_empty_dict (self):
+
+    def test_keep_characters_empty(self):
+        assert mutils.keep_characters('') == ''
+        assert mutils.keep_characters(self.teststr) == ''
+        assert mutils.keep_characters(self.geeks) == ''
+
+
+    def test_keep_characters(self):
+        assert mutils.keep_characters('aAbBcC..xXyYzZ', string.ascii_lowercase) == 'abcxyz'
+        assert mutils.keep_characters('aAbBcC..xXyYzZ', string.ascii_uppercase) == 'ABCXYZ'
+        assert mutils.keep_characters('aAbBcC..xXyYzZ', string.ascii_letters) == 'aAbBcCxXyYzZ'
+        assert mutils.keep_characters(self.geeks, self.ID_CHARS) == 'Geeksfor_Geeks_'
+        assert mutils.keep_characters(self.teststr, string.digits) == '024'
+        assert mutils.keep_characters(self.teststr, string.punctuation) == '**[]...:()!'
+
+
+    def test_keep_characters_sets(self):
+        assert mutils.keep_characters('aAbBcC..xXyYzZ', set(string.ascii_lowercase)) == 'abcxyz'
+        assert mutils.keep_characters('aAbBcC..xXyYzZ', set(string.ascii_uppercase)) == 'ABCXYZ'
+        assert mutils.keep_characters('aAbBcC..xXyYzZ', set(string.ascii_letters)) == 'aAbBcCxXyYzZ'
+        assert mutils.keep_characters(self.geeks, set(self.ID_CHARS)) == 'Geeksfor_Geeks_'
+        assert mutils.keep_characters(self.teststr, set(string.digits)) == '024'
+        assert mutils.keep_characters(self.teststr, set(string.punctuation)) == '**[]...:()!'
+
+
+
+    def test_keep_empty_dict(self):
         empty = dict()
         vec = mutils.keep(empty.get, self.testvec)
         assert vec == []
 
 
-    def test_keep_dict (self):
+    def test_keep_dict(self):
         vec = mutils.keep(self.testdict.get, self.testvec)
         print(vec)
         assert vec == [True, False, 0, 1, {}, {1: 1}, [], [1], 'Jstr', 99.9]
@@ -90,7 +122,7 @@ class TestMiscUtils(object):
         assert 'ccc' in miss
 
 
-    def test_remove_entries_default (self):
+    def test_remove_entries_default(self):
         hdrs = {
             'a': 1, 'b': 'bee', 'pi': 3.14159, 'AA': 'Milne',
             'COMMENT': 'no comment', 'HISTORY': 'repeats',
@@ -106,7 +138,7 @@ class TestMiscUtils(object):
         assert 'comment' in hdrs
 
 
-    def test_remove_entries_ignore_nonexist (self):
+    def test_remove_entries_ignore_nonexist(self):
         hdrs = {
             'a': 1, 'b': 'bee', 'pi': 3.14159, 'AA': 'Milne',
             'COMMENT': 'no comment', 'HISTORY': 'repeats',
@@ -122,7 +154,7 @@ class TestMiscUtils(object):
         assert 'pikey' not in hdrs
 
 
-    def test_remove_entries_ignore_empty (self):
+    def test_remove_entries_ignore_empty(self):
         hdrs = {
             'a': 1, 'b': 'bee', 'pi': 3.14159, 'AA': 'Milne',
             'COMMENT': 'no comment', 'HISTORY': 'repeats',
@@ -140,7 +172,7 @@ class TestMiscUtils(object):
         assert 'comment' in hdrs
 
 
-    def test_remove_entries_nohist (self):
+    def test_remove_entries_nohist(self):
         hdrs = {
             'a': 1, 'b': 'bee', 'pi': 3.14159, 'AA': 'Milne',
             'COMMENT': 'no comment', 'HISTORY': 'repeats',
@@ -156,7 +188,7 @@ class TestMiscUtils(object):
         assert 'comment' in hdrs
 
 
-    def test_remove_entries_all (self):
+    def test_remove_entries_all(self):
         hdrs = {
             'a': 1, 'b': 'bee', 'pi': 3.14159, 'AA': 'Milne',
             'COMMENT': 'no comment', 'HISTORY': 'repeats',
@@ -173,7 +205,7 @@ class TestMiscUtils(object):
 
 
 
-    def test_to_JSON_empty (self):
+    def test_to_JSON_empty(self):
         tstdict = dict()
         json = mutils.to_JSON(tstdict)
         print(json)
@@ -181,7 +213,7 @@ class TestMiscUtils(object):
         assert json == '{}'
 
 
-    def test_to_JSON (self):
+    def test_to_JSON(self):
         tstdict = {'a': 1, 'b': 'bee', 'pi': 3.14159, 'AA': 'Milne' }
         json = mutils.to_JSON(tstdict)
         print(json)
@@ -192,7 +224,7 @@ class TestMiscUtils(object):
         assert '"AA": "Milne"' in json
 
 
-    def test_to_JSON_keywords (self):
+    def test_to_JSON_keywords(self):
         tstdict = {'a': 1, 'b': 'bee', 'pi': 3.14159, 'AA': 'Milne' }
         json = mutils.to_JSON(tstdict, sort_keys=True)
         print(json)

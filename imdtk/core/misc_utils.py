@@ -1,7 +1,7 @@
 #
 # Miscellaneous Utility Methods.
 #   Written by: Tom Hicks. 5/22/2020.
-#   Last Modified: Add missing_entries method.
+#   Last Modified: Add keep_characters method.
 #
 import json
 
@@ -22,6 +22,18 @@ def get_in (a_dictionary, keys):
             dic = val
         else:
             return None
+
+
+def keep_characters (a_str, allowed=set()):
+    """
+    Return a new string formed from the given string by passing through only
+    the characters in the, optionally specified, iterable 'allowed' collection.
+
+    :param a_str: the string to be "filtered" by this method.
+    :param allowed: an iterable of allowable characters for the returned string.
+                    Default is the empty set (nothing allowed).
+    """
+    return ''.join(ch for ch in a_str if ch in allowed)
 
 
 def keep (fn, collection):
