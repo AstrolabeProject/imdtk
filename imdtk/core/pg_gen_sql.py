@@ -3,9 +3,10 @@
 #   Written by: Tom Hicks. 7/24/2020.
 #   Last Modified: Redo to clean and format fields at creation site.
 #
-from config.settings import DEC_ALIASES, ID_ALIASES, RA_ALIASES
+from config.settings import DEC_ALIASES, ID_ALIASES, RA_ALIASES, SQL_FIELDS_HYBRID
 import imdtk.exceptions as errors
 from imdtk.core.misc_utils import missing_entries
+from imdtk.core.misc_utils import to_JSON
 
 
 UNSUPPORTED = 'UNSUPPORTED'
@@ -55,15 +56,15 @@ _FITS_FORMAT_TO_SQL = {
 REQUIRED_DB_PARAMETERS = [ 'db_schema_name', 'db_user' ]
 
 
-def check_dbconfig_parameters (dbconfig, required=REQUIRED_DB_PARAMETERS):
+def check_missing_parameters (config, required=REQUIRED_DB_PARAMETERS):
     """
     Check the given configuration dictionary for all database parameters required by this module.
 
     :raises ProcessingError if a required database parameter is missing.
     """
-    missing = missing_entries(dbconfig, required)
+    missing = missing_entries(config, required)
     if (missing):
-        errMsg = "Missing required database parameters: {}".format(missing)
+        errMsg = "Missing required parameters: {}".format(missing)
         raise errors.ProcessingError(errMsg)
 
 
@@ -119,6 +120,59 @@ def gen_column_decls_sql (column_names, column_formats):
     col_types = [fits_format_to_sql(fmt) for fmt in column_formats]
     col_names_clean = [clean_id(name) for name in column_names]  # clean the column names
     return ["{0} {1}".format(n, t) for n, t in zip(col_names_clean, col_types)]
+
+
+def gen_hybrid_insert (datadict, table_name):
+    """
+    Return appropriate data structures for inserting the given data dictionary
+    into a database via a database access library. Currently using Psycopg2,
+    so return a tuple of an INSERT template string and a sequence of values.
+
+    Returns (None, None) if the given data dictionary does not contain the field
+    names required for the hybrid table (including the 'metadata' field).
+    """
+    if (not datadict):                      # sanity check
+        errMsg = "(gen_hybrid_insert): Empty data dictionary cannot be inserted into table."
+        raise errors.ProcessingError(errMsg)
+
+    table_clean = clean_id(table_name)
+
+    required = SQL_FIELDS_HYBRID.copy()
+    fieldnames = [clean_id(field) for field in required]
+    num_keys = len(fieldnames)              # number of keys minus 1 (w/o metadata)
+    fieldnames.append('metadata')           # add name of the JSON metadata field
+    keys = ', '.join(fieldnames)            # made from cleaned fieldnames
+
+    values = [ datadict.get(key) for key in required if datadict.get(key) is not None ]
+    num_vals = len(values)                  # number of values minus 1 (no metadata yet)
+    if (num_keys == num_vals):              # must have a value for each key
+        values.append(to_JSON(datadict, sort_keys=True))  # add the JSON for the metadata field
+        place_holders = ', '.join(['%s' for v in values])
+        sql_fmt_str = "insert into {0} ({1}) values ({2});".format(table_clean, keys, place_holders)
+        return (sql_fmt_str, values)
+    else:                                   # there was a mismatch of keys and values
+        errMsg = "Unable to find values for all {} required fields: {}".format(num_keys, required)
+        raise errors.ProcessingError(errMsg)
+
+
+def gen_insert (datadict, table_name):
+    """
+    Return appropriate data structures for inserting the given data dictionary
+    into a database via a database access library. Currently using Psycopg2,
+    so return a tuple of an INSERT template string and a sequence of values.
+    """
+    if (not datadict):                      # sanity check
+        errMsg = "(gen_insert): Empty data dictionary cannot be inserted into table."
+        raise errors.ProcessingError(errMsg)
+
+    table_clean = clean_id(table_name)
+    keys_clean = [clean_id(key) for key in datadict.keys()]
+    keys = ', '.join(keys_clean)
+
+    values = list(datadict.values())
+    place_holders = ', '.join(['%s' for v in values])
+    sql_fmt_str = "insert into {0} ({1}) values ({2});".format(table_clean, keys, place_holders)
+    return (sql_fmt_str, values)
 
 
 def gen_search_path_sql (argmix):
@@ -237,7 +291,7 @@ def gen_create_table_sql (args, dbconfig, column_names, column_formats):
     :raises ProcessingError if any database parameters required by this module are missing.
     """
     # raise error is any required database parameters are missing
-    check_dbconfig_parameters(dbconfig)
+    check_missing_parameters(dbconfig)
 
     # combine CLI and DB arguments for easy use with templating
     argmix = args.copy()
