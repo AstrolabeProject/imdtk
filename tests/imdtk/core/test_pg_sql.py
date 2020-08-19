@@ -1,6 +1,6 @@
 # Tests for the PostgreSQL interface module.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Update for update of PG SQL module.
+#   Last Modified: Update for refactoring of PG SQL modules.
 #
 import pytest
 
@@ -185,26 +185,27 @@ class TestPgSql(object):
 
 
 
-    def test_sql_insert_str_empty (self):
-        sql = pgsql.sql_insert_str(dict(), 'test_table')
-        print(sql)
-        assert sql is not None
-        assert len(sql) > 0
-        assert 'insert' in sql
-        assert 'test_table' in sql
-        assert 'values' in sql
-        assert '();' in sql
+    def test_insert_row_str_empty (self):
+        with pytest.raises(errors.ProcessingError, match='cannot be inserted'):
+            pgsql.insert_row_str(self.dbconfig, dict(), 'test_table')
+        # print(sql)
+        # assert sql is not None
+        # assert len(sql) > 0
+        # assert 'insert' in sql
+        # assert 'test_table' in sql
+        # assert 'values' in sql
+        # assert '();' in sql
 
 
-    def test_sql_insert_str (self):
-        sql = pgsql.sql_insert_str(self.datad, 'test_table')
+    def test_insert_row_str (self):
+        sql = pgsql.insert_row_str(self.dbconfig, self.datad, 'test_table')
         print(sql)
         assert sql is not None
         assert len(sql) > 175               # specific to datad table
         assert 'insert' in sql
         assert 'test_table' in sql
         assert 'values' in sql
-        assert 'True' in sql
+        assert 'true' in sql
         assert 'SIMPLE' in sql
         assert 'BITPIX' in sql
         assert '-64' in sql
@@ -214,26 +215,36 @@ class TestPgSql(object):
 
 
 
-    def test_sql_insert_hybrid_str_empty (self):
-        sql = pgsql.sql_insert_hybrid_str(dict(), 'TESTTBL')
-        print(sql)
-        assert sql is None
+    def test_insert_hybrid_row_str_empty (self):
+        with pytest.raises(errors.ProcessingError, match='cannot be inserted'):
+            pgsql.insert_hybrid_row_str(self.dbconfig, dict(), 'TESTTBL')
 
 
-    def test_sql_insert_hybrid_str_nomd (self):
-        datad_hyb_nomd = {
-            "ob_collection": "JWST",
+    def test_insert_hybrid_row_str_min (self):
+        datad_hyb_min = {
+            "obs_collection": "JWST",
             "s_dec": 53.157662568,
             "s_ra": -27.8075199236,
             "is_public": 0
         }
-        sql = pgsql.sql_insert_hybrid_str(datad_hyb_nomd, 'TESTTBL')
+        sql = pgsql.insert_hybrid_row_str(self.dbconfig, datad_hyb_min, 'test_tbl')
         print(sql)
-        assert sql is None
+        assert 'insert' in sql
+        assert 'test_tbl' in sql
+        assert 's_dec' in sql
+        assert 'is_public' in sql
+        assert 'values' in sql
+        assert '53.157662568' in sql
+        assert '-27.8075199236' in sql
+        assert 'JWST' in sql
+
+        assert 'true' not in sql
+        assert 'SIMPLE' not in sql
+        assert 'BITPIX' not in sql
 
 
-    def test_sql_insert_hybrid_str (self):
-        sql = pgsql.sql_insert_hybrid_str(self.datad_hyb, 'TESTTBL')
+    def test_insert_hybrid_row_str (self):
+        sql = pgsql.insert_hybrid_row_str(self.dbconfig, self.datad_hyb, 'TESTTBL')
         print(sql)
         assert sql is not None
         print("LEN(sql)={}".format(len(sql)))
@@ -247,49 +258,17 @@ class TestPgSql(object):
         assert '53.157662568' in sql
         assert '-27.8075199236' in sql
 
-        assert 'True' not in sql
+        assert 'true' not in sql
         assert 'SIMPLE' not in sql
         assert 'BITPIX' not in sql
 
 
-
-    def test_sql4_hybrid_table_insert_empty (self):
-        sql = pgsql.sql4_hybrid_table_insert(dict(), 'TESTTBL')
-        print(sql)
-        assert sql is None
-
-
-    def test_sql4_hybrid_table_insert_nomd (self):
-        datad_hyb_nomd = {
-            "ob_collection": "JWST",
+    def test_insert_hybrid_row_str_noval (self):
+        datad_hyb_min = {
+            "obs_collection": "JWST",
             "s_dec": 53.157662568,
             "s_ra": -27.8075199236,
-            "is_public": 0
+            "is_public": None
         }
-        sql = pgsql.sql4_hybrid_table_insert(datad_hyb_nomd, 'TESTTBL')
-        print(sql)
-        assert sql is None
-
-
-    def test_sql4_hybrid_table_insert (self):
-        sql = pgsql.sql4_hybrid_table_insert(self.datad_hyb, 'TESTTBL')
-        print(sql)
-        assert sql is not None
-        assert len(sql) == 2                # tuple of template, values
-
-        templ = sql[0]
-        assert 'insert' in templ
-        assert 'TESTTBL' in templ
-        assert 'values' in templ
-
-        for fld in SQL_FIELDS_HYBRID:
-            assert fld in templ
-
-        vals = sql[1]
-        assert 53.157662568 in vals
-        assert -27.8075199236 in vals
-        assert 'JWST' in vals
-
-        assert 'True' not in vals
-        assert 'SIMPLE' not in vals
-        assert 'BITPIX' not in vals
+        with pytest.raises(errors.ProcessingError, match='Unable to find .* required fields'):
+            pgsql.insert_hybrid_row_str(self.dbconfig, datad_hyb_min, 'test_tbl')
