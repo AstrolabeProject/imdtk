@@ -1,7 +1,7 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Remove version argument: read from file.
+#   Last Modified: Remove mentions of schema.
 #
 import argparse
 import sys
@@ -39,7 +39,7 @@ def add_catalog_table_arguments (parser, tool_name, default_msg='no default'):
     """ Add the argument(s) related to naming a database table for a catalog
         to the given argparse parser object. """
     parser.add_argument(
-        '-ct', '--catalog-table', dest='catalog_table', required=True, metavar='schema.table',
+        '-ct', '--catalog-table', dest='catalog_table', required=True, metavar='table-name',
         help="Catalog table name in the database [default: {}]".format(default_msg)
     )
 
@@ -66,7 +66,7 @@ def add_database_arguments (parser, tool_name,
     )
 
     parser.add_argument(
-        '-tn', '--table-name', dest='table_name', metavar='schema.table',
+        '-tn', '--table-name', dest='table_name', metavar='table-name',
         default=argparse.SUPPRESS,
         help="Table name for data to be stored in the database [default: {}]".format(table_msg)
     )
