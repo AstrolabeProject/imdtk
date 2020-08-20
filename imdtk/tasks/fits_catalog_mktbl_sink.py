@@ -1,7 +1,7 @@
 #
 # Class to create a new database table from the metadata of a FITS catalog file.
 #   Written by: Tom Hicks. 7/22/2020.
-#   Last Modified: Update for PG SQL changes.
+#   Last Modified: Fix the check for existing catalog table.
 #
 import sys
 
@@ -62,7 +62,7 @@ class FitsCatalogMakeTableSink (ISQLSink):
 
     def table_exists (self, dbconfig, catalog_table):
         """ Return True if the named table already exists in the database, else False. """
-        return catalog_table in pg_sql.list_catalog_tables(self.args, dbconfig, catalog_table)
+        return catalog_table in pg_sql.list_table_names(self.args, dbconfig)
 
 
     def create_table (self, catalog_table, dbconfig, metadata, file_info):
