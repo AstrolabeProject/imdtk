@@ -98,7 +98,7 @@ fits_img_md -v -ff /images/DC_191217/F356W.fits | img_aliases -v | fields_info -
 echo "============================================"
 echo "Headers to img_aliases to fields_info to jwst_oc_calc to miss_report, specify COLLECTION:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /images/DC_191217/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -c TEST_COLL -ff /images/DC_191217/F356W.fits | miss_report -v -g
+fits_img_md -v -ff /images/DC_191217/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -c TEST -ff /images/DC_191217/F356W.fits | miss_report -v -g
 
 echo "============================================"
 echo "Headers to img_aliases to fields_info to jwst_oc_calc to miss_report to no_op:"
@@ -109,16 +109,6 @@ echo "============================================"
 echo "Headers to img_aliases to fields_info to jwst_oc_calc to miss_report to no_op to pickle_sink:"
 echo "--------------------------------------------"
 fits_img_md -v -ff /images/DC_191217/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | no_op -v | pickle_sink -v -g
-
-echo "============================================"
-echo "Headers to img_aliases to fields_info to jwst_oc_calc to miss_report to no_op to jwst_pgsql_sink:"
-echo "--------------------------------------------"
-fits_img_md -v -ff /images/DC_191217/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | no_op -v | jwst_pgsql_sink -v -sql -g
-
-echo "============================================"
-echo "Headers to img_aliases to fields_info to jwst_oc_calc to miss_report to no_op to jwst_pghyb_sink:"
-echo "--------------------------------------------"
-fits_img_md -v -ff /images/DC_191217/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /images/DC_191217/F356W.fits | miss_report -v | no_op -v | jwst_pghyb_sink -v -sql -g
 
 
 echo "============================================"
@@ -202,15 +192,10 @@ fits_img_md -ff /images/DC_191217/F356W.fits | img_aliases | fields_info | jwst_
 
 
 echo "============================================"
-echo "NO-OPs in various positions, verbose:"
+echo "NO-OPs in various positions:"
 echo "--------------------------------------------"
 fits_img_md -v -ff /images/DC_191217/F356W.fits | img_aliases -v | no_op -v -g
 fits_img_md -v -ff /images/DC_191217/F356W.fits | no_op -v | img_aliases -v -g
-
-echo "============================================"
-echo "NO-OPs in various positions, debug:"
-echo "--------------------------------------------"
-fits_img_md -v -ff /images/DC_191217/F356W.fits | img_aliases -v | no_op -v -g
 fits_img_md -d -ff /images/DC_191217/F356W.fits | no_op -d | img_aliases -d -g
 
 
@@ -242,7 +227,7 @@ csv_sink -d -if /work/hafijocmr1 -of /work/hafijocmrcsv1
 
 
 echo "============================================"
-echo "Exception catching on bad files:"
+echo "Exception catching on bad files (ERROR EXPECTED):"
 echo "--------------------------------------------"
 fits_img_md -ff /images/BAD.fits -g -v
 fits_img_md -ff /images/small_table.fits -g -v
@@ -260,7 +245,7 @@ fits_cat_md -ff /images/NOSUCH.fits -g -v
 
 
 echo "============================================"
-echo "Exception catching on bad task arguments:"
+echo "Exception catching on bad task arguments (ERROR EXPECTED):"
 echo "--------------------------------------------"
 fits_img_md -ff /images/m13.fits | pickle_sink -v
 
@@ -271,40 +256,43 @@ echo "--------------------------------------------"
 md_pgsql_pipe -ff /images/DC_191217/F356W.fits -v -sql -g
 
 
-echo "============================================"
-echo "Multiple FITS metadata to PostgreSQL JWST table pipeline:"
-echo "--------------------------------------------"
-multi_md_pgsql_pipe -idir /tmp -c JADES -sql -g -v
-echo "--------------------------------------------"
+# echo "============================================"
+# echo "Multiple FITS metadata to PostgreSQL JWST table pipeline:"
+# echo "--------------------------------------------"
+# multi_md_pgsql_pipe -idir /tmp -c JADES -sql -g -v
+# echo "--------------------------------------------"
 # multi_md_pgsql_pipe -idir /images/JADES -v
+# multi_md_pgsql_pipe -idir /images/JADES -c JADES -v
 # multi_md_pgsql_pipe -idir /images/JADES -sql -g -v
-echo "--------------------------------------------"
+# echo "--------------------------------------------"
 # multi_md_pgsql_pipe -idir /images/DC_191217 -v
+# multi_md_pgsql_pipe -idir /images/DC_191217 -c DC_191217 -v
 # multi_md_pgsql_pipe -idir /images/DC_191217 -sql -g -v
-echo "--------------------------------------------"
+# echo "--------------------------------------------"
 # multi_md_pgsql_pipe -idir /images -v
 # multi_md_pgsql_pipe -idir /images -sql -g -v
 
 
-echo "============================================"
-echo "Multiple FITS metadata to hybrid PostgreSQL/JSON JWST table pipeline:"
-echo "--------------------------------------------"
+# echo "============================================"
+# echo "Multiple FITS metadata to hybrid PostgreSQL/JSON JWST table pipeline:"
+# echo "--------------------------------------------"
 # multi_md_pghyb_pipe -idir /tmp -c JADES -sql -g -v
-echo "--------------------------------------------"
+# echo "--------------------------------------------"
 # multi_md_pghyb_pipe -idir /images/JADES -v
+# multi_md_pghyb_pipe -idir /images/JADES -c JADES -v
 # multi_md_pghyb_pipe -idir /images/JADES -sql -g -v
-echo "--------------------------------------------"
+# echo "--------------------------------------------"
 # multi_md_pghyb_pipe -idir /images/DC_191217 -v
+# multi_md_pghyb_pipe -idir /images/DC_191217 -c DC_191217 -v
 # multi_md_pghyb_pipe -idir /images/DC_191217 -sql -g -v
-echo "--------------------------------------------"
+# echo "--------------------------------------------"
 # multi_md_pghyb_pipe -idir /images -c ALLIMGS -v
 # multi_md_pghyb_pipe -idir /images -c ALLIMGS -sql -g -v
 
 
 # echo "============================================"
-# echo " SQL refactoring:"
+# echo " SQL refactoring tests:"
 # echo "--------------------------------------------"
-# multi_md_pgsql_pipe -idir /images/JADES -c JADES2 -v
 # multi_md_pghyb_pipe -idir /images -c HYB_ALLIMGS -v
 # multi_md_pgsql_pipe -idir /images -c SQL_ALLIMGS -v
 
@@ -313,19 +301,62 @@ echo "============================================"
 echo "Catalog Metadata:"
 echo "--------------------------------------------"
 fits_cat_md -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -d -g
-fits_cat_md -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -of /work/ez_cat.json
 fits_cat_md -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -g
+fits_cat_md -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -of /work/ez_cat.json
 echo "--------------------------------------------"
 fits_cat_md -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -d -g
-fits_cat_md -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -v -of /work/photo_cat.json
 fits_cat_md -v -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -v -g
+fits_cat_md -ff /catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -v -of /work/photo_cat.json
+
+
+echo "============================================"
+echo "Catalog Metadata with Aliases:"
+echo "--------------------------------------------"
+fits_cat_md -v -ff /catalogs/small_table.fits | cat_aliases -v -g
+fits_cat_md -v -ff /catalogs/small_table.fits | cat_aliases -v -of /work/small_table_fits_cat_md_alias.json
+
+
+echo "============================================"
+echo "Catalog Make Table:"
+echo "--------------------------------------------"
+fits_cat_md -v -ff /catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v -sql -g
+fits_cat_md -v -ff /catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v -sql -of /work/small_table_fits_cat_mktbl.sql
+echo "--------------------------------------------"
+fits_cat_md -v -ff /catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -v -sql -g
+fits_cat_md -v -ff /catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -v -sql -of /work/small_table_fits_cat_mktbl_alias.sql
+echo "--------------------------------------------"
+fits_cat_md -v -ff /catalogs/small_table.fits | fits_cat_mktbl -ct noalias -v -sql -g
+fits_cat_md -v -ff /catalogs/small_table.fits | fits_cat_mktbl -ct noalias -v -sql -of /work/small_table_fits_cat_mktbl_noalias.sql
+
+
+# echo "============================================"
+# echo "Catalog Data extraction:"
+# echo "--------------------------------------------"
+# Smallest (~60k) data file (with meta):
+# fits_cat_data -v -ff /catalogs/small_table.fits -v -g
+# Medium sized (~1M) data file:
+# fits_cat_data -v -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -g
+# Medium sized (~2.9M) data file:
+# fits_cat_data -v -ff /catalogs/DC_191217/Photometric_Catalog.F200W_kron_f80.fits -v -g
+# Largest (~4M) and most complex (nested fields) data file:
+# fits_cat_data -v -ff /catalogs/DC_191217/photometry_table_psf_matched_v5.0.fits -v -g
 
 
 echo "============================================"
 echo "Current development:"
-echo "--------------------------------------------"
-fits_cat_md -v -ff /catalogs/small_table.fits | cat_aliases -v -g
-fits_cat_md -v -ff /catalogs/small_table.fits | fits_cat_mktbl -ct noalias -sql -v -of /work/small_table_fits_cat_maketbl_noalias.sql
-fits_cat_md -v -ff /catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -sql -g -v
+# echo "--------------------------------------------"
+echo ""
+# echo "---------- Store image MD to SQL & Hybrid tables ----------"
+# fits_img_md -v -ff /images/DC_191217/F356W.fits | img_aliases | fields_info | jwst_oc_calc -ff /images/DC_191217/F356W.fits | miss_report -v | jwst_pgsql_sink -v
+# fits_img_md -v -ff /images/DC_191217/F356W.fits | img_aliases | fields_info | jwst_oc_calc -ff /images/DC_191217/F356W.fits | miss_report -v | jwst_pghyb_sink -v
+
+# echo "---------- Make table in DB: with aliases, w/o aliases, repetition failure  ----------"
+# fits_cat_md -ff /catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v
+# fits_cat_md -ff /catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl2 -v
+# fits_cat_md -ff /catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v
+
+echo "---------- Make table Pipeline ----------"
+fits_cat_mktbl_pipe -ff /catalogs/small_table.fits -ct test_tbl -sql -g -v
+# fits_cat_mktbl_pipe -ff /catalogs/small_table.fits -ct test_tbl -v
 
 echo "============================================"
