@@ -1,7 +1,7 @@
 #
 # Module to curate FITS data with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/24/2020.
-#   Last Modified: Implement clean_id method.
+#   Last Modified: Make insert(s) use schema from DB config.
 #
 from config.settings import DEC_ALIASES, ID_ALIASES, RA_ALIASES, SQL_FIELDS_HYBRID
 import imdtk.exceptions as errors
@@ -124,7 +124,7 @@ def gen_column_decls_sql (column_names, column_formats):
     return ["{0} {1}".format(n, t) for n, t in zip(col_names_clean, col_types)]
 
 
-def gen_hybrid_insert (datadict, table_name):
+def gen_hybrid_insert (dbconfig, datadict, table_name):
     """
     Return appropriate data structures for inserting the given data dictionary
     into a database via a database access library. Currently using Psycopg2,
@@ -137,6 +137,7 @@ def gen_hybrid_insert (datadict, table_name):
         errMsg = "(gen_hybrid_insert): Empty data dictionary cannot be inserted into table."
         raise errors.ProcessingError(errMsg)
 
+    schema_clean = clean_id(dbconfig.get('db_schema_name'))
     table_clean = clean_id(table_name)
 
     required = SQL_FIELDS_HYBRID.copy()
@@ -150,14 +151,14 @@ def gen_hybrid_insert (datadict, table_name):
     if (num_keys == num_vals):              # must have a value for each key
         values.append(to_JSON(datadict, sort_keys=True))  # add the JSON for the metadata field
         place_holders = ', '.join(['%s' for v in values])
-        sql_fmt_str = "insert into {0} ({1}) values ({2});".format(table_clean, keys, place_holders)
+        sql_fmt_str = "insert into {0}.{1} ({2}) values ({3});".format(schema_clean, table_clean, keys, place_holders)
         return (sql_fmt_str, values)
     else:                                   # there was a mismatch of keys and values
         errMsg = "Unable to find values for all {} required fields: {}".format(num_keys, required)
         raise errors.ProcessingError(errMsg)
 
 
-def gen_insert (datadict, table_name):
+def gen_insert (dbconfig, datadict, table_name):
     """
     Return appropriate data structures for inserting the given data dictionary
     into a database via a database access library. Currently using Psycopg2,
@@ -167,13 +168,15 @@ def gen_insert (datadict, table_name):
         errMsg = "(gen_insert): Empty data dictionary cannot be inserted into table."
         raise errors.ProcessingError(errMsg)
 
+    schema_clean = clean_id(dbconfig.get('db_schema_name'))
     table_clean = clean_id(table_name)
+
     keys_clean = [clean_id(key) for key in datadict.keys()]
     keys = ', '.join(keys_clean)
 
     values = list(datadict.values())
     place_holders = ', '.join(['%s' for v in values])
-    sql_fmt_str = "insert into {0} ({1}) values ({2});".format(table_clean, keys, place_holders)
+    sql_fmt_str = "insert into {0}.{1} ({2}) values ({3});".format(schema_clean, table_clean, keys, place_holders)
     return (sql_fmt_str, values)
 
 

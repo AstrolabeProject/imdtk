@@ -1,7 +1,7 @@
 #
 # Module to interact with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Refactor/update/move code for/for/to renamed SQL generator module.
+#   Last Modified: Make insert(s) use schema from DB config.
 #
 import sys
 
@@ -115,7 +115,7 @@ def insert_hybrid_row (dbconfig, datadict, table_name):
     Insert the given data dictionary into the named hybrid SQL/JSON table using the
     given DB parameters.
     """
-    (sql_fmt_str, sql_values) = pg_gen.gen_hybrid_insert(datadict, table_name)
+    (sql_fmt_str, sql_values) = pg_gen.gen_hybrid_insert(dbconfig, datadict, table_name)
     execute_sql(dbconfig, sql_fmt_str, sql_values)
 
 
@@ -125,7 +125,7 @@ def insert_hybrid_row_str (dbconfig, datadict, table_name):
     Returns None if the given data dictionary does not contain the field names required
     for the hybrid table (including the 'metadata' field).
     """
-    (sql_fmt_str, sql_values) = pg_gen.gen_hybrid_insert(datadict, table_name)
+    (sql_fmt_str, sql_values) = pg_gen.gen_hybrid_insert(dbconfig, datadict, table_name)
     return sql_as_string(dbconfig, sql_fmt_str, sql_values)
 
 
@@ -133,7 +133,7 @@ def insert_row (dbconfig, datadict, table_name):
     """
     Insert the given data dictionary into the named SQL table using the given DB parameters.
     """
-    (sql_fmt_str, sql_values) = pg_gen.gen_insert(datadict, table_name)
+    (sql_fmt_str, sql_values) = pg_gen.gen_insert(dbconfig, datadict, table_name)
     execute_sql(dbconfig, sql_fmt_str, sql_values)
 
 
@@ -141,7 +141,7 @@ def insert_row_str (dbconfig, datadict, table_name):
     """
     Return an SQL string to insert a data dictionary into the named SQL table.
     """
-    (sql_fmt_str, sql_values) = pg_gen.gen_insert(datadict, table_name)
+    (sql_fmt_str, sql_values) = pg_gen.gen_insert(dbconfig, datadict, table_name)
     return sql_as_string(dbconfig, sql_fmt_str, sql_values)
 
 
