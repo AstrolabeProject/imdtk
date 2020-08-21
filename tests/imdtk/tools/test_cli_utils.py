@@ -1,6 +1,6 @@
 # Tests for the CLI utilities module.
 #   Written by: Tom Hicks. 7/15/2020.
-#   Last Modified: Remove version.
+#   Last Modified: Update for CLI utils redo.
 #
 import argparse
 import pytest
@@ -21,9 +21,9 @@ class TestCliUtils(object):
     resources_tstdir = "{}/resources".format(TEST_DIR)
 
 
-    def test_add_aliases_arguments(self):
+    def test_add_aliases_argument(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_aliases_arguments(parser, TOOL_NAME)
+        utils.add_aliases_argument(parser, TOOL_NAME)
 
         args = vars(parser.parse_args([]))
         print(args)
@@ -38,9 +38,24 @@ class TestCliUtils(object):
         assert 'alias_file' in args
 
 
-    def test_add_catalog_table_arguments(self):
+    def test_add_catalog_hdu_argument(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_catalog_table_arguments(parser, TOOL_NAME)
+        utils.add_catalog_hdu_argument(parser, TOOL_NAME)
+
+        args = vars(parser.parse_args([]))
+        print(args)
+        assert 'catalog_hdu' in args          # it has a default
+        assert args.get('catalog_hdu') == 1   # zero is the default
+
+        args = vars(parser.parse_args(['-chdu', '2']))
+        print(args)
+        assert 'catalog_hdu' in args
+        assert args.get('catalog_hdu') == 2
+
+
+    def test_add_catalog_table_argument(self):
+        parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+        utils.add_catalog_table_argument(parser, TOOL_NAME)
 
         with pytest.raises(SystemExit) as se:
             args = vars(parser.parse_args([])) # catalog table name is required
@@ -55,9 +70,9 @@ class TestCliUtils(object):
         assert 'catalog_table' in args
 
 
-    def test_add_collection_arguments(self):
+    def test_add_collection_argument(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_collection_arguments(parser, TOOL_NAME)
+        utils.add_collection_argument(parser, TOOL_NAME)
 
         args = vars(parser.parse_args([]))
         print(args)
@@ -96,9 +111,9 @@ class TestCliUtils(object):
         assert 'sql_only' in args
 
 
-    def test_add_fields_info_arguments(self):
+    def test_add_fields_info_argument(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_fields_info_arguments(parser, TOOL_NAME)
+        utils.add_fields_info_argument(parser, TOOL_NAME)
 
         args = vars(parser.parse_args([]))
         print(args)
@@ -113,9 +128,9 @@ class TestCliUtils(object):
         assert 'fields_file' in args
 
 
-    def test_add_fits_file_arguments(self):
+    def test_add_fits_file_argument(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_fits_file_arguments(parser, TOOL_NAME)
+        utils.add_fits_file_argument(parser, TOOL_NAME)
 
         with pytest.raises(SystemExit) as se:
             args = vars(parser.parse_args([])) # fits-file is required
@@ -124,19 +139,12 @@ class TestCliUtils(object):
         args = vars(parser.parse_args(['-ff', 'astro.fits']))
         print(args)
         assert 'fits_file' in args
-        assert 'which_hdu' in args          # it has a default
-        assert args.get('which_hdu') == 0   # zero is the default
-
-        args = vars(parser.parse_args(['--fits-file', '/fake/astro.fits', '--hdu', '1']))
-        print(args)
-        assert 'fits_file' in args
-        assert 'which_hdu' in args
-        assert args.get('which_hdu') == 1
+        assert 'which_hdu' not in args
 
 
-    def test_add_hdu_arguments(self):
+    def test_add_hdu_argument(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_hdu_arguments(parser, TOOL_NAME)
+        utils.add_hdu_argument(parser, TOOL_NAME)
 
         args = vars(parser.parse_args([]))
         print(args)
@@ -149,9 +157,32 @@ class TestCliUtils(object):
         assert args.get('which_hdu') == 1
 
 
-    def test_add_input_arguments(self):
+    def test_add_ignore_list_argument(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_input_arguments(parser, TOOL_NAME)
+        utils.add_ignore_list_argument(parser, TOOL_NAME)
+
+        args = vars(parser.parse_args([]))
+        print(args)
+        assert 'ignore_list' not in args
+
+        args = vars(parser.parse_args(['--ig', 'COMMENT']))
+        print(args)
+        assert 'ignore_list' in args
+        iglist = args.get('ignore_list')
+        assert iglist is not None
+        assert len(iglist) == 1
+
+        args = vars(parser.parse_args(['--ig', 'HISTORY', '--ig', 'COMMENT']))
+        print(args)
+        assert 'ignore_list' in args
+        iglist = args.get('ignore_list')
+        assert iglist is not None
+        assert len(iglist) == 2
+
+
+    def test_add_input_file_argument(self):
+        parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+        utils.add_input_file_argument(parser, TOOL_NAME)
 
         args = vars(parser.parse_args([]))
         print(args)
@@ -166,9 +197,9 @@ class TestCliUtils(object):
         assert 'input_file' in args
 
 
-    def test_add_input_dir_arguments(self):
+    def test_add_input_dir_argument(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_input_dir_arguments(parser, TOOL_NAME)
+        utils.add_input_dir_argument(parser, TOOL_NAME)
 
         with pytest.raises(SystemExit) as se:
             args = vars(parser.parse_args([])) # input-dir is required
@@ -203,9 +234,9 @@ class TestCliUtils(object):
         assert 'gen_file_path' in args
 
 
-    def test_add_report_arguments(self):
+    def test_add_report_format_argument(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-        utils.add_report_arguments(parser, TOOL_NAME)
+        utils.add_report_format_argument(parser, TOOL_NAME)
 
         args = vars(parser.parse_args([]))
         print(args)

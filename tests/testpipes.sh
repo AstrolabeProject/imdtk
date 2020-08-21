@@ -22,6 +22,7 @@ jwst_pghyb_sink -d --version
 jwst_pgsql_sink -d --version
 md_pgsql_pipe -d --version
 miss_report -d --version
+multi_md_pghyb_pipe -d --version
 multi_md_pgsql_pipe -d --version
 no_op -d --version
 pickle_sink -d --version
@@ -52,6 +53,8 @@ echo "--------------------------------------------"
 md_pgsql_pipe --help
 echo "--------------------------------------------"
 miss_report --help
+echo "--------------------------------------------"
+multi_md_pghyb_pipe --help
 echo "--------------------------------------------"
 multi_md_pgsql_pipe --help
 echo "--------------------------------------------"

@@ -2,7 +2,7 @@
 #
 # Python pipeline to extract catalog metadata and create a PostreSQL database table from it.
 #   Written by: Tom Hicks. 8/20/20.
-#   Last Modified: Initial creation.
+#   Last Modified: Update for CLI utils redo.
 #
 import argparse
 import sys
@@ -39,19 +39,13 @@ def main (argv=None):
     )
 
     cli_utils.add_shared_arguments(parser, TOOL_NAME)
-    cli_utils.add_input_arguments(parser, TOOL_NAME)
-    cli_utils.add_fits_file_arguments(parser, TOOL_NAME)
-    cli_utils.add_aliases_arguments(parser, TOOL_NAME, default_msg=DEFAULT_CAT_ALIASES_FILEPATH)
+    cli_utils.add_input_file_argument(parser, TOOL_NAME)
+    cli_utils.add_fits_file_argument(parser, TOOL_NAME)
+    cli_utils.add_aliases_argument(parser, TOOL_NAME, default_msg=DEFAULT_CAT_ALIASES_FILEPATH)
     cli_utils.add_output_arguments(parser, TOOL_NAME)
     cli_utils.add_database_arguments(parser, TOOL_NAME)
-    cli_utils.add_catalog_table_arguments(parser, TOOL_NAME)
-
-    # add arguments specific to this module
-    parser.add_argument(
-        '-thdu', '--table_hdu', dest='table_hdu', metavar='HDU_index',
-        default=1,
-        help='Index of HDU containing the data table [default: 1 (the second)]'
-    )
+    cli_utils.add_catalog_hdu_argument(parser, TOOL_NAME)
+    cli_utils.add_catalog_table_argument(parser, TOOL_NAME)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))

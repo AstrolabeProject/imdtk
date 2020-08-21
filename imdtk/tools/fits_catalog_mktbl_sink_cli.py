@@ -2,7 +2,7 @@
 #
 # Module to create a new database table from the metadata of a FITS catalog file.
 #   Written by: Tom Hicks. 7/22/2020.
-#   Last Modified: Update for renames.
+#   Last Modified: Update for CLI utils redo.
 #
 import argparse
 import sys
@@ -36,9 +36,9 @@ def main (argv=None):
 
     cli_utils.add_shared_arguments(parser, TOOL_NAME)
     cli_utils.add_output_arguments(parser, TOOL_NAME)
-    cli_utils.add_input_arguments(parser, TOOL_NAME)
+    cli_utils.add_input_file_argument(parser, TOOL_NAME)
     cli_utils.add_database_arguments(parser, TOOL_NAME)
-    cli_utils.add_catalog_table_arguments(parser, TOOL_NAME)
+    cli_utils.add_catalog_table_argument(parser, TOOL_NAME)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))

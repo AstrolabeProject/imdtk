@@ -2,7 +2,7 @@
 #
 # Module to report on the presence of missing fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/20.
-#   Last Modified: Remove version.
+#   Last Modified: Update for CLI utils redo.
 #
 import argparse
 import sys
@@ -36,8 +36,8 @@ def main (argv=None):
 
     cli_utils.add_shared_arguments(parser, TOOL_NAME)
     cli_utils.add_output_arguments(parser, TOOL_NAME)
-    cli_utils.add_input_arguments(parser, TOOL_NAME)
-    cli_utils.add_report_arguments(parser, TOOL_NAME)
+    cli_utils.add_input_file_argument(parser, TOOL_NAME)
+    cli_utils.add_report_format_argument(parser, TOOL_NAME)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))

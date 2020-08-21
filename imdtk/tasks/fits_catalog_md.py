@@ -1,7 +1,7 @@
 #
 # Class to extract catalog metadata from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 7/6/2020.
-#   Last Modified: Minor doc cleanup.
+#   Last Modified: Update for CLI utils redo.
 #
 import os
 import sys
@@ -40,7 +40,7 @@ class FitsCatalogMetadataTask (IImdTask):
         # process the given, already validated FITS file
         fits_file = self.args.get('fits_file')
         ignore_list = self.args.get('ignore_list') or fits_utils.FITS_IGNORE_KEYS
-        table_hdu = self.args.get('table_hdu', 1)
+        catalog_hdu = self.args.get('catalog_hdu', 1)
 
         try:
             with fits.open(fits_file) as hdus_list:
@@ -48,8 +48,8 @@ class FitsCatalogMetadataTask (IImdTask):
                     errMsg = "Skipping non-catalog FITS file '{}'".format(fits_file)
                     raise errors.UnsupportedTypeError(errMsg)
 
-                hdrs = fits_utils.get_header_fields(hdus_list, table_hdu, ignore_list)
-                cinfo = fits_utils.get_column_info(hdus_list, table_hdu)
+                hdrs = fits_utils.get_header_fields(hdus_list, catalog_hdu, ignore_list)
+                cinfo = fits_utils.get_column_info(hdus_list, catalog_hdu)
 
         except OSError as oserr:
             errMsg = "Unable to read catalog metadata from FITS file '{}': {}.".format(fits_file, oserr)

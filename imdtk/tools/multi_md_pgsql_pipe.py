@@ -3,14 +3,14 @@
 # Python pipeline to extract image metadata from each FITS images in a directory, storing
 # the metadata into a PostreSQL database.
 #   Written by: Tom Hicks. 7/18/2020.
-#   Last Modified: Update for renames.
+#   Last Modified: Update for CLI utils redo.
 #
 import argparse
 import sys
 
 import imdtk.exceptions as errors
 import imdtk.tools.cli_utils as cli_utils
-from imdtk.core.fits_utils import FITS_IGNORE_KEYS, gen_fits_file_paths
+from imdtk.core.fits_utils import gen_fits_file_paths
 from imdtk.tasks.fields_info import FieldsInfoTask
 from imdtk.tasks.fits_image_md import FitsImageMetadataTask
 from imdtk.tasks.image_aliases import ImageAliasesTask
@@ -43,19 +43,14 @@ def main (argv=None):
 
     cli_utils.add_shared_arguments(parser, TOOL_NAME)
     cli_utils.add_output_arguments(parser, TOOL_NAME)
-    cli_utils.add_input_dir_arguments(parser, TOOL_NAME)
-    cli_utils.add_hdu_arguments(parser, TOOL_NAME)
-    cli_utils.add_fields_info_arguments(parser, TOOL_NAME)
-    cli_utils.add_collection_arguments(parser, TOOL_NAME)
-    cli_utils.add_report_arguments(parser, TOOL_NAME)
+    cli_utils.add_input_dir_argument(parser, TOOL_NAME)
+    cli_utils.add_hdu_argument(parser, TOOL_NAME)
+    cli_utils.add_aliases_argument(parser, TOOL_NAME)
+    cli_utils.add_fields_info_argument(parser, TOOL_NAME)
+    cli_utils.add_collection_argument(parser, TOOL_NAME)
+    cli_utils.add_report_format_argument(parser, TOOL_NAME)
     cli_utils.add_database_arguments(parser, TOOL_NAME)
-
-    # add arguments specific to this pipeline
-    parser.add_argument(
-        '-ig', '--ignore', dest='ignore_list', action="append", metavar='header_key_to_ignore',
-        default=argparse.SUPPRESS,
-        help="Single header key to ignore (may repeat). [default: {} ]".format(FITS_IGNORE_KEYS)
-    )
+    cli_utils.add_ignore_list_argument(parser, TOOL_NAME)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))

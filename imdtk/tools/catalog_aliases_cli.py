@@ -3,7 +3,7 @@
 # Module to add aliases (fields) for the column name fields in an Astropy-derived
 # catalog information metadata structure.
 #   Written by: Tom Hicks. 8/7/2020.
-#   Last Modified: Update for renames.
+#   Last Modified: Update for CLI utils redo.
 #
 import argparse
 import sys
@@ -38,8 +38,8 @@ def main (argv=None):
 
     cli_utils.add_shared_arguments(parser, TOOL_NAME)
     cli_utils.add_output_arguments(parser, TOOL_NAME)
-    cli_utils.add_input_arguments(parser, TOOL_NAME)
-    cli_utils.add_aliases_arguments(parser, TOOL_NAME, default_msg=DEFAULT_CAT_ALIASES_FILEPATH)
+    cli_utils.add_input_file_argument(parser, TOOL_NAME)
+    cli_utils.add_aliases_argument(parser, TOOL_NAME, default_msg=DEFAULT_CAT_ALIASES_FILEPATH)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))

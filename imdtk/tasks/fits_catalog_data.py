@@ -1,7 +1,7 @@
 #
 # Class to extract a catalog data table from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 8/12/2020.
-#   Last Modified: Cleanup table processing steps.
+#   Last Modified: Update for CLI utils redo.
 #
 import os
 import sys
@@ -42,19 +42,19 @@ class FitsCatalogDataTask (IImdTask):
         # process the given, already validated FITS file
         fits_file = self.args.get('fits_file')
         ignore_list = self.args.get('ignore_list') or fits_utils.FITS_IGNORE_KEYS
-        table_hdu = self.args.get('table_hdu', 1)
+        catalog_hdu = self.args.get('catalog_hdu', 1)
 
         try:
             with fits.open(fits_file) as hdus_list:
                 if (not fits_utils.is_catalog_file(hdus_list)):
                     errMsg = "Skipping non-catalog FITS file '{}'".format(fits_file)
                     raise errors.UnsupportedTypeError(errMsg)
-                hdrs = fits_utils.get_header_fields(hdus_list, table_hdu, ignore_list)
-                cinfo = fits_utils.get_column_info(hdus_list, table_hdu)
+                hdrs = fits_utils.get_header_fields(hdus_list, catalog_hdu, ignore_list)
+                cinfo = fits_utils.get_column_info(hdus_list, catalog_hdu)
 
-                fits_rec = hdus_list[table_hdu].data
+                fits_rec = hdus_list[catalog_hdu].data
                 data = fits_utils.rows_from_data(fits_rec)
-                table = Table.read(hdus_list, hdu=table_hdu)
+                table = Table.read(hdus_list, hdu=catalog_hdu)
                 meta = fits_utils.get_table_meta_attribute(table)
 
         except OSError as oserr:
