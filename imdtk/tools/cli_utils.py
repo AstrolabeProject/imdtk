@@ -1,7 +1,7 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Redo: separate and rename argument add methods.
+#   Last Modified: Continue redo: separate table name argument, update doc strings.
 #
 import argparse
 import sys
@@ -26,27 +26,27 @@ INPUT_FILE_EXIT_CODE = 33
 
 
 def add_aliases_argument (parser, tool_name, default_msg=DEFAULT_IMD_ALIASES_FILEPATH):
-    """ Add the argument related to parsing information from aliases files
+    """ Add the argument, specifying the path to a file of data or metadata alias fields,
         to the given argparse parser object. """
     parser.add_argument(
         '-a', '--aliases', dest='alias_file', metavar='filepath',
         default=argparse.SUPPRESS,
-        help="Path to file of aliases for metadata header fields [default: {}]".format(default_msg)
+        help="Path to a file of aliases for data or metadata fields [default: {}]".format(default_msg)
     )
 
 
 def add_catalog_hdu_argument (parser, tool_name):
-    """ Add the argument related to parsing information from HDUs of FITS files
+    """ Add the argument, specifying which HDU of a FITS file contains the catalog data table,
         to the given argparse parser object. """
     parser.add_argument(
         '-chdu', '--catalog_hdu', dest='catalog_hdu', metavar='HDU_index',
         default=1, type=int,
-        help='Index of HDU containing the data table [default: 1 (the second)]'
+        help='Index of the HDU containing the data table [default: 1 (the second)]'
     )
 
 
 def add_catalog_table_argument (parser, tool_name, default_msg='no default'):
-    """ Add the argument related to naming a database catalog table
+    """ Add the argument, naming a database catalog table,
         to the given argparse parser object. """
     parser.add_argument(
         '-ct', '--catalog-table', dest='catalog_table', required=True, metavar='table-name',
@@ -55,7 +55,7 @@ def add_catalog_table_argument (parser, tool_name, default_msg='no default'):
 
 
 def add_collection_argument (parser, tool_name, default_msg='no default'):
-    """ Add the argument related to collection specification
+    """ Add the argument, naming a specific data collection within the database,
         to the given argparse parser object. """
     parser.add_argument(
         '-c', '--collection', dest='collection', metavar='collection-name',
@@ -67,18 +67,12 @@ def add_collection_argument (parser, tool_name, default_msg='no default'):
 def add_database_arguments (parser, tool_name,
                             default_msg=DEFAULT_DBCONFIG_FILEPATH,
                             table_msg=DEFAULT_METADATA_TABLE_NAME):
-    """ Add the arguments related to parsing information from a database configuration file
+    """ Add the arguments, related to configuration of the database,
         to the given argparse parser object. """
     parser.add_argument(
         '-db', '--db-config', dest='dbconfig_file', metavar='filepath',
         default=argparse.SUPPRESS,
         help="Path to database configuration file [default: {}]".format(default_msg)
-    )
-
-    parser.add_argument(
-        '-tn', '--table-name', dest='table_name', metavar='table-name',
-        default=argparse.SUPPRESS,
-        help="Table name for data stored in the database [default: {}]".format(table_msg)
     )
 
     parser.add_argument(
@@ -89,7 +83,7 @@ def add_database_arguments (parser, tool_name,
 
 
 def add_fields_info_argument (parser, tool_name, default_msg=DEFAULT_FIELDS_FILEPATH):
-    """ Add the argument related to parsing information from fields information files
+    """ Add the argument, specifying the path to file containing fields information,
         to the given argparse parser object. """
     parser.add_argument(
         '-fi', '--fields-info', dest='fields_file', metavar='filepath',
@@ -99,7 +93,7 @@ def add_fields_info_argument (parser, tool_name, default_msg=DEFAULT_FIELDS_FILE
 
 
 def add_fits_file_argument (parser, tool_name):
-    """ Add the arguments related to parsing information from FITS files
+    """ Add the argument, specifying a path to a file containing a FITS image or catalog,
         to the given argparse parser object. """
     parser.add_argument(
         '-ff', '--fits-file', dest='fits_file', required=True, metavar='filepath',
@@ -108,7 +102,7 @@ def add_fits_file_argument (parser, tool_name):
 
 
 def add_hdu_argument (parser, tool_name):
-    """ Add the argument, related to parsing information from HDUs of FITS files,
+    """ Add the argument, specifying which HDU of a FITS file contains the image metadata,
         to the given argparse parser object. """
     parser.add_argument(
         '-hdu', '--hdu', dest='which_hdu', metavar='HDU_index',
@@ -118,17 +112,17 @@ def add_hdu_argument (parser, tool_name):
 
 
 def add_ignore_list_argument (parser, tool_name):
-    """ Add the argument, specifying a list of input symbols to ignore,
+    """ Add the argument, specifying a single header keyword to ignore in the input,
         to the given argparse parser object. """
     parser.add_argument(
         '-ig', '--ignore', dest='ignore_list', action="append", metavar='header_key_to_ignore',
         default=argparse.SUPPRESS,
-        help="Single header key to ignore (may repeat). [default: {} ]".format(FITS_IGNORE_KEYS)
+        help="Single header keyword to ignore (may repeat). [default: {} ]".format(FITS_IGNORE_KEYS)
     )
 
 
 def add_input_dir_argument (parser, tool_name):
-    """ Add the argument related to parsing information from a directory of input files
+    """ Add the argument, specifying the path to a directory of input files,
         to the given argparse parser object. """
     parser.add_argument(
         '-idir', '--input-dir', dest='input_dir', required=True, metavar='dirpath',
@@ -137,7 +131,8 @@ def add_input_dir_argument (parser, tool_name):
 
 
 def add_input_file_argument (parser, tool_name):
-    """ Add an input file argument to the given argparse parser object. """
+    """ Add the argument, specifying the path to a single input file,
+        to the given argparse parser object. """
     parser.add_argument(
         '-if', '--input-file', dest='input_file', metavar='filepath',
         default=argparse.SUPPRESS,
@@ -156,7 +151,7 @@ def add_input_file_argument (parser, tool_name):
 
 
 def add_output_arguments (parser, tool_name):
-    """ Add common output arguments to the given argparse parser object. """
+    """ Add common output directive and file arguments to the given argparse parser object. """
     parser.add_argument(
         '-g', '--generate', dest='gen_file_path', action='store_true',
         default=False,
@@ -217,6 +212,16 @@ def add_shared_arguments (parser, tool_name):
         default=False,
         help='Print informational messages during processing [default: False (non-verbose mode)].'
     )
+
+
+def add_table_name_argument (parser, tool_name, default_msg='no default'):
+    """ Add the argument, naming a database table, to the given argparse parser object. """
+    parser.add_argument(
+        '-tn', '--table-name', dest='table_name', metavar='table-name',
+        default=argparse.SUPPRESS,
+        help="Table name for data stored in the database [default: {}]".format(default_msg)
+    )
+
 
 
 def check_catalog_table (catalog_table_name, tool_name, exit_code=CATALOG_TABLE_EXIT_CODE):
