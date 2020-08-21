@@ -2,7 +2,7 @@
 #
 # Python pipeline to extract catalog metadata and create a PostreSQL database table from it.
 #   Written by: Tom Hicks. 8/20/20.
-#   Last Modified: Update for CLI utils redo.
+#   Last Modified: Reorder CLI arguments.
 #
 import argparse
 import sys
@@ -41,10 +41,10 @@ def main (argv=None):
     cli_utils.add_shared_arguments(parser, TOOL_NAME)
     cli_utils.add_input_file_argument(parser, TOOL_NAME)
     cli_utils.add_fits_file_argument(parser, TOOL_NAME)
+    cli_utils.add_catalog_hdu_argument(parser, TOOL_NAME)
     cli_utils.add_aliases_argument(parser, TOOL_NAME, default_msg=DEFAULT_CAT_ALIASES_FILEPATH)
     cli_utils.add_output_arguments(parser, TOOL_NAME)
     cli_utils.add_database_arguments(parser, TOOL_NAME)
-    cli_utils.add_catalog_hdu_argument(parser, TOOL_NAME)
     cli_utils.add_catalog_table_argument(parser, TOOL_NAME)
 
     # actually parse the arguments from the command line

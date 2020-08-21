@@ -2,7 +2,7 @@
 #
 # Module to add information about desired fields to the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/9/20.
-#   Last Modified: Update for CLI utils redo.
+#   Last Modified: Reorder CLI arguments.
 #
 import argparse
 import sys
@@ -35,9 +35,9 @@ def main (argv=None):
     )
 
     cli_utils.add_shared_arguments(parser, TOOL_NAME)
-    cli_utils.add_output_arguments(parser, TOOL_NAME)
     cli_utils.add_input_file_argument(parser, TOOL_NAME)
     cli_utils.add_fields_info_argument(parser, TOOL_NAME)
+    cli_utils.add_output_arguments(parser, TOOL_NAME)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))

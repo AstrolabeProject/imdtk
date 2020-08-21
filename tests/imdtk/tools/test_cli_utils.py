@@ -1,6 +1,6 @@
 # Tests for the CLI utilities module.
 #   Written by: Tom Hicks. 7/15/2020.
-#   Last Modified: Update for CLI utils redo.
+#   Last Modified: Update for table name argument separation in CLI utils.
 #
 import argparse
 import pytest
@@ -61,13 +61,15 @@ class TestCliUtils(object):
             args = vars(parser.parse_args([])) # catalog table name is required
         assert se.type == SystemExit
 
-        args = vars(parser.parse_args(['-ct', 'cat_table_name']))
+        args = vars(parser.parse_args(['-ct', 'TABLE_NAME']))
         print(args)
         assert 'catalog_table' in args
+        assert args.get('catalog_table') == 'TABLE_NAME'
 
-        args = vars(parser.parse_args(['--catalog-table', 'catalog_table_name']))
+        args = vars(parser.parse_args(['--catalog-table', 'a_cat_table']))
         print(args)
         assert 'catalog_table' in args
+        assert args.get('catalog_table') == 'a_cat_table'
 
 
     def test_add_collection_argument(self):
@@ -95,19 +97,19 @@ class TestCliUtils(object):
         print(args)
         assert 'dbconfig_file' not in args  # no default
         assert 'sql_only' in args           # it has a default
-        assert 'table_name' not in args     # no default
+        assert 'table_name' not in args     # was removed
 
         args = vars(parser.parse_args(['-db', 'dbconfig.ini']))
         print(args)
         assert 'dbconfig_file' in args
+        assert args.get('dbconfig_file') == 'dbconfig.ini'
         assert 'sql_only' in args           # it has a default
-        assert 'table_name' not in args     # no default
+        assert 'table_name' not in args     # was removed
 
-        args = vars(parser.parse_args([
-            '--db-config', '/fake/dbconfig.ini', '--table-name', 'mytable', '--sql-only']))
+        args = vars(parser.parse_args(['--db-config', '/fake/dbconfig.ini', '--sql-only']))
         print(args)
         assert 'dbconfig_file' in args
-        assert 'table_name' in args
+        assert args.get('dbconfig_file') == '/fake/dbconfig.ini'
         assert 'sql_only' in args
 
 
@@ -288,6 +290,25 @@ class TestCliUtils(object):
         assert 'version' not in args        # no default
         assert 'debug' in args              # it has a default
         assert 'verbose' in args            # it has a default
+
+
+    def test_add_table_name_argument(self):
+        parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+        utils.add_table_name_argument(parser, TOOL_NAME)
+
+        args = vars(parser.parse_args([]))
+        print(args)
+        assert 'table_name' not in args
+
+        args = vars(parser.parse_args(['-tn', 'TABLE_NAME']))
+        print(args)
+        assert 'table_name' in args
+        assert args.get('table_name') == 'TABLE_NAME'
+
+        args = vars(parser.parse_args(['--table-name', 'a_table_name']))
+        print(args)
+        assert 'table_name' in args
+        assert args.get('table_name') == 'a_table_name'
 
 
     def test_check_alias_file(self):

@@ -2,7 +2,7 @@
 #
 # Module to add aliases (fields) for the header fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 5/30/2020.
-#   Last Modified: Update for CLI utils redo.
+#   Last Modified: Reorder CLI arguments.
 #
 import argparse
 import sys
@@ -35,9 +35,9 @@ def main (argv=None):
     )
 
     cli_utils.add_shared_arguments(parser, TOOL_NAME)
-    cli_utils.add_output_arguments(parser, TOOL_NAME)
     cli_utils.add_input_file_argument(parser, TOOL_NAME)
     cli_utils.add_aliases_argument(parser, TOOL_NAME)
+    cli_utils.add_output_arguments(parser, TOOL_NAME)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))

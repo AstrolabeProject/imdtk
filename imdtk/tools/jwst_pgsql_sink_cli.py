@@ -2,7 +2,7 @@
 #
 # Module to store incoming data in an ObsCore PostgreSQL database.
 #   Written by: Tom Hicks. 6/21/20.
-#   Last Modified: Update for CLI utils redo.
+#   Last Modified: Update for table name argument separation in CLI utils. Reorder CLI arguments.
 #
 import argparse
 import sys
@@ -35,9 +35,10 @@ def main (argv=None):
     )
 
     cli_utils.add_shared_arguments(parser, TOOL_NAME)
-    cli_utils.add_output_arguments(parser, TOOL_NAME)
     cli_utils.add_input_file_argument(parser, TOOL_NAME)
+    cli_utils.add_output_arguments(parser, TOOL_NAME)
     cli_utils.add_database_arguments(parser, TOOL_NAME)
+    cli_utils.add_table_name_argument(parser, TOOL_NAME)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))

@@ -3,7 +3,7 @@
 # Python pipeline to extract image metadata from each FITS images in a directory, storing
 # the metadata into a PostreSQL database.
 #   Written by: Tom Hicks. 7/18/2020.
-#   Last Modified: Update for CLI utils redo.
+#   Last Modified: Update for table name argument separation in CLI utils. Reorder CLI arguments.
 #
 import argparse
 import sys
@@ -42,15 +42,16 @@ def main (argv=None):
     )
 
     cli_utils.add_shared_arguments(parser, TOOL_NAME)
-    cli_utils.add_output_arguments(parser, TOOL_NAME)
     cli_utils.add_input_dir_argument(parser, TOOL_NAME)
     cli_utils.add_hdu_argument(parser, TOOL_NAME)
+    cli_utils.add_ignore_list_argument(parser, TOOL_NAME)
     cli_utils.add_aliases_argument(parser, TOOL_NAME)
     cli_utils.add_fields_info_argument(parser, TOOL_NAME)
     cli_utils.add_collection_argument(parser, TOOL_NAME)
     cli_utils.add_report_format_argument(parser, TOOL_NAME)
+    cli_utils.add_output_arguments(parser, TOOL_NAME)
     cli_utils.add_database_arguments(parser, TOOL_NAME)
-    cli_utils.add_ignore_list_argument(parser, TOOL_NAME)
+    cli_utils.add_table_name_argument(parser, TOOL_NAME)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))
