@@ -1,6 +1,6 @@
 # Tests for the metata utilities module.
 #   Written by: Tom Hicks. 7/16/2020.
-#   Last Modified: Add tests for get_aliased_column_names.
+#   Last Modified: Add test for get_data.
 #
 import imdtk.tasks.metadata_utils as utils
 
@@ -99,6 +99,14 @@ class TestMetadataUtils(object):
             "id",
             "s_ra",
             "s_dec",
+        ],
+        "data": [
+            [ 100, 53.199042819, -27.853734606, 2.2401, 1.968, 2.032,
+              1.908737, 1.794, 2.267, 1.645, 2.636, 0.211,
+              2.94, 9.0, 1.21917, 2.053, 0.977, 1.7755 ],
+            [ 200, 53.202861572, -27.852506463, 2.4176, 3.785, 4.943,
+              0.7698837, 2.118, 7.504, 0.771, 9.485, 0.219,
+              12.567, 9.0, 16.0073, 4.809, 0.979, 6.9545 ]
         ]
     }
 
@@ -164,6 +172,23 @@ class TestMetadataUtils(object):
         assert 'COMMENT' not in data
 
 
+    def test_get_aliased_column_names (self):
+        data = utils.get_aliased_column_names(self.cat_md)
+        print(data)
+        assert data is not None
+        assert len(data) > 1
+        assert 'id' in data
+        assert 's_ra' in data
+        assert 's_dec' in data
+
+        assert 'ID' not in data
+        assert 'RA' not in data
+        assert 'DEC' not in data
+        assert 'COMMENT' not in data
+        assert 'name' not in data
+        assert 'kron_flag' not in data
+
+
     def test_get_column_names (self):
         data = utils.get_column_names(self.cat_md)
         print(data)
@@ -188,18 +213,14 @@ class TestMetadataUtils(object):
         assert 'Q' not in data
 
 
-    def test_get_aliased_column_names (self):
-        data = utils.get_aliased_column_names(self.cat_md)
+    def test_get_data (self):
+        data = utils.get_data(self.cat_md)
         print(data)
         assert data is not None
-        assert len(data) > 1
-        assert 'id' in data
-        assert 's_ra' in data
-        assert 's_dec' in data
-
-        assert 'ID' not in data
-        assert 'RA' not in data
-        assert 'DEC' not in data
-        assert 'COMMENT' not in data
-        assert 'name' not in data
-        assert 'kron_flag' not in data
+        assert len(data) == 2
+        assert data[0][0] == 100
+        assert data[0][5] == 2.032
+        assert data[0][17] == 1.7755
+        assert data[1][0] == 200
+        assert data[1][5] == 4.943
+        assert data[1][17] == 6.9545
