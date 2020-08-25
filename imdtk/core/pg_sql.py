@@ -1,7 +1,7 @@
 #
 # Module to interact with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Make insert(s) use schema from DB config.
+#   Last Modified: Add stubs for fill_table* methods.
 #
 import sys
 
@@ -108,6 +108,31 @@ def fetch_rows (dbconfig, sql_query_string, sql_values):
         conn.close()
 
     return rows
+
+
+def fill_table (dbconfig, data, catalog_table):
+    """
+    Insert the given list of data row lists into the named catalog table using
+    the given DB parameters.
+    """
+    val_lst = ('%s,' * 18)[:-1]
+    ftqry = "insert into sia.{} values({});".format(catalog_table, val_lst)
+    execute_sql(dbconfig, ftqry, data[0])
+
+    # TODO: IMPLEMENT insertion of rows LATER
+    # (sql_fmt_str, sql_values) = pg_gen.gen_fill_table(dbconfig, data, table_name)
+    # execute_sql(dbconfig, sql_fmt_str, sql_values)
+
+
+def fill_table_str (dbconfig, data, catalog_table):
+    """
+    Return an SQL string to Insert the given list of data row lists into the
+    named catalog table using the given DB parameters.
+    """
+    return "insert into catalog_table values({});".format(data[0])
+    # TODO: IMPLEMENT insertion of rows LATER
+    # (sql_fmt_str, sql_values) = pg_gen.gen_fill_table(dbconfig, data, table_name)
+    # return sql_as_string(dbconfig, sql_fmt_str, sql_values)
 
 
 def insert_hybrid_row (dbconfig, datadict, table_name):

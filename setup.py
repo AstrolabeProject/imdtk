@@ -13,6 +13,7 @@ setup(
             'csv_sink        = imdtk.tools.csv_file_sink_cli:main',
             'fields_info     = imdtk.tools.fields_info_cli:main',
             'fits_cat_data   = imdtk.tools.fits_catalog_data_cli:main',
+            'fits_cat_fill   = imdtk.tools.fits_catalog_table_sink_cli:main',
             'fits_cat_md     = imdtk.tools.fits_catalog_md_cli:main',
             'fits_cat_mktbl  = imdtk.tools.fits_catalog_mktbl_sink_cli:main',
             'fits_cat_mktbl_pipe = imdtk.tools.fits_catalog_mktbl_pipe:main',
