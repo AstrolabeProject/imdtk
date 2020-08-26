@@ -1,7 +1,7 @@
 #
 # Module to curate FITS data with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/24/2020.
-#   Last Modified: Make insert(s) use schema from DB config.
+#   Last Modified: Rename method to gen_insert_row. Add gen_insert_rows method.
 #
 from config.settings import DEC_ALIASES, ID_ALIASES, RA_ALIASES, SQL_FIELDS_HYBRID
 import imdtk.exceptions as errors
@@ -124,6 +124,35 @@ def gen_column_decls_sql (column_names, column_formats):
     return ["{0} {1}".format(n, t) for n, t in zip(col_names_clean, col_types)]
 
 
+def gen_create_table_sql (args, dbconfig, column_names, column_formats):
+    """
+    Generate the SQL for creating a table, given column names, FITS format specs, and
+    general arguments.
+
+    :param args: dictionary containing command line arguments.
+    :param dbconfig: dictionary containing database parameters.
+    :param column_names: a list of column name strings.
+    :param column_formats: a list of FITS format specifiers strings.
+
+    :return a list of SQL declaration strings for the table columns (no trailing commas!)
+    :raises ProcessingError if any database parameters required by this module are missing.
+    """
+    # raise error is any required database parameters are missing
+    check_missing_parameters(dbconfig)
+
+    # combine CLI and DB arguments for easy use with templating
+    argmix = args.copy()
+    argmix.update(dbconfig)
+
+    ddl = []
+
+    ddl.extend(gen_search_path_sql(argmix))
+    ddl.extend(gen_table_sql(argmix, column_names, column_formats))
+    ddl.extend(gen_table_indices_sql(argmix, column_names))
+
+    return ddl
+
+
 def gen_hybrid_insert (dbconfig, datadict, table_name):
     """
     Return appropriate data structures for inserting the given data dictionary
@@ -158,14 +187,14 @@ def gen_hybrid_insert (dbconfig, datadict, table_name):
         raise errors.ProcessingError(errMsg)
 
 
-def gen_insert (dbconfig, datadict, table_name):
+def gen_insert_row (dbconfig, datadict, table_name):
     """
     Return appropriate data structures for inserting the given data dictionary
     into a database via a database access library. Currently using Psycopg2,
     so return a tuple of an INSERT template string and a sequence of values.
     """
     if (not datadict):                      # sanity check
-        errMsg = "(gen_insert): Empty data dictionary cannot be inserted into table."
+        errMsg = "(gen_insert_row): Empty data dictionary cannot be inserted into table."
         raise errors.ProcessingError(errMsg)
 
     schema_clean = clean_id(dbconfig.get('db_schema_name'))
@@ -178,6 +207,20 @@ def gen_insert (dbconfig, datadict, table_name):
     place_holders = ', '.join(['%s' for v in values])
     sql_fmt_str = "insert into {0}.{1} ({2}) values ({3});".format(schema_clean, table_clean, keys, place_holders)
     return (sql_fmt_str, values)
+
+
+def gen_insert_rows (dbconfig, table_name):
+    """
+    Return appropriate data structures for later inserting a list of rows
+    into a database via a database access library. Currently using Psycopg2, so return
+    an INSERT template string which can later be used to insert a sequence of values.
+
+    Note: The generated SQL expects to be used by the psycopg2.extras.execute_values() method!
+          This makes it incompatible with the rest of the psycopg2 "execute" methods.
+    """
+    schema_clean = clean_id(dbconfig.get('db_schema_name'))
+    table_clean = clean_id(table_name)
+    return "insert into {0}.{1} values %s;".format(schema_clean, table_clean)
 
 
 def gen_search_path_sql (argmix):
@@ -280,32 +323,3 @@ def gen_table_indices_sql (argmix, column_names):
             "CREATE INDEX {0}_{1}_idx on {2}.{3} USING btree ({4});".format(cattbl_clean, ra, schema_clean, cattbl_clean, ra) )
 
     return ddl                              # return list of SQL strings
-
-
-def gen_create_table_sql (args, dbconfig, column_names, column_formats):
-    """
-    Generate the SQL for creating a table, given column names, FITS format specs, and
-    general arguments.
-
-    :param args: dictionary containing command line arguments.
-    :param dbconfig: dictionary containing database parameters.
-    :param column_names: a list of column name strings.
-    :param column_formats: a list of FITS format specifiers strings.
-
-    :return a list of SQL declaration strings for the table columns (no trailing commas!)
-    :raises ProcessingError if any database parameters required by this module are missing.
-    """
-    # raise error is any required database parameters are missing
-    check_missing_parameters(dbconfig)
-
-    # combine CLI and DB arguments for easy use with templating
-    argmix = args.copy()
-    argmix.update(dbconfig)
-
-    ddl = []
-
-    ddl.extend(gen_search_path_sql(argmix))
-    ddl.extend(gen_table_sql(argmix, column_names, column_formats))
-    ddl.extend(gen_table_indices_sql(argmix, column_names))
-
-    return ddl
