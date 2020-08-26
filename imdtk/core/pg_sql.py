@@ -1,11 +1,12 @@
 #
 # Module to interact with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Add stubs for fill_table* methods.
+#   Last Modified: Add insert_rows_sql method. Implement fill_table* methods. Update for rename to gen_insert_row.
 #
 import sys
 
 import psycopg2
+from psycopg2.extras import execute_values
 
 import imdtk.exceptions as errors
 import imdtk.core.pg_gen_sql as pg_gen
@@ -65,14 +66,14 @@ def create_table_sql (args, dbconfig, column_names, column_formats):
 def execute_sql (dbconfig, sql_query_string, sql_values):
     """
     Open a database connection using the given DB configuration and execute the given SQL
-    format string with the given SQL values FOR SIDE EFFECT (i.e. no values are returned).
+    format string with the given SQL values list FOR SIDE EFFECT (i.e. no values are returned).
 
     :param dbconfig: dictionary containing database parameters used by this method: db_uri
         Note: the given database configuration must contain a valid 'db_uri' string.
     :param sql_query_string: a valid Psycopg2 query string. This is similar to a
         standard python template string, BUT NOT THE SAME. See:
         https://www.psycopg.org/docs/usage.html#passing-parameters-to-sql-queries
-    :param sql_value: a list of values to substitute into the query string.
+    :param sql_values: a list of values to substitute into the query string.
     """
     db_uri = dbconfig.get('db_uri')
     conn = psycopg2.connect(db_uri)
@@ -115,24 +116,27 @@ def fill_table (dbconfig, data, catalog_table):
     Insert the given list of data row lists into the named catalog table using
     the given DB parameters.
     """
-    val_lst = ('%s,' * 18)[:-1]
-    ftqry = "insert into sia.{} values({});".format(catalog_table, val_lst)
-    execute_sql(dbconfig, ftqry, data[0])
+    if (not data):                          # sanity check
+        errMsg = "(fill_table): Empty data list cannot be inserted into table."
+        raise errors.ProcessingError(errMsg)
 
-    # TODO: IMPLEMENT insertion of rows LATER
-    # (sql_fmt_str, sql_values) = pg_gen.gen_fill_table(dbconfig, data, table_name)
-    # execute_sql(dbconfig, sql_fmt_str, sql_values)
+    sql_fmt_str = pg_gen.gen_insert_rows(dbconfig, catalog_table)
+    insert_rows_sql(dbconfig, sql_fmt_str, data)  # data already in the correct form
+    return len(data)                              # assume all rows correctly inserted
 
 
 def fill_table_str (dbconfig, data, catalog_table):
     """
-    Return an SQL string to Insert the given list of data row lists into the
+    Return a single EXAMPLE SQL string to insert the FIRST data row ONLY into the
     named catalog table using the given DB parameters.
+
+    Note: Because the generated SQL expects to be used by the psycopg2.extras.execute_values
+          method, it cannot be correctly interpolated by the psycopg2.cursor.mogrify method
+          in sql_as_string. Therefore we generate the returned SQL string manually.
     """
-    return "insert into catalog_table values({});".format(data[0])
-    # TODO: IMPLEMENT insertion of rows LATER
-    # (sql_fmt_str, sql_values) = pg_gen.gen_fill_table(dbconfig, data, table_name)
-    # return sql_as_string(dbconfig, sql_fmt_str, sql_values)
+    sql_fmt_str = pg_gen.gen_insert_rows(dbconfig, catalog_table)
+    valu = '(' + ', '.join([str(datum) for datum in data[0]]) + ')'
+    return sql_fmt_str.replace('%s', valu)
 
 
 def insert_hybrid_row (dbconfig, datadict, table_name):
@@ -158,7 +162,7 @@ def insert_row (dbconfig, datadict, table_name):
     """
     Insert the given data dictionary into the named SQL table using the given DB parameters.
     """
-    (sql_fmt_str, sql_values) = pg_gen.gen_insert(dbconfig, datadict, table_name)
+    (sql_fmt_str, sql_values) = pg_gen.gen_insert_row(dbconfig, datadict, table_name)
     execute_sql(dbconfig, sql_fmt_str, sql_values)
 
 
@@ -166,8 +170,33 @@ def insert_row_str (dbconfig, datadict, table_name):
     """
     Return an SQL string to insert a data dictionary into the named SQL table.
     """
-    (sql_fmt_str, sql_values) = pg_gen.gen_insert(dbconfig, datadict, table_name)
+    (sql_fmt_str, sql_values) = pg_gen.gen_insert_row(dbconfig, datadict, table_name)
     return sql_as_string(dbconfig, sql_fmt_str, sql_values)
+
+
+def insert_rows_sql (dbconfig, sql_query_string, data_rows):
+    """
+    Open a database connection using the given DB configuration and execute the given
+    SQL format string with the given list of rows (list of values) FOR SIDE EFFECT
+    (i.e. no values are returned).
+
+    Note: The query string MUST be compatible with the psycopg2.extras.execute_values method!
+
+    :param dbconfig: dictionary containing database parameters used by this method: db_uri
+        Note: the given database configuration must contain a valid 'db_uri' string.
+    :param sql_query_string: a valid Psycopg2 query string. This is similar to a
+        standard python template string, BUT NOT THE SAME. See:
+        https://www.psycopg.org/docs/extras.html#psycopg2.extras.execute_values
+    :param data_rows: a list of rows (list of values) to substitute into the query string.
+    """
+    db_uri = dbconfig.get('db_uri')
+    conn = psycopg2.connect(db_uri)
+    try:
+        with conn:
+            with conn.cursor() as cursor:
+                execute_values(cursor, sql_query_string, data_rows)
+    finally:
+        conn.close()
 
 
 def list_catalog_tables (args, dbconfig, db_schema=None):
