@@ -1,7 +1,7 @@
 #
 # Class to fill a DB table from the data of a FITS catalog file.
 #   Written by: Tom Hicks. 8/24/2020
-#   Last Modified: Initial creation.
+#   Last Modified: Better error message.
 #
 import sys
 
@@ -42,7 +42,7 @@ class FitsCatalogFillTableSink (ISQLSink):
         # check table name to see if it is still available in the database
         catalog_table = self.args.get('catalog_table')
         if (not self.table_exists(dbconfig, catalog_table)):
-            errMsg = "Catalog table name to fill '{}' does not exist.".format(catalog_table)
+            errMsg = "Catalog table to fill '{}' does not exist.".format(catalog_table)
             raise errors.ProcessingError(errMsg)
 
         # file information is needed by the SQL generation methods below
