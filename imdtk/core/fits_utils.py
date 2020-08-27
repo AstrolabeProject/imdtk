@@ -1,7 +1,7 @@
 #
 # Module to provide FITS utility functions for Astrolabe code.
 #   Written by: Tom Hicks. 1/26/2020.
-#   Last Modified: Rename method to rows_from_data.
+#   Last Modified: Convert table data using numpy.ndarray conversion.
 #
 import fnmatch
 # import pandas
@@ -181,7 +181,7 @@ def rows_from_data (data):
     Return a list of rows for the given astropy.io.fits.fitsrec.FITS_rec data.
     Each row in the returned list is a heterogeneous list of values for the row.
     """
-    return [list(row) for row in data]
+    return data.tolist()                    # use numpy.ndarray conversion function
 
 
 # def table_to_JSON (table, orient='values'):
