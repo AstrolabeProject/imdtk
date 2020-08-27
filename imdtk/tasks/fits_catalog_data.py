@@ -1,14 +1,13 @@
 #
 # Class to extract a catalog data table from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 8/12/2020.
-#   Last Modified: Update for CLI utils redo.
+#   Last Modified: Update for data array conversion in FITS utils.
 #
 import os
 import sys
 
 from astropy.io import fits
 from astropy.table import Table
-from numpyencoder import NumpyEncoder
 
 import imdtk.exceptions as errors
 import imdtk.core.fits_utils as fits_utils
@@ -67,14 +66,6 @@ class FitsCatalogDataTask (IImdTask):
         outdata['column_info'] = cinfo      # add column metadata to the output
         outdata['data'] = data              # add the data table to the output
         return outdata                      # return the results of processing
-
-
-    def output_JSON (self, outdata, file_path=None, **json_keywords):
-        """
-        Override this method to add the numpy encoder class needed to
-        serialize astropy.io.fits.fitsrec.FITS_rec data.
-        """
-        super().output_JSON(outdata, file_path=file_path, cls=NumpyEncoder)
 
 
 
