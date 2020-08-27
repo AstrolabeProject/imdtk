@@ -359,7 +359,30 @@
 # fits_cat_md -ff /catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v
 
 # echo "---------- Make table Pipeline ----------"
-fits_cat_mktbl_pipe -ff /catalogs/small_table.fits -ct test_tbl -sql -g -v
+# fits_cat_mktbl_pipe -ff /catalogs/small_table.fits -ct test_tbl -sql -g -v
 # fits_cat_mktbl_pipe -ff /catalogs/small_table.fits -ct test_tbl -v
 
+
+# fits_cat_md -ff /catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v
+# fits_cat_data -ff /catalogs/small_table.fits -v | fits_cat_fill -ct test_tbl -v -sql -g
+# fits_cat_data -ff /catalogs/small_table.fits -v | fits_cat_fill -ct test_tbl -v
+
+# echo "---------- Fill table Pipeline ----------"
+# fits_cat_table_pipe -ff /catalogs/small_table.fits -ct test_tbl -v -sql -g
+
+# echo "---------- Make & Fill table Pipeline ----------"
+# fits_cat_md -ff /catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl2 -v
+# fits_cat_mktbl_pipe -ff /catalogs/small_table.fits -ct test_tbl2 -v
+fits_cat_mktbl_pipe -ff /catalogs/small_table.fits -a /imdtk/config/jwst-cat-aliases.ini -ct test_tbl2 -v
+fits_cat_table_pipe -ff /catalogs/small_table.fits -ct test_tbl2 -v
+
+# Medium sized (~1M) data file:
+# fits_cat_mktbl_pipe -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -a /imdtk/config/jwst-cat-aliases.ini -ct test_ez -v
+# fits_cat_mktbl_pipe -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -ct test_ez -v
+# fits_cat_table_pipe -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -ct test_ez -v
+
+# Medium sized (~2.9M) data file:
+# fits_cat_mktbl_pipe -ff /catalogs/DC_191217/Photometric_Catalog.F200W_kron_f80.fits -a /imdtk/config/jwst-cat-aliases.ini -ct test_pho -v
+# fits_cat_mktbl_pipe -ff /catalogs/DC_191217/Photometric_Catalog.F200W_kron_f80.fits -ct test_pho -v
+# fits_cat_table_pipe -ff /catalogs/DC_191217/Photometric_Catalog.F200W_kron_f80.fits -ct test_pho -v
 # echo "============================================"
