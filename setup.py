@@ -17,6 +17,7 @@ setup(
             'fits_cat_md     = imdtk.tools.fits_catalog_md_cli:main',
             'fits_cat_mktbl  = imdtk.tools.fits_catalog_mktbl_sink_cli:main',
             'fits_cat_mktbl_pipe = imdtk.tools.fits_catalog_mktbl_pipe:main',
+            'fits_cat_table_pipe = imdtk.tools.fits_catalog_table_pipe:main',
             'fits_img_md     = imdtk.tools.fits_image_md_cli:main',
             'img_aliases     = imdtk.tools.image_aliases_cli:main',
             'jwst_oc_calc    = imdtk.tools.jwst_oc_calc_cli:main',
