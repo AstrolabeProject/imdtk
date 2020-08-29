@@ -16,7 +16,6 @@ IMG=imdtk:devel
 NAME=imdtk
 NET=vos_net
 PROG=imdtk
-RUN=${SCRIPTS}/runit
 SHELL=/bin/bash
 STACK=vos
 TARG=/imdtk
