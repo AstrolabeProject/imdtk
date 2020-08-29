@@ -39,7 +39,7 @@ help:
 	@echo '     watch     - show logfile for a running container'
 
 bash:
-	docker run -it --rm --name ${NAME} -v ${IMGS}:/images:ro -v ${WORKDIR}:/work  -v ${RUN}:/imdtk/runit --entrypoint /bin/bash ${TSTIMG}
+	docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs -v ${IMGS}:/images:ro -v ${SCRIPTS}:/imdtk/scripts -v ${WORKDIR}:/work --entrypoint /bin/bash ${TSTIMG} ${ARGS}
 
 cleancache:
 	find . -name __pycache__ -print | grep -v .venv | xargs rm -rf
@@ -64,10 +64,10 @@ run:
 	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs -v ${IMGS}:/images:ro -v ${WORKDIR}:/work -v ${RUN}:/imdtk/runit ${IMG} ${ARGS}
 
 runit:
-	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs -v ${IMGS}:/images:ro -v ${WORKDIR}:/work -v ${RUN}:/imdtk/runit ${TSTIMG} ${ARGS}
+	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs -v ${IMGS}:/images:ro -v ${SCRIPTS}:/imdtk/scripts -v ${WORKDIR}:/work -v ${RUN}:/imdtk/runit ${TSTIMG} ${ARGS}
 
 runtep:
-	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs -v ${IMGS}:/images:ro -v ${WORKDIR}:/work --entrypoint=${EP} ${TSTIMG} ${ARGS}
+	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs -v ${IMGS}:/images:ro -v ${SCRIPTS}:/imdtk/scripts -v ${WORKDIR}:/work --entrypoint ${EP} ${TSTIMG} ${ARGS}
 
 runt1:
 	docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs -v ${IMGS}:/images:ro --entrypoint pytest ${TSTIMG} -vv ${TARG}
