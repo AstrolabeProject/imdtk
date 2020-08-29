@@ -1,16 +1,21 @@
+# environment variables for Docker container run parameters.
+TOPLVL=${PWD}
+CATS=${TOPLVL}/catalogs
+IMGS=${TOPLVL}/images
+SCRIPTS=${TOPLVL}/scripts
+WORK=${TOPLVL}/work
+
 ARGS=
-CATS=${PWD}/catalogs
+APP_ROOT=/imdtk
+CONSCRIPTS=${APP_ROOT}/scripts
 COLLECTION=JWST
 ENVLOC=/etc/trhenv
 EP=/bin/bash
 IMG=imdtk:devel
-IMGS=${PWD}/images
 NAME=imdtk
 NET=vos_net
-WORKDIR=${PWD}/work
 PROG=imdtk
-SCRIPTS=${PWD}/scripts
-RUN=${SCRIPTS}/runit
+SHELL=/bin/bash
 STACK=vos
 TARG=/imdtk
 TSTIMG=imdtk:test
@@ -39,13 +44,13 @@ help:
 	@echo '     watch     - show logfile for a running container'
 
 bash:
-	docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs -v ${IMGS}:/images:ro -v ${SCRIPTS}:/imdtk/scripts -v ${WORKDIR}:/work --entrypoint /bin/bash ${TSTIMG} ${ARGS}
+	docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs:ro -v ${IMGS}:/images:ro -v ${SCRIPTS}:${CONSCRIPTS} -v ${WORK}:/work --entrypoint ${SHELL} ${TSTIMG} ${ARGS}
 
 cleancache:
 	find . -name __pycache__ -print | grep -v .venv | xargs rm -rf
 
 cleanwork:
-	@rm ${WORKDIR}/*.json ${WORKDIR}/*.pickle ${WORKDIR}/*.sql ${WORKDIR}/*.csv
+	@rm ${WORK}/*.json ${WORK}/*.pickle ${WORK}/*.sql ${WORK}/*.csv
 
 docker:
 	docker build -t ${IMG} .
@@ -58,22 +63,22 @@ down:
 
 exec:
 	docker cp .bash_env ${NAME}:${ENVLOC}
-	docker exec -it ${NAME} bash
+	docker exec -it ${NAME} ${EP}
 
 run:
-	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs -v ${IMGS}:/images:ro -v ${WORKDIR}:/work -v ${RUN}:/imdtk/runit ${IMG} ${ARGS}
+	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs:ro -v ${IMGS}:/images:ro -v ${SCRIPTS}:${CONSCRIPTS} -v ${WORK}:/work ${IMG} ${ARGS}
 
 runit:
-	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs -v ${IMGS}:/images:ro -v ${SCRIPTS}:/imdtk/scripts -v ${WORKDIR}:/work -v ${RUN}:/imdtk/runit ${TSTIMG} ${ARGS}
+	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs:ro -v ${IMGS}:/images:ro -v ${SCRIPTS}:${CONSCRIPTS} -v ${WORK}:/work ${TSTIMG} ${ARGS}
 
 runtep:
-	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs -v ${IMGS}:/images:ro -v ${SCRIPTS}:/imdtk/scripts -v ${WORKDIR}:/work --entrypoint ${EP} ${TSTIMG} ${ARGS}
+	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs:ro -v ${IMGS}:/images:ro -v ${SCRIPTS}:${CONSCRIPTS} -v ${WORK}:/work --entrypoint ${EP} ${TSTIMG} ${ARGS}
 
 runt1:
-	docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs -v ${IMGS}:/images:ro --entrypoint pytest ${TSTIMG} -vv ${TARG}
+	docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs:ro -v ${IMGS}:/images:ro --entrypoint pytest ${TSTIMG} -vv ${TARG}
 
 runtc:
-	docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs -v ${IMGS}:/images:ro --entrypoint pytest ${TSTIMG} -vv --cov-report term-missing --cov ${TARG}
+	docker run -it --rm --network ${NET} --name ${NAME} -v ${CATS}:/catalogs:ro -v ${IMGS}:/images:ro --entrypoint pytest ${TSTIMG} -vv --cov-report term-missing --cov ${TARG}
 
 stop:
 	docker stop ${NAME}
