@@ -7,7 +7,7 @@ ARG TESTS=notests
 ENV RUNNING_IN_CONTAINER True
 ENV INSTALL_PATH /imdtk
 
-RUN mkdir -p $INSTALL_PATH /catalogs /images /work
+RUN mkdir -p $INSTALL_PATH $INSTALL_PATH/scripts /catalogs /images /work
 
 WORKDIR $INSTALL_PATH
 
