@@ -15,6 +15,7 @@
 # fields_info -d --version
 # fits_cat_md -d --version
 # fits_cat_mktbl -d --version
+fits_cat_table_pipe -d --version
 # fits_img_md -d --version
 # img_aliases -d --version
 # jwst_oc_calc -d --version
@@ -39,6 +40,8 @@
 # fits_cat_md --help
 # echo "--------------------------------------------"
 # fits_cat_mktbl --help
+# echo "--------------------------------------------"
+fits_cat_table_pipe --help
 # echo "--------------------------------------------"
 # fits_img_md --help
 # echo "--------------------------------------------"
@@ -373,8 +376,8 @@
 # echo "---------- Make & Fill table Pipeline ----------"
 # fits_cat_md -ff /catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl2 -v
 # fits_cat_mktbl_pipe -ff /catalogs/small_table.fits -ct test_tbl2 -v
-fits_cat_mktbl_pipe -ff /catalogs/small_table.fits -a /imdtk/config/jwst-cat-aliases.ini -ct test_tbl2 -v
-fits_cat_table_pipe -ff /catalogs/small_table.fits -ct test_tbl2 -v
+# fits_cat_mktbl_pipe -ff /catalogs/small_table.fits -a /imdtk/config/jwst-cat-aliases.ini -ct test_tbl2 -v
+# fits_cat_table_pipe -ff /catalogs/small_table.fits -ct test_tbl2 -v
 
 # Medium sized (~1M) data file:
 # fits_cat_mktbl_pipe -ff /catalogs/DC_191217/EAZY_results_summary_F356W.fits -a /imdtk/config/jwst-cat-aliases.ini -ct test_ez -v

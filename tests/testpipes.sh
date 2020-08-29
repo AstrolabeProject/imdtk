@@ -15,6 +15,7 @@ csv_sink -d --version
 fields_info -d --version
 fits_cat_md -d --version
 fits_cat_mktbl -d --version
+fits_cat_table_pipe -d --version
 fits_img_md -d --version
 img_aliases -d --version
 jwst_oc_calc -d --version
@@ -39,6 +40,8 @@ echo "--------------------------------------------"
 fits_cat_md --help
 echo "--------------------------------------------"
 fits_cat_mktbl --help
+echo "--------------------------------------------"
+fits_cat_table_pipe --help
 echo "--------------------------------------------"
 fits_img_md --help
 echo "--------------------------------------------"
