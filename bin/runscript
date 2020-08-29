@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# Shell script to run a specified script or program inside an ImdTk container environment.
+# This scripts launches the container which then runs the specified script/program.
+#
+
+# echo "ARGS=$@"
+
+Usage () {
+   echo "Usage: $0 script_name [arguments..] "
+   echo "where: script_name = the name of the script to run (from the 'scripts' directory)"
+   echo "       arguments = any arguments used by the script"
+}
+
+if [ $# -lt 1 -o "$1" = "-h" -o "$1" = "--help" ]; then
+    Usage
+    exit 2
+else
+    SCRIPT_NAME=$1
+    shift
+fi
+
+# echo "SCRIPT=${SCRIPT_NAME}, ARGS=$@"
+
+# Import the local configuration environment for running the Docker container
+source cmds-env.sh
+
+docker run -it --rm --network ${NET} -v ${CATS}:/catalogs:ro -v ${IMGS}:/images:ro -v ${WORK}:/work -v ${SCRIPTS}:${CONSCRIPTS} --entrypoint ${CONSCRIPTS}/${SCRIPT_NAME} ${TSTIMG} "$@"
