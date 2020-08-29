@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='ImdTk',
-    version='0.7.0',
+    version='0.17.0',
     packages=find_packages(),
     package_data={'imdtk': ['resources/*.txt', 'resources/*.properties']},
     include_package_data=True,
