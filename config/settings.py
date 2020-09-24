@@ -27,7 +27,6 @@ DEFAULT_HYBRID_TABLE_NAME = 'hybrid'
 LOG_LEVEL = 'INFO'  # CRITICAL / ERROR / WARNING / INFO / DEBUG
 
 # Image and Cutout Server information
-IMAGES_DIR = '/vos'
 IMAGE_FETCH_PREFIX = 'https://hector.cyverse.org/cuts/image_fetch?path='
 
 # Name of this program: used programmatically so keeping it lower case.

@@ -1,13 +1,13 @@
 #
 # Class to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/2020.
-#   Last Modified: Revamp error handling.
+#   Last Modified: Update for removal of images dir prefix.
 #
 import sys
 
 from astropy.io import fits
 
-from config.settings import IMAGE_FETCH_PREFIX, IMAGES_DIR
+from config.settings import IMAGE_FETCH_PREFIX
 import imdtk.exceptions as errors
 import imdtk.core.fits_utils as fits_utils
 import imdtk.tasks.metadata_utils as md_utils
@@ -83,8 +83,8 @@ class JWST_ObsCoreCalcTask (IObsCoreCalcTask):
         file_info = md_utils.get_file_info(metadata)
         file_path = file_info.get('file_path') if file_info else None
         if (file_path is not None):
-            image_path = "{0}{1}{2}".format(IMAGE_FETCH_PREFIX, IMAGES_DIR, file_path)
-            calculations['access_url'] = image_path
+            access_url = "{0}{1}".format(IMAGE_FETCH_PREFIX, file_path)
+            calculations['access_url'] = access_url
 
 
     def calc_instrument_name (self, metadata, calculations):
