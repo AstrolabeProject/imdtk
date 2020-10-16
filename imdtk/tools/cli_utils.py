@@ -1,7 +1,7 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Continue redo: separate table name argument, update doc strings.
+#   Last Modified: Add iRods FITS file argument.
 #
 import argparse
 import sys
@@ -148,6 +148,15 @@ def add_input_file_argument (parser, tool_name):
 #         choices=['json', 'text'],
 #         help='Format of input data file: "json" or "text" [default: "json"]'
 #     )
+
+
+def add_irods_fits_file_argument (parser, tool_name):
+    """ Add the argument, specifying an absolute iRods path to a file containing a FITS image,
+        to the given argparse parser object. """
+    parser.add_argument(
+        '-iff', '--irods-fits-file', dest='irods_fits_file', required=True, metavar='filepath',
+        help='Full iRods path to a FITS image file from which to extract metadata [required]'
+    )
 
 
 def add_output_arguments (parser, tool_name):

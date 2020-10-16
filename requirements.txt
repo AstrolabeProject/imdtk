@@ -1,6 +1,7 @@
 astropy==4.0.1.post1
 # numpyencoder==0.2.0
 # pandas==1.1.0
+python-irodsclient==0.8.3
 pyyaml==5.3.1
 toml==0.10.1
 
