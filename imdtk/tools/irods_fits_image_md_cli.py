@@ -2,7 +2,7 @@
 #
 # Module to extract image metadata from an iRods-resident FITS file and output it as JSON.
 #   Written by: Tom Hicks. 10/14/20.
-#   Last Modified: Initial creation.
+#   Last Modified: Move required argument to end.
 #
 import argparse
 import sys
@@ -35,10 +35,10 @@ def main (argv=None):
     )
 
     cli_utils.add_shared_arguments(parser, TOOL_NAME)
-    cli_utils.add_irods_fits_file_argument(parser, TOOL_NAME)
     cli_utils.add_hdu_argument(parser, TOOL_NAME)
     cli_utils.add_ignore_list_argument(parser, TOOL_NAME)
     cli_utils.add_output_arguments(parser, TOOL_NAME)
+    cli_utils.add_irods_fits_file_argument(parser, TOOL_NAME)
 
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))

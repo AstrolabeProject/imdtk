@@ -1,9 +1,12 @@
-# Path to the root location of the application. If app is run
-# inside a container (the default) this is container-relative (e.g. '/imdtk')
+# Path to the root location of the application. When app is run inside
+# a container (the default) this is container-relative (e.g. '/imdtk')
 APP_ROOT = '/imdtk'
 
-# Configuration information
+# Configuration directory, inside the application
 CONFIG_DIR = "{}/config".format(APP_ROOT)
+
+# iRods configuration directory, inside the application
+IRODS_DIR = "{}/.irods".format(APP_ROOT)
 
 # Default resource file for catalog field aliases.
 DEFAULT_CAT_ALIASES_FILEPATH = "{}/jwst-cat-aliases.ini".format(CONFIG_DIR)
@@ -16,6 +19,14 @@ DEFAULT_DBCONFIG_FILEPATH = "{}/jwst-dbconfig.ini".format(CONFIG_DIR)
 
 # Default resource file for default field values.
 DEFAULT_FIELDS_FILEPATH = "{}/jwst-fields.toml".format(CONFIG_DIR)
+
+# Default configuration file for iRods.
+DEFAULT_IRODS_ENV_FILENAME = 'irods_environment.json'
+DEFAULT_IRODS_ENV_FILEPATH = "{}/{}".format(IRODS_DIR, DEFAULT_IRODS_ENV_FILENAME)
+
+# Default authentication file for iRods.
+DEFAULT_IRODS_AUTH_FILENAME = '.irodsA'
+DEFAULT_IRODS_AUTH_FILEPATH = "{}/{}".format(IRODS_DIR, DEFAULT_IRODS_AUTH_FILENAME)
 
 # Default schema and table name in which to store image metadata in a database.
 DEFAULT_METADATA_TABLE_NAME = 'jwst'
