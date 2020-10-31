@@ -1,7 +1,7 @@
 #
 # Class for extracting header information from iRods-resident FITS files.
 #   Written by: Tom Hicks. 10/15/20.
-#   Last Modified: Initial creation.
+#   Last Modified: Continue developing: add cleanup, get file info.
 #
 import os
 import sys
@@ -10,7 +10,7 @@ from astropy.io import fits
 
 import imdtk.exceptions as errors
 import imdtk.core.fits_utils as fits_utils
-import imdtk.core.irods_helper as irods
+import imdtk.core.irods_helper as irh
 from imdtk.tasks.i_task import IImdTask
 
 
@@ -22,6 +22,13 @@ class IRodsFitsImageMetadataTask (IImdTask):
         Constructor for the class extracting header information from iRods-resident FITS files.
         """
         super().__init__(args)
+        self.irods = None                   # holder for IRodsHelper instance
+
+
+    def cleanup (self):
+        """ Do any cleanup/shutdown tasks necessary for the task instance. """
+        self.irods.cleanup()
+        super().cleanup
 
 
     #
@@ -36,28 +43,37 @@ class IRodsFitsImageMetadataTask (IImdTask):
             print("({}.process): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
 
         # TODO: add check of given iRods FITS file path LATER?
-        irods_fits_file = self.args.get('irods_fits_file')
-        # check_irods_fits_file(irods_fits_file, TOOL_NAME) # throw error if not found
+        iff_path = self.args.get('irods_fits_file')
+        # check_irods_fits_file(iff_path, TOOL_NAME) # throw error if not found
 
         # process the validated FITS file
         ignore_list = self.args.get('ignore_list') or fits_utils.FITS_IGNORE_KEYS
         which_hdu = self.args.get('which_hdu', 0)
 
         try:
-            # with fits.open(irods_fits_file) as hdus_list:
+            # with fits.open(iff_path) as hdus_list:
             #     if (fits_utils.is_catalog_file(hdus_list)):
-            #         errMsg = "Skipping FITS catalog '{}'".format(irods_fits_file)
+            #         errMsg = "Skipping FITS catalog '{}'".format(iff_path)
             #         raise errors.UnsupportedTypeError(errMsg)
 
             #     hdrs = fits_utils.get_header_fields(hdus_list, which_hdu, ignore_list)
 
-            print("iRods FILE: {}".format(irods_fits_file)) # REMOVE LATER
             hdrs = {}                       # REMOVE LATER
+            print("iRods file path: {}".format(iff_path)) # REMOVE LATER
 
-            file_info = self.get_file_info(irods_fits_file) # TODO: IMPLEMENT LATER
+            self.irods = irh.IRodsHelper(self.args)
+
+            print("({}.process): cwd={}".format(self.TOOL_NAME, self.irods.cwd()), file=sys.stderr)
+
+            i_file = self.irods.getf(iff_path, absolute=True)
+            print("({}.process): iRods file={}".format(self.TOOL_NAME, i_file), file=sys.stderr)
+
+            print([x for x in dir(i_file)])        # REMOVE LATER
+
+            file_info = self.get_file_info(iff_path, i_file)
 
         except OSError as oserr:
-            errMsg = "Unable to read image metadata from FITS file '{}': {}.".format(irods_fits_file, oserr)
+            errMsg = "Unable to read image metadata from FITS file '{}': {}.".format(iff_path, oserr)
             raise errors.ProcessingError(errMsg)
 
         metadata = dict()                   # create overall metadata structure
@@ -71,11 +87,14 @@ class IRodsFitsImageMetadataTask (IImdTask):
     # Non-interface and/or task-specific Methods
     #
 
-    def get_file_info (self, irods_fits_file):
-        """ Return a dictionary of information about the given file. """
-        # TODO: really implement LATER:
+    def get_file_info (self, iff_path, i_file=None):
+        """
+        Return a dictionary of information about the file at the given iRods path. If given,
+        use the open iRods file to get additional information.
+        """
         file_info = dict()
-        file_info['file_path'] = irods_fits_file
-        file_info['file_name'] = os.path.basename(irods_fits_file)
-        # file_info['file_size'] = os.path.getsize(irods_fits_file)
+        file_info['file_path'] = iff_path
+        file_info['file_name'] = os.path.basename(iff_path)
+        if (i_file):
+            file_info['file_size'] = i_file.size
         return file_info

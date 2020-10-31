@@ -1,7 +1,8 @@
-"""
-Helper class for iRods commands: manipulate the filesystem, including metadata.
-  Last Modified: Redo auth and env file handling, sessions, and connection.
-"""
+#
+# Helper class for iRods commands: manipulate the filesystem, including metadata.
+#   Written by: Tom Hicks. 10/15/20.
+#   Last Modified: Refactor/use path extractor.
+#
 import os
 import errno
 import pathlib as pl
@@ -65,11 +66,6 @@ class IRodsHelper:
         self.cleanup()
 
 
-    def abs_path (self, path):
-        """ Return an iRods path for the given path relative to the users root directory. """
-        return str(self._root / path)
-
-
     def cleanup (self):
         """ Cleanup the current session. """
         self.disconnect()
@@ -80,7 +76,6 @@ class IRodsHelper:
         if (self._DEBUG):
             print("(IRodsHelper.connect): args={}".format(self.args))
 
-        # self._session = IRodsHelper.make_session(self.args)
         self._session = self.make_session()
 
         if (self._DEBUG):
@@ -140,6 +135,11 @@ class IRodsHelper:
         return str(self._cwdpath)
 
 
+    def cwd_rel_path (self, path):
+        """ Return an iRods path for the given path relative to the current working directory. """
+        return str(self._cwdpath / path)
+
+
     def delete_dir (self, dir_path, absolute=False, force=False, recurse=True):
         """ Delete the specified directory relative to the iRods current working directory
             (default) OR relative to the users root directory, if the absolute argument is True.
@@ -193,6 +193,9 @@ class IRodsHelper:
                     errMsg("No iRods authentication file specified.")
                     raise OSError(errno.ENOENT, errMsg, DEFAULT_IRODS_AUTH_FILENAME)
 
+        if (self._DEBUG):
+            print("(IRodsHelper.get_authentication_file): auth_file={}".format(auth_file))
+
         return auth_file                    # return the filepath
 
 
@@ -231,17 +234,17 @@ class IRodsHelper:
                     errMsg("No iRods environment file specified.")
                     raise OSError(errno.ENOENT, errMsg, DEFAULT_IRODS_ENV_FILENAME)
 
+        if (self._DEBUG):
+            print("(IRodsHelper.get_environment_file): env_file={}".format(env_file))
+
         return env_file                     # return the filepath
 
 
-    def getf (self, file_path, absolute=False):
-        """ Get the specified file relative to the iRods current working directory (default)
-            OR relative to the users root directory, if the absolute argument is True.
+    def getf (self, file_path, absolute=False, rootrel=False):
+        """ Get the file at the specified file path, which is interpreted based on
+            the given absolute/relative flags.
         """
-        if (absolute):
-            filepath = self.abs_path(file_path)  # path is relative to root dir
-        else:
-            filepath = self.rel_path(file_path)  # path is relative to current working dir
+        filepath = self.path_to(file_path, absolute, rootrel)
         return self._session.data_objects.get(filepath)
 
 
@@ -293,6 +296,21 @@ class IRodsHelper:
         return self._session.collections.create(dirpath)
 
 
+    def path_to (self, a_path, absolute=False, rootrel=False):
+        """
+        Interpret the given path using the values of the absolute and rootrel flags.
+        If absolute is True, return the path unchanged. If rootrel is True,
+        return an absolute path calculated relative to the user's root directory,
+        else return an absolute path calculated relative to the current working directory.
+        """
+        if (absolute):                            # if path is absolute
+            return a_path                         # then return it w/o change
+        elif (rootrel):                           # else if path is relative to user root dir
+            return self.root_rel_path(a_path)     # expand to full path
+        else:                                     # else path is relative to current directory
+            return self.cwd_rel_path(a_path)      # expand to full path
+
+
     def put_file (self, local_file, file_path, absolute=False):
         """ Upload the specified local file to the specified path, relative to the iRods
             current working directory (default) OR relative to the users root directory,
@@ -319,14 +337,14 @@ class IRodsHelper:
         return len(obj.metadata)
 
 
-    def rel_path (self, path):
-        """ Return an iRods path for the given path relative to the current working directory. """
-        return str(self._cwdpath / path)
-
-
     def root (self):
         """ Return the user root directory as a string. """
         return str(self._root)
+
+
+    def root_rel_path (self, path):
+        """ Return an iRods path for the given path relative to the users root directory. """
+        return str(self._root / path)
 
 
     def session (self):
