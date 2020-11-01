@@ -1,7 +1,7 @@
 #
 # Class for extracting header information from iRods-resident FITS files.
 #   Written by: Tom Hicks. 10/15/20.
-#   Last Modified: Continue developing: add cleanup, get file info.
+#   Last Modified: Continue developing: method to read first HDU headers.
 #
 import os
 import sys
@@ -11,7 +11,14 @@ from astropy.io import fits
 import imdtk.exceptions as errors
 import imdtk.core.fits_utils as fits_utils
 import imdtk.core.irods_helper as irh
+from imdtk.core.fits_utils import FITS_IGNORE_KEYS
 from imdtk.tasks.i_task import IImdTask
+
+
+FITS_BLOCK_SIZE = 2880
+FITS_ENCODING = 'utf-8'
+FITS_END_KEY = b'END'
+# FITS_END_CARD = FITS_END_KEY + ' ' * 77
 
 
 class IRodsFitsImageMetadataTask (IImdTask):
@@ -68,9 +75,12 @@ class IRodsFitsImageMetadataTask (IImdTask):
             i_file = self.irods.getf(iff_path, absolute=True)
             print("({}.process): iRods file={}".format(self.TOOL_NAME, i_file), file=sys.stderr)
 
-            print([x for x in dir(i_file)])        # REMOVE LATER
+            # print([x for x in dir(i_file)], file=sys.stderr)  # for DEBUGGING
 
             file_info = self.get_file_info(iff_path, i_file)
+
+            header = self.read_header(i_file)
+            hdrs = fits_utils.get_fields_from_header(header)
 
         except OSError as oserr:
             errMsg = "Unable to read image metadata from FITS file '{}': {}.".format(iff_path, oserr)
@@ -98,3 +108,23 @@ class IRodsFitsImageMetadataTask (IImdTask):
         if (i_file):
             file_info['file_size'] = i_file.size
         return file_info
+
+
+    def read_header (self, i_file):
+        header_str = b''
+        offset = 0
+
+        with i_file.open('r+') as irff:
+            while True:
+                irff.seek(offset, 0)
+                block = irff.read(FITS_BLOCK_SIZE)
+                header_str += block
+
+                if (header_str.strip().endswith(FITS_END_KEY)):
+                    break
+                else:
+                    offset = offset + FITS_BLOCK_SIZE
+
+        header = fits.Header.fromstring(header_str.decode(FITS_ENCODING))
+        # print("HEADER={}".format(header), sile=sys.stderr)   # for DEBUGGING
+        return header
