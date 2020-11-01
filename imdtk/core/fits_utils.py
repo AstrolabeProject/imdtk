@@ -1,7 +1,7 @@
 #
 # Module to provide FITS utility functions for Astrolabe code.
 #   Written by: Tom Hicks. 1/26/2020.
-#   Last Modified: Convert table data using numpy.ndarray conversion.
+#   Last Modified: Add get_fields_from_header, refactor get_header_fields to use it.
 #
 import fnmatch
 # import pandas
@@ -70,6 +70,19 @@ def get_column_info (hdus_list, which_hdu=1):
     return col_md
 
 
+def get_fields_from_header (header, ignore=FITS_IGNORE_KEYS):
+    """
+    Return a dictionary of keys and values for the cards in the given FITS header.
+    The result dictionary will not contain entries for cards whose keys are
+    in the given "ignore list". Note that the result dictionary will contain only the
+    last value found for duplicate keys.
+    """
+    hdrs = dict()
+    filtered = [ card for card in header.items() if (card[0] not in ignore) ]
+    hdrs.update(filtered)
+    return hdrs
+
+
 def get_header_fields (hdus_list, which_hdu=0, ignore=FITS_IGNORE_KEYS):
     """
     Return a dictionary of keys and values for the cards in the selected HDU
@@ -80,11 +93,8 @@ def get_header_fields (hdus_list, which_hdu=0, ignore=FITS_IGNORE_KEYS):
     """
     if (which_hdu >= len(hdus_list)):       # sanity check
         return None
-    hdrs = dict()
     header = hdus_list[which_hdu].header
-    filtered = [ card for card in header.items() if (card[0] not in ignore) ]
-    hdrs.update(filtered)
-    return hdrs
+    return get_fields_from_header(header, ignore)
 
 
 def get_image_corners (wcs):
