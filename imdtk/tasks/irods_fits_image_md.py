@@ -1,24 +1,19 @@
 #
 # Class for extracting header information from iRods-resident FITS files.
 #   Written by: Tom Hicks. 10/15/20.
-#   Last Modified: Continue developing: method to read first HDU headers.
+#   Last Modified: Refactor for new FITS iRods helper class.
 #
 import os
 import sys
 
-from astropy.io import fits
+# from astropy.io import fits
 
 import imdtk.exceptions as errors
+import imdtk.core.fits_irods_helper as firh
 import imdtk.core.fits_utils as fits_utils
-import imdtk.core.irods_helper as irh
+
 from imdtk.core.fits_utils import FITS_IGNORE_KEYS
 from imdtk.tasks.i_task import IImdTask
-
-
-FITS_BLOCK_SIZE = 2880
-FITS_ENCODING = 'utf-8'
-FITS_END_KEY = b'END'
-# FITS_END_CARD = FITS_END_KEY + ' ' * 77
 
 
 class IRodsFitsImageMetadataTask (IImdTask):
@@ -50,40 +45,32 @@ class IRodsFitsImageMetadataTask (IImdTask):
             print("({}.process): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
 
         # TODO: add check of given iRods FITS file path LATER?
-        iff_path = self.args.get('irods_fits_file')
-        # check_irods_fits_file(iff_path, TOOL_NAME) # throw error if not found
+        irff_path = self.args.get('irods_fits_file')
+        # check_irods_fits_file(irff_path, TOOL_NAME) # throw error if not found
 
         # process the validated FITS file
         ignore_list = self.args.get('ignore_list') or fits_utils.FITS_IGNORE_KEYS
         which_hdu = self.args.get('which_hdu', 0)
 
         try:
-            # with fits.open(iff_path) as hdus_list:
+            # TODO: skip catalog files LATER:
+            # with fits.open(irff_path) as hdus_list:
             #     if (fits_utils.is_catalog_file(hdus_list)):
-            #         errMsg = "Skipping FITS catalog '{}'".format(iff_path)
+            #         errMsg = "Skipping FITS catalog '{}'".format(irff_path)
             #         raise errors.UnsupportedTypeError(errMsg)
 
-            #     hdrs = fits_utils.get_header_fields(hdus_list, which_hdu, ignore_list)
 
-            hdrs = {}                       # REMOVE LATER
-            print("iRods file path: {}".format(iff_path)) # REMOVE LATER
+            self.irods = firh.FitsIRodsHelper(self.args)
 
-            self.irods = irh.IRodsHelper(self.args)
+            irff = self.irods.getf(irff_path, absolute=True)
 
-            print("({}.process): cwd={}".format(self.TOOL_NAME, self.irods.cwd()), file=sys.stderr)
+            file_info = self.irods.get_irods_file_info(irff)
 
-            i_file = self.irods.getf(iff_path, absolute=True)
-            print("({}.process): iRods file={}".format(self.TOOL_NAME, i_file), file=sys.stderr)
-
-            # print([x for x in dir(i_file)], file=sys.stderr)  # for DEBUGGING
-
-            file_info = self.get_file_info(iff_path, i_file)
-
-            header = self.read_header(i_file)
+            header = self.irods.read_header(irff)
             hdrs = fits_utils.get_fields_from_header(header)
 
         except OSError as oserr:
-            errMsg = "Unable to read image metadata from FITS file '{}': {}.".format(iff_path, oserr)
+            errMsg = "Unable to read image metadata from iRods FITS file '{}': {}.".format(irff_path, oserr)
             raise errors.ProcessingError(errMsg)
 
         metadata = dict()                   # create overall metadata structure
@@ -92,39 +79,6 @@ class IRodsFitsImageMetadataTask (IImdTask):
         return metadata                     # return the results of processing
 
 
-
     #
     # Non-interface and/or task-specific Methods
     #
-
-    def get_file_info (self, iff_path, i_file=None):
-        """
-        Return a dictionary of information about the file at the given iRods path. If given,
-        use the open iRods file to get additional information.
-        """
-        file_info = dict()
-        file_info['file_path'] = iff_path
-        file_info['file_name'] = os.path.basename(iff_path)
-        if (i_file):
-            file_info['file_size'] = i_file.size
-        return file_info
-
-
-    def read_header (self, i_file):
-        header_str = b''
-        offset = 0
-
-        with i_file.open('r+') as irff:
-            while True:
-                irff.seek(offset, 0)
-                block = irff.read(FITS_BLOCK_SIZE)
-                header_str += block
-
-                if (header_str.strip().endswith(FITS_END_KEY)):
-                    break
-                else:
-                    offset = offset + FITS_BLOCK_SIZE
-
-        header = fits.Header.fromstring(header_str.decode(FITS_ENCODING))
-        # print("HEADER={}".format(header), sile=sys.stderr)   # for DEBUGGING
-        return header
