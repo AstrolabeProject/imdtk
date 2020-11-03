@@ -1,7 +1,7 @@
 #
 # Class for manipulating FITS files within the the iRods filesystem.
 #   Written by: Tom Hicks. 11/1/20.
-#   Last Modified: Initial creation.
+#   Last Modified: Add sanity checks while looping to read FITS headers.
 #
 import os
 import sys
@@ -34,7 +34,7 @@ class FitsIRodsHelper (IRodsHelper):
 
 
     def get_irods_file_info (self, irff=None):
-        """ Return a dictionary of file information about the given iRods file. """
+        """ Return a dictionary of file information about the given iRods FITS file. """
         file_info = dict()
 
         if (irff):
@@ -66,12 +66,19 @@ class FitsIRodsHelper (IRodsHelper):
 
 
     def read_header (self, irods_fits_file):
+        if (irods_fits_file.size < FITS_BLOCK_SIZE):
+            return None
+
+        file_size = irods_fits_file.size
         header_str = b''
         offset = 0
 
         with irods_fits_file.open('r+') as irff_fd:
             while True:
-                irff_fd.seek(offset, 0)
+                pos = irff_fd.seek(offset, 0)
+                if (pos > file_size):       # sanity check: abort on bad file
+                    return None             # exit out now
+
                 block = irff_fd.read(FITS_BLOCK_SIZE)
                 header_str += block
 
