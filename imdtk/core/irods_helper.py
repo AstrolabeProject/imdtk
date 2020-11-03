@@ -1,7 +1,7 @@
 #
 # Helper class for iRods commands: manipulate the filesystem, including metadata.
 #   Written by: Tom Hicks. 10/15/20.
-#   Last Modified: Refactor/use path extractor.
+#   Last Modified: Add file/collection exists methods. De-static some methods.
 #
 import os
 import errno
@@ -19,23 +19,11 @@ from imdtk.core import Metadatum
 class IRodsHelper:
     """ Helper class for iRods commands """
 
-    _CWD_FORMAT = "/{}/{}/{}"
-
     @staticmethod
     def cleanup_session (session):
         """ Cleanup the given session. """
         if (session):
             session.cleanup()
-
-
-    @staticmethod
-    def is_collection (node):
-        return isinstance(node, iRODSCollection)
-
-
-    @staticmethod
-    def is_dataobject (node):
-        return isinstance(node, iRODSDataObject)
 
 
     @staticmethod
@@ -85,11 +73,6 @@ class IRodsHelper:
         self.set_root()
 
 
-    def is_connected (self):
-        """ Tell whether this class is currently connected to iRods. """
-        return (bool(self._session))
-
-
     def cd_down (self, subdir):
         """ Change the current working directory to the given subdirectory. """
         if (self._cwdpath):
@@ -128,6 +111,14 @@ class IRodsHelper:
                 self._cwdpath = newdir
         else:
             self._cwdpath = None
+
+
+    def collection_exists (self, apath):
+        """ Tell whether the given path points to an existing iRods collection (dir) or not. """
+        if (apath):                         # sanity check
+            return (self._session.collections.exists(apath))
+        else:
+            return False
 
 
     def cwd (self):
@@ -172,6 +163,14 @@ class IRodsHelper:
             self._cwdpath = None
             self._root = None
             self.args = {}
+
+
+    def file_exists (self, apath):
+        """ Tell whether the given path points to an existing iRods file or not. """
+        if (apath):                         # sanity check
+            return (self._session.data_objects.exists(apath))
+        else:
+            return False
 
 
     def get_authentication_file (self, args):
@@ -243,6 +242,8 @@ class IRodsHelper:
     def getf (self, file_path, absolute=False, rootrel=False):
         """ Get the file at the specified file path, which is interpreted based on
             the given absolute/relative flags.
+
+        :raises irods.exception.DataObjectDoesNotExist if file not found or not readable
         """
         filepath = self.path_to(file_path, absolute, rootrel)
         return self._session.data_objects.get(filepath)
@@ -271,6 +272,21 @@ class IRodsHelper:
         return self._session.collections.get(self._root)
 
 
+    def is_collection (self, node):
+        """ Tell whether the given iRods node is a collection or not. """
+        return isinstance(node, iRODSCollection)
+
+
+    def is_connected (self):
+        """ Tell whether this class is currently connected to iRods. """
+        return (bool(self._session))
+
+
+    def is_dataobject (self, node):
+        """ Tell whether the given iRods node is a file or not. """
+        return isinstance(node, iRODSDataObject)
+
+
     def make_session (self):
         """
         Create and return an iRods session using the given arguments dictionary.
@@ -296,7 +312,7 @@ class IRodsHelper:
         return self._session.collections.create(dirpath)
 
 
-    def path_to (self, a_path, absolute=False, rootrel=False):
+    def path_to (self, apath, absolute=False, rootrel=False):
         """
         Interpret the given path using the values of the absolute and rootrel flags.
         If absolute is True, return the path unchanged. If rootrel is True,
@@ -304,11 +320,11 @@ class IRodsHelper:
         else return an absolute path calculated relative to the current working directory.
         """
         if (absolute):                            # if path is absolute
-            return a_path                         # then return it w/o change
+            return apath                          # then return it w/o change
         elif (rootrel):                           # else if path is relative to user root dir
-            return self.root_rel_path(a_path)     # expand to full path
+            return self.root_rel_path(apath)      # expand to full path
         else:                                     # else path is relative to current directory
-            return self.cwd_rel_path(a_path)      # expand to full path
+            return self.cwd_rel_path(apath)       # expand to full path
 
 
     def put_file (self, local_file, file_path, absolute=False):
