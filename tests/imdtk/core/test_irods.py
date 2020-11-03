@@ -1,12 +1,13 @@
 # Tests for the iRods interface module.
 #   Written by: Tom Hicks. 10/20/20.
-#   Last Modified: Initial creation
+#   Last Modified: Import auth and env file paths.
 #
 import os
 import pytest
 
 import imdtk.exceptions as errors
 import imdtk.core.irods_helper as irh
+from config.settings import DEFAULT_IRODS_AUTH_FILEPATH, DEFAULT_IRODS_ENV_FILEPATH
 
 # from tests import TEST_DBCONFIG_FILEPATH
 
@@ -36,7 +37,7 @@ class TestIRods(object):
         auth_file = ihelper.get_authentication_file(args)
         print(auth_file)
         assert auth_file is not None
-        assert auth_file == '/imdtk/.irods/.irodsA'
+        assert auth_file == DEFAULT_IRODS_AUTH_FILEPATH
 
 
     def test_get_environment_file (self):
@@ -48,8 +49,7 @@ class TestIRods(object):
         env_file = ihelper.get_environment_file(args)
         print(env_file)
         assert env_file is not None
-        assert env_file == '/imdtk/.irods/irods_environment.json'
-
+        assert env_file == DEFAULT_IRODS_ENV_FILEPATH
 
     # def test_insert_hybrid_row_str_noval (self):
     #     with pytest.raises(errors.ProcessingError, match='Unable to find .* required fields'):
