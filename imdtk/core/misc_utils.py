@@ -1,9 +1,11 @@
 #
 # Miscellaneous Utility Methods.
 #   Written by: Tom Hicks. 5/22/2020.
-#   Last Modified: Add keep_characters method.
+#   Last Modified: Add product function.
 #
 import json
+import operator
+from functools import reduce
 
 
 def get_in (a_dictionary, keys):
@@ -51,6 +53,11 @@ def missing_entries (a_dictionary, required=[]):
     """
     missing = [ rkey for rkey in required if (rkey not in a_dictionary) ]
     return None if (len(missing) < 1) else missing
+
+
+def product (iterable):
+    """ Return the product of the numbers in the given iterable. """
+    return reduce(operator.mul, iterable, 1)
 
 
 def remove_entries (a_dictionary, ignore=[]):
