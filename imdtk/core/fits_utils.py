@@ -1,7 +1,7 @@
 #
 # Module to provide FITS utility functions for Astrolabe code.
 #   Written by: Tom Hicks. 1/26/2020.
-#   Last Modified: Add get_fields_from_header, refactor get_header_fields to use it.
+#   Last Modified: Add bitpix_size function.
 #
 import fnmatch
 # import pandas
@@ -31,8 +31,15 @@ FITS_MIME_TYPE = 'image/fits'
 # FITS data type code to name translation table
 PIXTYPE_TABLE = {
     8: 'byte', 16: 'short', 32: 'int', 64: 'long', -32: 'float', -64: 'double',
-    '8': 'byte', '16': 'short', '32': 'int', '64': 'long', '-32': 'float', '-64': 'double',
+    '8': 'byte', '16': 'short', '32': 'int', '64': 'long', '-32': 'float', '-64': 'double'
 }
+
+
+def bitpix_size (bitpix):
+    """
+    Return the size in bits for the given FITS header code value from the BITPIX field.
+    """
+    return abs(int(bitpix))
 
 
 def fits_utc_date (value_str, scale='utc'):
