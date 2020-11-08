@@ -1,7 +1,7 @@
 #
 # Class for manipulating FITS files within the the iRods filesystem.
 #   Written by: Tom Hicks. 11/1/20.
-#   Last Modified: Check primary read. Reduce use of header info. Better method documentation.
+#   Last Modified: Refactor methods getting headers.
 #
 import os
 import sys
@@ -114,23 +114,16 @@ class FitsIRodsHelper (IRodsHelper):
         return metadata
 
 
-    def get_header_fields (self, irods_fits_file, which_hdu=0, ignore=FITS_IGNORE_KEYS):
+    def get_header (self, irods_fits_file, which_hdu=0):
         """
-        Return a dictionary of keys and values for the cards in the selected HDU
-        (default: 0 (the first HDU)) or None, if the given HDU index is out of range.
-        The result dictionary will not contain entries for cards whose keys are
-        in the given "ignore list". Note that the result dictionary will contain only the
-        last value found for duplicate keys.
+        Return a FITS header for the specified HDU (default: 0 (the first HDU)) of
+        the given iRods FITS file or return None, if the given HDU index is out of range.
         """
         with irods_fits_file.open('r+') as irff_fd:
-            header = self.get_header(irff_fd, irods_fits_file.size, which_hdu)
-            if (header):
-                return fits_utils.get_fields_from_header(header, ignore)
-            else:
-                return None
+            return self.get_header_at(irff_fd, irods_fits_file.size, which_hdu)
 
 
-    def get_header (self, irff_fd, irff_size, which_hdu=0):
+    def get_header_at (self, irff_fd, irff_size, which_hdu=0):
         """
         Follow the chain of HDU headers to return the header for the specified
         HDU, given an open iRods FITS file and its size.
@@ -157,6 +150,34 @@ class FitsIRodsHelper (IRodsHelper):
                 hdr_index += 1
 
         return hdr_info.hdr                 # success: return the desired header
+
+
+    def get_header_fields (self, irods_fits_file, which_hdu=0, ignore=FITS_IGNORE_KEYS):
+        """
+        Return a dictionary of keys and values for the cards in the selected HDU
+        (default: 0 (the first HDU)) or None, if the given HDU index is out of range.
+        The result dictionary will not contain entries for cards whose keys are
+        in the given "ignore list". Note that the result dictionary will contain only the
+        last value found for duplicate keys.
+        """
+        header = self.get_header(irods_fits_file, which_hdu)
+        if (header):
+            return fits_utils.get_fields_from_header(header, ignore)
+        else:
+            return None
+
+
+    def is_catalog_file (self, irods_fits_file, which_hdu=1):
+        """
+        Tell whether the given FITS file is a FITS catalog or not,
+        based on a specified HDU (defaults to the first extension).
+        Assumes: a catalog HDU will be of type BINTABLE or TABLE:
+        """
+        header = self.get_header(irods_fits_file, which_hdu)
+        if (header is not None):
+            return (header.get('XTENSION') in ['BINTABLE', 'TABLE'])
+        else:
+            return False
 
 
     def read_header (self, irff_fd, irff_size):
