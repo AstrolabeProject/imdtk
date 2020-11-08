@@ -1,7 +1,7 @@
 #
 # Module to provide FITS utility functions for Astrolabe code.
 #   Written by: Tom Hicks. 1/26/2020.
-#   Last Modified: Add bitpix_size function.
+#   Last Modified: Recognize TABLE extension as a catalog file.
 #
 import fnmatch
 # import pandas
@@ -168,11 +168,13 @@ def get_WCS (ff_hdus_list, which_hdu=0):
 
 
 def is_catalog_file (ff_hdus_list, which_hdu=1):
-    """ Tell whether the given FITS file is a FITS catalog or not.
-        Assumes: catalog HDU must be of type BINTABLE:
+    """
+    Tell whether the given FITS file is a FITS catalog or not,
+    based on a specified HDU (defaults to the first extension).
+    Assumes: a catalog HDU will be of type BINTABLE or TABLE:
     """
     return ( (len(ff_hdus_list) > which_hdu) and
-             (ff_hdus_list[which_hdu].header.get('XTENSION') == 'BINTABLE') )
+             (ff_hdus_list[which_hdu].header.get('XTENSION') in ['BINTABLE', 'TABLE']) )
 
 
 def is_fits_file (fyl):
