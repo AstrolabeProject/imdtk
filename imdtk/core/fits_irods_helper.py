@@ -1,7 +1,7 @@
 #
 # Class for manipulating FITS files within the the iRods filesystem.
 #   Written by: Tom Hicks. 11/1/20.
-#   Last Modified: WIP: simplify navigation within FITS file.
+#   Last Modified: Refactor/simplify calculation of data segment length.
 #
 import os
 import sys
@@ -87,11 +87,10 @@ class FitsIRodsHelper (IRodsHelper):
     def get_header (self, irff_fd, irff_size, which_hdu=0):
         # always have to read the primary header to start
         hdr_info = self.read_header(irff_fd, irff_size)
-        # print("hdr_info[0]={}".format(hdr_info.hdr), file=sys.stderr) # REMOVE LATER
 
         hdr_index = 0
         while (hdr_index < which_hdu):
-            datalen = self.calc_data_length(hdr_info)
+            datalen = self.calculate_data_length(hdr_info)
             pos = irff_fd.seek(datalen, 1)
             if (pos >= irff_size):          # exit condition: abort if at or past EOF
                 return None                 # truncated file or no such HDU: exit out now
@@ -99,60 +98,62 @@ class FitsIRodsHelper (IRodsHelper):
             hdr_info = self.read_header(irff_fd, irff_size)
             if (hdr_info is None):
                 return None
-            # print("hdr_info[{}]={}".format(hdr_index, hdr_info), file=sys.stderr) # REMOVE LATER
             hdr_index += 1
 
         return hdr_info.hdr
 
 
-    def calc_data_length (self, hdr_info):
+    def calculate_data_length (self, hdr_info):
         '''
-        Each FITS XTENSION has enough information to predict the next location of
-        the next XTENSION header. Here we'll take in the offset and length and
-        return a new offset which includes the data length difference.
+        Calculate the length of the data segment following the given header information.
+        Each FITS header has enough information to predict the location of the next header.
+        Calculations based on the FITS Standard version 4.0, revision 8/13/2018.
         '''
-        if (hdr_info.hdr.get('SIMPLE', False) is True):  # Primary Header
-            if (hdr_info.hdr.get('NAXIS') == 0):         # FITS Standard_4: 4.4.1.1
-                return 0
-            else:
-                B = fits_utils.bitpix_size(hdr_info.hdr['BITPIX']) / 8  # bits to bytes
-                N = [hdr_info.hdr[f'NAXIS{idx}'] for idx in range(1, hdr_info.hdr['NAXIS'] + 1)]
-                # print("FNHO: */N={}, N={}".format(product(N), N), file=sys.stderr) # REMOVE LATER
-                blocks = ceil((product(N) * B) / FITS_BLOCK_SIZE)
-                # print("FNHO: blocks={}".format(blocks), file=sys.stderr) # REMOVE LATER
-                length = (blocks * FITS_BLOCK_SIZE)
-                # print("FNHO: length={}".format(length), file=sys.stderr) # REMOVE LATER
-                return length
+        if (hdr_info.hdr.get('NAXIS') == 0):         # FITS 4.0: 4.4.1.1
+            return 0
 
-        elif (hdr_info.hdr.get('XTENSION', None) in ['IMAGE']):
-            # https://ui.adsabs.harvard.edu/abs/1994A%26AS..105...53P/abstract
-            # http://articles.adsabs.harvard.edu/pdf/1994A%26AS..105...53P
-            B = fits_utils.bitpix_size(hdr_info.hdr['BITPIX'])
-            G = hdr_info.hdr['GCOUNT']
-            P = hdr_info.hdr['PCOUNT']
-            N = [hdr_info.hdr[f'NAXIS{idx}'] for idx in range(1, hdr_info.hdr['NAXIS'] + 1)]
-            print("FNHO: B={}, G={}, P={}, N={}".format(B, G, P, N)) # REMOVE LATER
-            S = B * G * (P + product(N))
-            print("FNHO: S={}".format(S)) # REMOVE LATER
-            return int(S / FITS_BLOCK_SIZE) * FITS_BLOCK_SIZE
+        if (hdr_info.hdr.get('SIMPLE', False) is True):  # Primary Header
+            return self.calc_primary_data_length(hdr_info.hdr)
+
+        elif (hdr_info.hdr.get('XTENSION', None) in ['IMAGE', 'TABLE']):
+            return self.calc_extension_data_length(hdr_info.hdr)
 
         elif (hdr_info.hdr.get('XTENSION', None) in ['BINTABLE']):
-            # NAXIS1 = number of elements per row
-            # NAXIS2 = number of rows in the table
-            B = fits_utils.bitpix_size(hdr_info.hdr['BITPIX']) / 8  # bits to bytes
-            N = hdr_info.hdr['NAXIS1'] * hdr_info.hdr['NAXIS2']
-            # print("FNHO: N={}".format(N), file=sys.stderr) # REMOVE LATER
-            blocks = (ceil(N * B) / FITS_BLOCK_SIZE)
-            # print("FNHO: blocks={}".format(blocks), file=sys.stderr) # REMOVE LATER
-            length = (blocks * FITS_BLOCK_SIZE)
-            # print("FNHO: length={}".format(length), file=sys.stderr) # REMOVE LATER
-            return length
-
-        elif (hdr_info.hdr.get('XTENSION', None) in ['TABLE']):
-            raise NotImplementedError('TABLE')
+            return self.calc_extension_data_length(hdr_info.hdr, hdr_info.hdr.get('PCOUNT', 1))
 
         else:
-            raise RuntimeError('Unrecognized XTENSION type while seeking extension header')
+            raise RuntimeError('Unrecognized XTENSION type while calculating HDU data length')
+
+
+    def calc_primary_data_length (self, header):
+        """
+        Calculate length (in bytes) of the data segment following the (given) primary header.
+        """
+        if (header.get('NAXIS') == 0):      # sanity check per FITS 4.0: 4.4.1.1
+            return 0
+        B = fits_utils.bitpix_size(header['BITPIX']) / 8  # bits to bytes
+        N = [header[f'NAXIS{idx}'] for idx in range(1, header['NAXIS'] + 1)]
+        if (0 in N):                        # per FITS 4.0: 4.4.1.1
+            return 0                        # zero in a NAXISn => no data blocks
+        blocks = ceil(B * (product(N)) / FITS_BLOCK_SIZE)
+        return (blocks * FITS_BLOCK_SIZE)
+
+
+    def calc_extension_data_length (self, header, PCOUNT=0, GCOUNT=1):
+        """
+        Calculate length (in bytes) of the data segment following the given extension header.
+        Defaults are provided for PCOUNT and GCOUNT but must be overridden by the calling
+        function, where needed, as per the FITS Standard 4.0, sections 7.1, 7.2, and 7.3.
+        """
+        if (header.get('NAXIS') == 0):      # sanity check per FITS 4.0: 4.4.1.1
+            return 0
+        B = fits_utils.bitpix_size(header['BITPIX']) / 8
+        N = [header[f'NAXIS{idx}'] for idx in range(1, header['NAXIS'] + 1)]
+        if (0 in N):                        # per FITS 4.0: 4.4.1.1, 7.1.1
+            return 0                        # zero in a NAXISn => no data blocks
+        blocks = ceil(B * GCOUNT * (PCOUNT + product(N)) / FITS_BLOCK_SIZE)
+        return (blocks * FITS_BLOCK_SIZE)
+
 
 
     def read_header (self, irff_fd, irff_size):
