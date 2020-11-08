@@ -1,6 +1,6 @@
 # Tests for the iRods interface module.
 #   Written by: Tom Hicks. 11/5/20.
-#   Last Modified: Reduce tests by aiming higher.
+#   Last Modified: Test non-existant extensions.
 #
 import os
 import pytest
@@ -126,6 +126,7 @@ class TestIRods(object):
         assert ihelper.is_catalog_file(irff) is True
         assert ihelper.is_catalog_file(irff, which_hdu=1) is True
         assert ihelper.is_catalog_file(irff, which_hdu=0) is False
+        assert ihelper.is_catalog_file(irff, which_hdu=3) is False
 
 
     def test_is_catalog_file_smallcat (self):
@@ -137,3 +138,4 @@ class TestIRods(object):
         assert ihelper.is_catalog_file(irff) is True
         assert ihelper.is_catalog_file(irff, which_hdu=1) is True
         assert ihelper.is_catalog_file(irff, which_hdu=0) is False
+        assert ihelper.is_catalog_file(irff, which_hdu=3) is False
