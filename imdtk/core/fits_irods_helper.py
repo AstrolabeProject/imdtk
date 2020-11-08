@@ -1,7 +1,7 @@
 #
 # Class for manipulating FITS files within the the iRods filesystem.
 #   Written by: Tom Hicks. 11/1/20.
-#   Last Modified: Refactor/simplify calculation of data segment length.
+#   Last Modified: Consolidate data calculation methods.
 #
 import os
 import sys
@@ -34,6 +34,52 @@ class FitsIRodsHelper (IRodsHelper):
         Constructor of class for manipulating FITS files within the the iRods filesystem.
         """
         super().__init__(args, connect)
+
+
+    def calculate_data_length (self, hdr_info):
+        '''
+        Calculate the length of the data segment following the given header information.
+        Each FITS header has enough information to predict the location of the next header.
+        Calculations based on the FITS Standard version 4.0, revision 8/13/2018.
+        '''
+        if (hdr_info.hdr.get('NAXIS') == 0):         # FITS 4.0: 4.4.1.1
+            return 0
+
+        if (hdr_info.hdr.get('SIMPLE', False) is True):  # Primary Header
+            return self.calc_data_length(hdr_info.hdr, primary=True)
+
+        elif (hdr_info.hdr.get('XTENSION', None) in ['IMAGE', 'TABLE']):
+            return self.calc_data_length(hdr_info.hdr)
+
+        elif (hdr_info.hdr.get('XTENSION', None) in ['BINTABLE']):
+            return self.calc_data_length(hdr_info.hdr, PCOUNT=hdr_info.hdr.get('PCOUNT', 1))
+
+        else:
+            raise RuntimeError('Unrecognized XTENSION type while calculating HDU data length')
+
+
+    def calc_data_length (self, header, GCOUNT=1, PCOUNT=0, primary=False):
+        """
+        Calculate the length (in bytes) of the data segment following the given header.
+        Defaults are provided for PCOUNT and GCOUNT but must be overridden by the calling
+        function, where needed, as per the FITS Standard 4.0, section 7.1.
+        PCOUNT and GCOUNT are not used by the Primary header, as per section 4.4.1.
+        """
+        if (header.get('NAXIS') == 0):      # sanity check per FITS 4.0: section 4.4.1.1
+            return 0
+
+        B = fits_utils.bitpix_size(header['BITPIX']) / 8
+        N = [header[f'NAXIS{idx}'] for idx in range(1, header['NAXIS'] + 1)]
+
+        if (0 in N):                        # per FITS 4.0: 4.4.1.1, 7.1.1
+            return 0                        # zero in any NAXISn => no data blocks
+
+        if (primary):                       # if this is the primary header
+            blocks = ceil(B * (product(N)) / FITS_BLOCK_SIZE)
+        else:                               # else this is an extension header
+            blocks = ceil(B * GCOUNT * (PCOUNT + product(N)) / FITS_BLOCK_SIZE)
+
+        return (blocks * FITS_BLOCK_SIZE)
 
 
     def get_irods_file_info (self, irff=None):
@@ -101,59 +147,6 @@ class FitsIRodsHelper (IRodsHelper):
             hdr_index += 1
 
         return hdr_info.hdr
-
-
-    def calculate_data_length (self, hdr_info):
-        '''
-        Calculate the length of the data segment following the given header information.
-        Each FITS header has enough information to predict the location of the next header.
-        Calculations based on the FITS Standard version 4.0, revision 8/13/2018.
-        '''
-        if (hdr_info.hdr.get('NAXIS') == 0):         # FITS 4.0: 4.4.1.1
-            return 0
-
-        if (hdr_info.hdr.get('SIMPLE', False) is True):  # Primary Header
-            return self.calc_primary_data_length(hdr_info.hdr)
-
-        elif (hdr_info.hdr.get('XTENSION', None) in ['IMAGE', 'TABLE']):
-            return self.calc_extension_data_length(hdr_info.hdr)
-
-        elif (hdr_info.hdr.get('XTENSION', None) in ['BINTABLE']):
-            return self.calc_extension_data_length(hdr_info.hdr, hdr_info.hdr.get('PCOUNT', 1))
-
-        else:
-            raise RuntimeError('Unrecognized XTENSION type while calculating HDU data length')
-
-
-    def calc_primary_data_length (self, header):
-        """
-        Calculate length (in bytes) of the data segment following the (given) primary header.
-        """
-        if (header.get('NAXIS') == 0):      # sanity check per FITS 4.0: 4.4.1.1
-            return 0
-        B = fits_utils.bitpix_size(header['BITPIX']) / 8  # bits to bytes
-        N = [header[f'NAXIS{idx}'] for idx in range(1, header['NAXIS'] + 1)]
-        if (0 in N):                        # per FITS 4.0: 4.4.1.1
-            return 0                        # zero in a NAXISn => no data blocks
-        blocks = ceil(B * (product(N)) / FITS_BLOCK_SIZE)
-        return (blocks * FITS_BLOCK_SIZE)
-
-
-    def calc_extension_data_length (self, header, PCOUNT=0, GCOUNT=1):
-        """
-        Calculate length (in bytes) of the data segment following the given extension header.
-        Defaults are provided for PCOUNT and GCOUNT but must be overridden by the calling
-        function, where needed, as per the FITS Standard 4.0, sections 7.1, 7.2, and 7.3.
-        """
-        if (header.get('NAXIS') == 0):      # sanity check per FITS 4.0: 4.4.1.1
-            return 0
-        B = fits_utils.bitpix_size(header['BITPIX']) / 8
-        N = [header[f'NAXIS{idx}'] for idx in range(1, header['NAXIS'] + 1)]
-        if (0 in N):                        # per FITS 4.0: 4.4.1.1, 7.1.1
-            return 0                        # zero in a NAXISn => no data blocks
-        blocks = ceil(B * GCOUNT * (PCOUNT + product(N)) / FITS_BLOCK_SIZE)
-        return (blocks * FITS_BLOCK_SIZE)
-
 
 
     def read_header (self, irff_fd, irff_size):
