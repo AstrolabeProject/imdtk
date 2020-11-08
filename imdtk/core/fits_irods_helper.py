@@ -1,7 +1,7 @@
 #
 # Class for manipulating FITS files within the the iRods filesystem.
 #   Written by: Tom Hicks. 11/1/20.
-#   Last Modified: Consolidate data calculation methods.
+#   Last Modified: Check primary read. Reduce use of header info. Better method documentation.
 #
 import os
 import sys
@@ -36,23 +36,23 @@ class FitsIRodsHelper (IRodsHelper):
         super().__init__(args, connect)
 
 
-    def calculate_data_length (self, hdr_info):
+    def calculate_data_length (self, header):
         '''
         Calculate the length of the data segment following the given header information.
         Each FITS header has enough information to predict the location of the next header.
         Calculations based on the FITS Standard version 4.0, revision 8/13/2018.
         '''
-        if (hdr_info.hdr.get('NAXIS') == 0):         # FITS 4.0: 4.4.1.1
+        if (header.get('NAXIS') == 0):         # FITS 4.0: 4.4.1.1
             return 0
 
-        if (hdr_info.hdr.get('SIMPLE', False) is True):  # Primary Header
-            return self.calc_data_length(hdr_info.hdr, primary=True)
+        if (header.get('SIMPLE', False) is True):  # Primary Header
+            return self.calc_data_length(header, primary=True)
 
-        elif (hdr_info.hdr.get('XTENSION', None) in ['IMAGE', 'TABLE']):
-            return self.calc_data_length(hdr_info.hdr)
+        elif (header.get('XTENSION', None) in ['IMAGE', 'TABLE']):
+            return self.calc_data_length(header)
 
-        elif (hdr_info.hdr.get('XTENSION', None) in ['BINTABLE']):
-            return self.calc_data_length(hdr_info.hdr, PCOUNT=hdr_info.hdr.get('PCOUNT', 1))
+        elif (header.get('XTENSION', None) in ['BINTABLE']):
+            return self.calc_data_length(header, PCOUNT=header.get('PCOUNT', 1))
 
         else:
             raise RuntimeError('Unrecognized XTENSION type while calculating HDU data length')
@@ -131,22 +131,32 @@ class FitsIRodsHelper (IRodsHelper):
 
 
     def get_header (self, irff_fd, irff_size, which_hdu=0):
+        """
+        Follow the chain of HDU headers to return the header for the specified
+        HDU, given an open iRods FITS file and its size.
+
+        Note: the current file position is moved as a side-effect of this method!
+        """
         # always have to read the primary header to start
+        irff_fd.seek(0, 0)                  # move to beginning of file
         hdr_info = self.read_header(irff_fd, irff_size)
+        if (hdr_info is None):              # if unable to read first header
+            return None                     # signal failure
 
-        hdr_index = 0
+        hdr_index = 0                       # just read primary header
         while (hdr_index < which_hdu):
-            datalen = self.calculate_data_length(hdr_info)
-            pos = irff_fd.seek(datalen, 1)
+            datalen = self.calculate_data_length(hdr_info.hdr)
+            pos = irff_fd.seek(datalen, 1)  # skip over data segment
             if (pos >= irff_size):          # exit condition: abort if at or past EOF
-                return None                 # truncated file or no such HDU: exit out now
+                return None                 # exits on truncated file or no such HDU
 
-            hdr_info = self.read_header(irff_fd, irff_size)
-            if (hdr_info is None):
-                return None
-            hdr_index += 1
+            hdr_info = self.read_header(irff_fd, irff_size)  # try to read next header
+            if (hdr_info is None):          # if unable to read a header at current position
+                return None                 # signal failure
+            else:                           # else we got another header
+                hdr_index += 1
 
-        return hdr_info.hdr
+        return hdr_info.hdr                 # success: return the desired header
 
 
     def read_header (self, irff_fd, irff_size):
@@ -157,6 +167,8 @@ class FitsIRodsHelper (IRodsHelper):
         the header offset (from the start of the stream) and header length.
 
         Returns None if the file does not contain a full block of bytes from the given offset.
+
+        Note: the current file position is moved as a side-effect of this method!
         """
         header_str = b''
         length = 0
