@@ -1,6 +1,6 @@
 # Tests for the iRods interface module.
 #   Written by: Tom Hicks. 11/5/20.
-#   Last Modified: Test non-existant extensions.
+#   Last Modified: Refactor default arguments. Add tests for get_irods_file_info, get_header_fields.
 #
 import os
 import pytest
@@ -17,6 +17,8 @@ from tests import TEST_DIR
 
 class TestIRods(object):
 
+    defargs = { 'debug': True, 'verbose': True, 'TOOL_NAME': 'TestFitsIrodsHelper' }
+
     irff_m13 = '/iplant/home/hickst/vos/images/m13.fits'
     hdr0_size_m13 = 2880                    # size of primary header
     hdr0_datasize_m13 = 181440              # size of primary data table
@@ -27,6 +29,7 @@ class TestIRods(object):
     hdr1_size_hh = 2880                     # size of first extension
     hdr1_datasize_hh = 40320                # size of first extension data table
 
+    irff_BAD =      '/iplant/home/hickst/vos/images/BAD.fits'
     irff_smallcat = '/iplant/home/hickst/vos/catalogs/small_table.fits'
 
 
@@ -72,9 +75,7 @@ class TestIRods(object):
         """
         Also tests get_header_at, calculate_data_length, calc_data_length, read_header.
         """
-        args = { 'debug': True, 'verbose': True, 'TOOL_NAME': 'TestFitsIrodsHelper' }
-        ihelper = firh.FitsIRodsHelper(args)
-        print(ihelper)
+        ihelper = firh.FitsIRodsHelper(self.defargs)
         assert ihelper is not None
 
         # read primary header
@@ -91,8 +92,7 @@ class TestIRods(object):
         """
         Also tests get_header_at, calculate_data_length, calc_data_length, read_header.
         """
-        args = { 'debug': True, 'verbose': True, 'TOOL_NAME': 'TestFitsIrodsHelper' }
-        ihelper = firh.FitsIRodsHelper(args)
+        ihelper = firh.FitsIRodsHelper(self.defargs)
         assert ihelper is not None
 
         # read primary header
@@ -106,9 +106,51 @@ class TestIRods(object):
         assert header.get('GCOUNT') == 1
 
 
+    def test_get_header_fields_none (self):
+        """ Also tests get_fields_from_header. """
+        ihelper = firh.FitsIRodsHelper(self.defargs)
+        assert ihelper is not None
+
+        irff = ihelper.getf(self.irff_BAD, absolute=True)
+        hflds = ihelper.get_header_fields(irff)
+        assert hflds is None
+
+
+    def test_get_header_fields (self):
+        """ Also tests get_fields_from_header. """
+        ihelper = firh.FitsIRodsHelper(self.defargs)
+        assert ihelper is not None
+
+        irff = ihelper.getf(self.irff_m13, absolute=True)
+        hflds = ihelper.get_header_fields(irff)
+        assert hflds is not None
+        assert len(hflds) > 3               # 3 keywords are mandatory
+        assert 'SIMPLE' in hflds
+        assert 'BITPIX' in hflds
+        assert 'NAXIS' in hflds
+        assert 'EXTEND' in hflds
+        assert hflds.get('CTYPE1') == 'RA---TAN'
+        assert hflds.get('CTYPE2') == 'DEC--TAN'
+
+
+    def test_get_irods_file_info (self):
+        """ Also tests get_irods_file_metadata. """
+        ihelper = firh.FitsIRodsHelper(self.defargs)
+        assert ihelper is not None
+
+        # read primary header
+        irff = ihelper.getf(self.irff_hh, absolute=True)
+        finfo = ihelper.get_irods_file_info(irff)
+        assert finfo is not None
+        assert len(finfo) > 3               # file path, name, size minimum
+        assert 'file_path' in finfo
+        assert 'owner_zone' in finfo
+        assert 'name' in finfo
+        assert 'irods_metadata' in finfo
+
+
     def test_is_catalog_file_m13 (self):
-        args = { 'debug': True, 'verbose': True, 'TOOL_NAME': 'TestFitsIrodsHelper' }
-        ihelper = firh.FitsIRodsHelper(args)
+        ihelper = firh.FitsIRodsHelper(self.defargs)
         assert ihelper is not None
 
         irff = ihelper.getf(self.irff_m13, absolute=True)
@@ -118,8 +160,7 @@ class TestIRods(object):
 
 
     def test_is_catalog_file_hh (self):
-        args = { 'debug': True, 'verbose': True, 'TOOL_NAME': 'TestFitsIrodsHelper' }
-        ihelper = firh.FitsIRodsHelper(args)
+        ihelper = firh.FitsIRodsHelper(self.defargs)
         assert ihelper is not None
 
         irff = ihelper.getf(self.irff_hh, absolute=True)
@@ -130,8 +171,7 @@ class TestIRods(object):
 
 
     def test_is_catalog_file_smallcat (self):
-        args = { 'debug': True, 'verbose': True, 'TOOL_NAME': 'TestFitsIrodsHelper' }
-        ihelper = firh.FitsIRodsHelper(args)
+        ihelper = firh.FitsIRodsHelper(self.defargs)
         assert ihelper is not None
 
         irff = ihelper.getf(self.irff_smallcat, absolute=True)
