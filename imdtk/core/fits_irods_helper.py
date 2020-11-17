@@ -1,7 +1,7 @@
 #
 # Class for manipulating FITS files within the the iRods filesystem.
 #   Written by: Tom Hicks. 11/1/20.
-#   Last Modified: Refactor methods getting headers.
+#   Last Modified: Move FITS block size and end key to fits_utils. Add is_catalog_header. Sort methods.
 #
 import os
 import sys
@@ -13,14 +13,12 @@ from astropy.io import fits
 
 from imdtk.core import FitsHeaderInfo
 import imdtk.core.fits_utils as fits_utils
-from imdtk.core.fits_utils import FITS_IGNORE_KEYS
+from imdtk.core.fits_utils import FITS_BLOCK_SIZE, FITS_END_KEY, FITS_IGNORE_KEYS
 from imdtk.core.irods_helper import IRodsHelper
 from imdtk.core.misc_utils import product
 
 
-FITS_BLOCK_SIZE = 2880
 FITS_ENCODING = 'utf-8'
-FITS_END_KEY = b'END'
 IRODS_FILE_ATTRIBUTES =[ 'checksum', 'create_time', 'modify_time', 'name',
                          'owner_name', 'owner_zone', 'path', 'size',
                          'status', 'type', 'version' ]
@@ -82,38 +80,6 @@ class FitsIRodsHelper (IRodsHelper):
         return (blocks * FITS_BLOCK_SIZE)
 
 
-    def get_irods_file_info (self, irff=None):
-        """ Return a dictionary of file information about the given iRods FITS file. """
-        file_info = dict()
-
-        if (irff):
-            file_info['file_path'] = irff.path
-            file_info['file_name'] = irff.name
-            file_info['file_size'] = irff.size
-            for attr in IRODS_FILE_ATTRIBUTES:
-                val = getattr(irff, attr, lambda: None)
-                if (val):
-                    file_info[attr] = str(val) if (isinstance(val, dt.datetime)) else val
-
-            md = self.get_irods_file_metadata(irff)
-            if (md):
-                file_info['irods_metadata'] = md
-
-        return file_info
-
-
-    def get_irods_file_metadata (self, irff=None):
-        """ Return a dictionary of iRods file metadata (if any) for the given iRods file. """
-        metadata = dict()
-
-        if (irff):
-            irmd = getattr(irff, 'metadata', lambda: None)
-            if (irmd):
-                metadata = { md.name: md.value for md in irmd.items() }
-
-        return metadata
-
-
     def get_header (self, irods_fits_file, which_hdu=0):
         """
         Return a FITS header for the specified HDU (default: 0 (the first HDU)) of
@@ -167,13 +133,43 @@ class FitsIRodsHelper (IRodsHelper):
             return None
 
 
-    def is_catalog_file (self, irods_fits_file, which_hdu=1):
+    def get_irods_file_info (self, irff=None):
+        """ Return a dictionary of file information about the given iRods FITS file. """
+        file_info = dict()
+
+        if (irff):
+            file_info['file_path'] = irff.path
+            file_info['file_name'] = irff.name
+            file_info['file_size'] = irff.size
+            for attr in IRODS_FILE_ATTRIBUTES:
+                val = getattr(irff, attr, lambda: None)
+                if (val):
+                    file_info[attr] = str(val) if (isinstance(val, dt.datetime)) else val
+
+            md = self.get_irods_file_metadata(irff)
+            if (md):
+                file_info['irods_metadata'] = md
+
+        return file_info
+
+
+    def get_irods_file_metadata (self, irff=None):
+        """ Return a dictionary of iRods file metadata (if any) FOR the given iRods file. """
+        metadata = dict()
+
+        if (irff):
+            irmd = getattr(irff, 'metadata', lambda: None)
+            if (irmd):
+                metadata = { md.name: md.value for md in irmd.items() }
+
+        return metadata
+
+
+    def is_catalog_header (self, header):
         """
-        Tell whether the given FITS file is a FITS catalog or not,
-        based on a specified HDU (defaults to the first extension).
+        Tell whether the given FITS HDU header is for a catalog or not.
         Assumes: a catalog HDU will be of type BINTABLE or TABLE:
         """
-        header = self.get_header(irods_fits_file, which_hdu)
         if (header is not None):
             return (header.get('XTENSION') in ['BINTABLE', 'TABLE'])
         else:
