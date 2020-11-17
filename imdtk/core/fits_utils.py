@@ -1,7 +1,7 @@
 #
 # Module to provide FITS utility functions for Astrolabe code.
 #   Written by: Tom Hicks. 1/26/2020.
-#   Last Modified: Recognize TABLE extension as a catalog file.
+#   Last Modified: Move FITS block size and end key here.
 #
 import fnmatch
 # import pandas
@@ -17,6 +17,12 @@ from imdtk.core.misc_utils import to_JSON
 # patterns for identifying FITS and gzipped FITS files
 _FITS_PAT = "*.fits"
 _GZFITS_PAT = "*.fits.gz"
+
+# size, in bytes, of each FITS file chunk
+FITS_BLOCK_SIZE = 2880
+
+# keyword byte string identifying the last (unpadded!) card in a FITS Header
+FITS_END_KEY = b'END'
 
 # suffixes for identifying FITS and gzipped FITS files
 FITS_EXTENTS = [ '.fits', '.fits.gz' ]
