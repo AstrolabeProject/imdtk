@@ -1,7 +1,7 @@
 #
 # Class for manipulating FITS files within the the iRods filesystem.
 #   Written by: Tom Hicks. 11/1/20.
-#   Last Modified: Add is_image_header method.
+#   Last Modified: Add stub for get_column_info.
 #
 import os
 import sys
@@ -78,6 +78,24 @@ class FitsIRodsHelper (IRodsHelper):
             blocks = ceil(B * GCOUNT * (PCOUNT + product(N)) / FITS_BLOCK_SIZE)
 
         return (blocks * FITS_BLOCK_SIZE)
+
+
+    def get_column_info (self, irods_fits_file, header):
+        """
+        Return a dictionary of metadata describing the columns of the table in the
+        specified HDU. Per Astropy, the returned dictionary contains arrays of metadata,
+        each containing values for a particular property for each table column (e.g., name,
+        format, unit, bscale, etc).
+        """
+        col_md = None
+        try:
+            pass
+        # TODO: IMPLEMENT LATER
+            # if (which_hdu < len(hdus_list)):    # if HDU index is in valid range
+            #     col_md = hdus_list[which_hdu].columns.info(output=False)
+        except AttributeError:                  # probably wrong HDU was specified
+            return None
+        return col_md
 
 
     def get_header (self, irods_fits_file, which_hdu=0):

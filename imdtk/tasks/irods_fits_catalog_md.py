@@ -1,7 +1,7 @@
 #
-# Class to extract image metadata from iRods-resident FITS image files.
-#   Written by: Tom Hicks. 10/15/20.
-#   Last Modified: Minor update to doc strings.
+# Class to extract catalog metadata from iRods-resident FITS catalog files.
+#   Written by: Tom Hicks. 11/17/20.
+#   Last Modified: Initial creation.
 #
 import os
 import sys
@@ -16,12 +16,12 @@ from imdtk.core.fits_utils import FITS_BLOCK_SIZE, FITS_IGNORE_KEYS
 from imdtk.tasks.i_task import IImdTask
 
 
-class IRodsFitsImageMetadataTask (IImdTask):
-    """ Class to extract image metadata from iRods-resident FITS image files. """
+class IRodsFitsCatalogMetadataTask (IImdTask):
+    """ Class to extract catalog metadata from iRods-resident FITS catalog files."""
 
     def __init__(self, args):
         """
-        Constructor for class to extract image metadata from iRods-resident FITS image files.
+        Constructor for class to extract catalog metadata from iRods-resident FITS catalog files.
         """
         super().__init__(args)
         self.irods = None                   # holder for IRodsHelper instance
@@ -46,7 +46,7 @@ class IRodsFitsImageMetadataTask (IImdTask):
             print("({}.process): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
 
         # get the selection and filtering arguments
-        which_hdu = self.args.get('which_hdu', 0)
+        catalog_hdu = self.args.get('catalog_hdu', 1)
         ignore_list = self.args.get('ignore_list') or fits_utils.FITS_IGNORE_KEYS
 
         # get the iRods file path argument of the file to be opened
@@ -54,7 +54,7 @@ class IRodsFitsImageMetadataTask (IImdTask):
 
         # the specified FITS file must have a valid FITS extension
         if (not fits_utils.is_fits_filename(irff_path)):
-            errMsg = "A readable, valid FITS image filepath must be specified.".format(irff_path)
+            errMsg = "A readable, valid FITS filepath must be specified.".format(irff_path)
             raise errors.ProcessingError(errMsg)
 
         try:
@@ -70,20 +70,23 @@ class IRodsFitsImageMetadataTask (IImdTask):
                 raise errors.UnsupportedTypeError(errMsg)
 
             # actually read the file to get the specified header
-            header = self.irods.get_header(irff, which_hdu)
+            header = self.irods.get_header(irff, catalog_hdu)
             if (header):
-                if (not self.irods.is_image_header(header)):
-                    errMsg = "HDU {} is not an image header. Skipping FITS file '{}'.".format(which_hdu, irff_path)
+                if (not self.irods.is_catalog_header(header)):
+                    errMsg = "HDU {} is not a table header. Skipping FITS file '{}'.".format(catalog_hdu, irff_path)
                     raise errors.ProcessingError(errMsg)
 
                 # get and save some metadata ABOUT the iRods FITS file
                 file_info = self.irods.get_irods_file_info(irff)
 
+                # get and save metadata about the columns in the table
+                cinfo = self.irods.get_column_info(irff, header) # TODO: IMPLEMENT
+
                 # now try to read the FITS header from the FITS file
                 hdrs = fits_utils.get_fields_from_header(header, ignore_list)
 
             else:                           # unable to read the specified header
-                errMsg = "Unable to read image metadata from HDU {} of FITS file '{}'.".format(which_hdu, irff_path)
+                errMsg = "Unable to read catalog metadata from HDU {} of FITS file '{}'.".format(catalog_hdu, irff_path)
                 raise errors.ProcessingError(errMsg)
 
         except DataObjectDoesNotExist as dodne:
@@ -91,11 +94,13 @@ class IRodsFitsImageMetadataTask (IImdTask):
             raise errors.ProcessingError(errMsg)
 
         except OSError as oserr:
-            errMsg = "Unable to read image metadata from iRods FITS file '{}': {}.".format(irff_path, oserr)
+            errMsg = "Unable to read catalog metadata from iRods FITS file '{}': {}.".format(irff_path, oserr)
             raise errors.ProcessingError(errMsg)
 
         metadata = dict()                   # create overall metadata structure
         metadata['file_info'] = file_info   # add previously gathered remote file information
         if (hdrs is not None):
             metadata['headers'] = hdrs      # add the headers to the metadata
+        if (cinfo is not None):
+            metadata['column_info'] = cinfo  # add column metadata to the metadata
         return metadata                     # return the results of processing

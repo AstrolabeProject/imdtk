@@ -20,6 +20,7 @@ setup(
             'fits_cat_table_pipe = imdtk.tools.fits_catalog_table_pipe:main',
             'fits_img_md     = imdtk.tools.fits_image_md_cli:main',
             'img_aliases     = imdtk.tools.image_aliases_cli:main',
+            'irods_fits_cat_md   = imdtk.tools.irods_fits_catalog_md_cli:main',
             'irods_fits_img_md   = imdtk.tools.irods_fits_image_md_cli:main',
             'jwst_oc_calc    = imdtk.tools.jwst_oc_calc_cli:main',
             'jwst_pghyb_sink = imdtk.tools.jwst_pghybrid_sink_cli:main',
