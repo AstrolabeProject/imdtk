@@ -1,6 +1,6 @@
 # Tests for the iRods interface module.
 #   Written by: Tom Hicks. 11/5/20.
-#   Last Modified: Refactor default arguments. Add tests for get_irods_file_info, get_header_fields.
+#   Last Modified: Redo tests for is_catalog_header.
 #
 import os
 import pytest
@@ -149,33 +149,52 @@ class TestIRods(object):
         assert 'irods_metadata' in finfo
 
 
-    def test_is_catalog_file_m13 (self):
+    def test_is_catalog_header_m13 (self):
         ihelper = firh.FitsIRodsHelper(self.defargs)
         assert ihelper is not None
-
         irff = ihelper.getf(self.irff_m13, absolute=True)
-        assert ihelper.is_catalog_file(irff) is False
-        assert ihelper.is_catalog_file(irff, which_hdu=1) is False
-        assert ihelper.is_catalog_file(irff, which_hdu=0) is False
+
+        header = ihelper.get_header(irff)
+        assert ihelper.is_catalog_header(header) is False
+
+        header = ihelper.get_header(irff, which_hdu=1)
+        assert ihelper.is_catalog_header(header) is False
+
+        header = ihelper.get_header(irff, which_hdu=0)
+        assert ihelper.is_catalog_header(header) is False
 
 
-    def test_is_catalog_file_hh (self):
+    def test_is_catalog_header_hh (self):
         ihelper = firh.FitsIRodsHelper(self.defargs)
         assert ihelper is not None
-
         irff = ihelper.getf(self.irff_hh, absolute=True)
-        assert ihelper.is_catalog_file(irff) is True
-        assert ihelper.is_catalog_file(irff, which_hdu=1) is True
-        assert ihelper.is_catalog_file(irff, which_hdu=0) is False
-        assert ihelper.is_catalog_file(irff, which_hdu=3) is False
+
+        header = ihelper.get_header(irff)
+        assert ihelper.is_catalog_header(header) is False
+
+        header = ihelper.get_header(irff, which_hdu=1)
+        assert ihelper.is_catalog_header(header) is True
+
+        header = ihelper.get_header(irff, which_hdu=0)
+        assert ihelper.is_catalog_header(header) is False
+
+        header = ihelper.get_header(irff, which_hdu=3)
+        assert ihelper.is_catalog_header(header) is False
 
 
-    def test_is_catalog_file_smallcat (self):
+    def test_is_catalog_header_smallcat (self):
         ihelper = firh.FitsIRodsHelper(self.defargs)
         assert ihelper is not None
-
         irff = ihelper.getf(self.irff_smallcat, absolute=True)
-        assert ihelper.is_catalog_file(irff) is True
-        assert ihelper.is_catalog_file(irff, which_hdu=1) is True
-        assert ihelper.is_catalog_file(irff, which_hdu=0) is False
-        assert ihelper.is_catalog_file(irff, which_hdu=3) is False
+
+        header = ihelper.get_header(irff)
+        assert ihelper.is_catalog_header(header) is False
+
+        header = ihelper.get_header(irff, which_hdu=1)
+        assert ihelper.is_catalog_header(header) is True
+
+        header = ihelper.get_header(irff, which_hdu=0)
+        assert ihelper.is_catalog_header(header) is False
+
+        header = ihelper.get_header(irff, which_hdu=3)
+        assert ihelper.is_catalog_header(header) is False
