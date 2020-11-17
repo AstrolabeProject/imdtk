@@ -1,7 +1,7 @@
 #
 # Class for manipulating FITS files within the the iRods filesystem.
 #   Written by: Tom Hicks. 11/1/20.
-#   Last Modified: Move FITS block size and end key to fits_utils. Add is_catalog_header. Sort methods.
+#   Last Modified: Add is_image_header method.
 #
 import os
 import sys
@@ -173,6 +173,47 @@ class FitsIRodsHelper (IRodsHelper):
         if (header is not None):
             return (header.get('XTENSION') in ['BINTABLE', 'TABLE'])
         else:
+            return False
+
+
+    def is_image_header (self, header):
+        """
+        Tell whether the given FITS HDU header is for an image or not.
+        Note: based on a bunch of heuristics, hopefully correctly inferred from
+              the FITS Standard version 4.0, revision 8/13/2018.
+        """
+        if ((header is None) or (header.get('NAXIS') == 0)):  # per FITS 4.0: 4.4.1.1
+            return False
+
+        # if this header is the Primary Header
+        if (header.get('SIMPLE', False) is True):
+            if (header.get('NAXIS') < 2):   # heuristic: images have at least 2 dimensions?
+                return False
+
+            N = [header[f'NAXIS{idx}'] for idx in range(1, header['NAXIS'] + 1)]
+            if (0 in N):                    # per FITS 4.0: 4.4.1.1, 7.1.1
+                return False                # zero in any NAXISn => no data blocks
+
+            if (header.get('NTABLE') is not None):  # heuristic: number of table extensions
+                return False
+
+            if (header.get('VOTMETA', False) is True):  # heuristic
+                return False
+
+            return True                     # passed all checks
+
+        # else if this header is an Image Extension header
+        elif (header.get('XTENSION') in ['IMAGE']):
+            if (header.get('NAXIS') < 2):   # heuristic: images have at least 2 dimensions?
+                return False
+
+            N = [header[f'NAXIS{idx}'] for idx in range(1, header['NAXIS'] + 1)]
+            if (0 in N):                    # per FITS 4.0: 4.4.1.1, 7.1.1
+                return False                # zero in any NAXISn => no data blocks
+
+            return True                     # passed all checks
+
+        else:                               # else assume not an image header
             return False
 
 
