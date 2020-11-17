@@ -348,6 +348,28 @@ fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct noalias -
 # fits_cat_data -v -ff /vos/catalogs/DC_191217/photometry_table_psf_matched_v5.0.fits -v -g
 
 
+echo "============================================"
+echo "iRods Image Metadata extraction:"
+echo ""
+echo "--------------------------------------------"
+echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
+echo "--------------------------------------------"
+irods_fits_img_md -iff /iplant/home/hickst/vos/images/m14.fits -v
+irods_fits_img_md -iff /iplant/home/hickst/vos/images/BAD.fits -v
+irods_fits_img_md -iff /iplant/home/hickst/vos/images/m13.fits -v -hdu 1
+irods_fits_img_md -iff /iplant/home/hickst/vos/images/small_table.fits -v
+irods_fits_img_md -iff /iplant/home/hickst/vos/images/small_table.fits -v -hdu 1
+irods_fits_img_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v -hdu 1
+irods_fits_img_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -v -hdu 1
+irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v -hdu 1
+echo "--------------------------------------------"
+irods_fits_img_md -iff /iplant/home/hickst/vos/images/m13.fits -v
+irods_fits_img_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v
+irods_fits_img_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -v
+irods_fits_img_md -iff /iplant/home/hickst/sample-data/egami-samp/test_mosaic_F356W_2018_03_19.fits -v
+irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v
+
+
 # echo "============================================"
 # echo "Current development:"
 # echo "--------------------------------------------"
