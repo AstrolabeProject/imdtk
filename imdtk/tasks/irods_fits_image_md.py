@@ -1,12 +1,10 @@
 #
 # Class for extracting header information from iRods-resident FITS files.
 #   Written by: Tom Hicks. 10/15/20.
-#   Last Modified: Refactor to skip catalog HDUs. Use FITS block size fromfits_utils.
+#   Last Modified: Update to check and process only image HDUs.
 #
 import os
 import sys
-
-# from astropy.io import fits
 
 from irods.exception import DataObjectDoesNotExist
 
@@ -16,7 +14,6 @@ import imdtk.core.fits_utils as fits_utils
 
 from imdtk.core.fits_utils import FITS_BLOCK_SIZE, FITS_IGNORE_KEYS
 from imdtk.tasks.i_task import IImdTask
-from imdtk.tools.cli_utils import FITS_FILE_EXIT_CODE
 
 
 class IRodsFitsImageMetadataTask (IImdTask):
@@ -75,8 +72,8 @@ class IRodsFitsImageMetadataTask (IImdTask):
             # actually read the file to get the specified header
             header = self.irods.get_header(irff, which_hdu)
             if (header):
-                if (self.irods.is_catalog_header(header)):
-                    errMsg = "HDU {} is a table. Skipping FITS file '{}'.".format(which_hdu, irff_path)
+                if (not self.irods.is_image_header(header)):
+                    errMsg = "HDU {} is not an image header. Skipping FITS file '{}'.".format(which_hdu, irff_path)
                     raise errors.ProcessingError(errMsg)
 
                 # get and save some metadata ABOUT the iRods FITS file
@@ -102,8 +99,3 @@ class IRodsFitsImageMetadataTask (IImdTask):
         if (hdrs is not None):
             metadata['headers'] = hdrs      # add the headers to the metadata
         return metadata                     # return the results of processing
-
-
-    #
-    # Non-interface and/or task-specific Methods
-    #
