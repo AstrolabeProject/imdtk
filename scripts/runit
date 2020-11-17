@@ -396,11 +396,12 @@
 # irods_fits_img_md -iff /iplant/home/hickst/vos/images/BAD.fits -v
 # irods_fits_img_md -iff /iplant/home/hickst/vos/images/m13.fits -v
 # irods_fits_img_md -iff /iplant/home/hickst/vos/images/m13.fits -v -hdu 1
-# irods_fits_img_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v
+irods_fits_img_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v
 irods_fits_img_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v -hdu 1
 # irods_fits_img_md -iff /iplant/home/hickst/vos/images/small_table.fits -v
 # irods_fits_img_md -iff /iplant/home/hickst/vos/images/small_table.fits -v -hdu 1
 # irods_fits_img_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -v
+# irods_fits_img_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -v -hdu 1
 # irods_fits_img_md -iff /iplant/home/hickst/sample-data/egami-samp/test_mosaic_F356W_2018_03_19.fits -v
 # irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v
 # irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v -hdu 1
