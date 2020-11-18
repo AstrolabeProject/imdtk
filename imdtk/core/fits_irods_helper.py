@@ -1,7 +1,7 @@
 #
 # Class for manipulating FITS files within the the iRods filesystem.
 #   Written by: Tom Hicks. 11/1/20.
-#   Last Modified: Add stub for get_column_info.
+#   Last Modified: Add methods to read a chunk, read an HDU, get a specific HDU.
 #
 import os
 import sys
@@ -10,9 +10,11 @@ import datetime as dt
 from math import ceil
 
 from astropy.io import fits
+from astropy.io.fits.hdu.hdulist import HDUList
 
-from imdtk.core import FitsHeaderInfo
 import imdtk.core.fits_utils as fits_utils
+import imdtk.core.column_info as column_info
+from imdtk.core import FitsHeaderInfo
 from imdtk.core.fits_utils import FITS_BLOCK_SIZE, FITS_END_KEY, FITS_IGNORE_KEYS
 from imdtk.core.irods_helper import IRodsHelper
 from imdtk.core.misc_utils import product
@@ -89,13 +91,39 @@ class FitsIRodsHelper (IRodsHelper):
         """
         col_md = None
         try:
-            pass
-        # TODO: IMPLEMENT LATER
-            # if (which_hdu < len(hdus_list)):    # if HDU index is in valid range
-            #     col_md = hdus_list[which_hdu].columns.info(output=False)
-        except AttributeError:                  # probably wrong HDU was specified
+            if (header is not None):
+                column_info.get_column_info(header)
+        except AttributeError as ae:                  # probably wrong HDU was specified
             return None
         return col_md
+
+
+    def get_hdu (self, irods_fits_file, which_hdu=0):
+        """
+        Return the specified HDU (default: 0 (the first HDU)) of the given iRods FITS file.
+        Returns None if the specified HDU is out of range.
+        """
+        with irods_fits_file.open('r+') as irff_fd:
+            return self.get_hdu_at(irff_fd, irods_fits_file.size, which_hdu)
+
+
+    def get_hdu_at (self, irff_fd, irff_size, which_hdu=0):
+        """
+        Follow the chain of HDU headers and return the specified HDU,
+        given an open iRods FITS file and its size.
+        Returns None if the specified HDU is out of range.
+
+        Note: the current file position is moved as a side-effect of this method!
+        """
+        hdr_info = self.get_header_info_at(irff_fd, irff_size, which_hdu)
+        if (hdr_info is None):              # failed to find the desired header
+            return None                     # signal failure
+
+        data_len = self.calc_data_length(hdr_info.hdr)  # find length of data segment
+        hdu_len = hdr_info.length + data_len  # calculate total length of HDU
+
+        irff_fd.seek(hdr_info.offset, 0)      # seek to start of HDU
+        return self.read_hdu(irff_fd, irff_size, hdu_len)
 
 
     def get_header (self, irods_fits_file, which_hdu=0):
@@ -109,8 +137,21 @@ class FitsIRodsHelper (IRodsHelper):
 
     def get_header_at (self, irff_fd, irff_size, which_hdu=0):
         """
-        Follow the chain of HDU headers to return the header for the specified
-        HDU, given an open iRods FITS file and its size.
+        Follow the chain of HDU headers to return the header for
+        the specified HDU, given an open iRods FITS file and its size.
+        Returns None if the specified HDU is out of range.
+
+        Note: the current file position is moved as a side-effect of this method!
+        """
+        hdr_info = self.get_header_info_at(irff_fd, irff_size, which_hdu)
+        return hdr_info.hdr if (hdr_info is not None) else None
+
+
+    def get_header_info_at (self, irff_fd, irff_size, which_hdu=0):
+        """
+        Follow the chain of HDU headers to return a header information record for
+        the specified HDU, given an open iRods FITS file and its size.
+        Returns None if the specified HDU is out of range.
 
         Note: the current file position is moved as a side-effect of this method!
         """
@@ -133,7 +174,7 @@ class FitsIRodsHelper (IRodsHelper):
             else:                           # else we got another header
                 hdr_index += 1
 
-        return hdr_info.hdr                 # success: return the desired header
+        return hdr_info                     # success: return the desired header information
 
 
     def get_header_fields (self, irods_fits_file, which_hdu=0, ignore=FITS_IGNORE_KEYS):
@@ -235,21 +276,56 @@ class FitsIRodsHelper (IRodsHelper):
             return False
 
 
+    def read_chunk (self, irff_fd, irff_size, chunk_size=FITS_BLOCK_SIZE):
+        """
+        Read and return a chunk of bytes from the given open file at the current file position.
+        Returns None if the file does not contain the specified number of bytes from
+        the current file position.
+
+        Note: the current file position is moved as a side-effect of this method!
+        """
+        pos = irff_fd.tell()                # current position in file
+        if ((pos + chunk_size) > irff_size):  # not enough data left to read
+            return None                     # signal failure
+        return irff_fd.read(chunk_size)     # read and return chunck
+
+
+    def read_hdu (self, irff_fd, irff_size, hdu_size):
+        """
+        Read a chunk of hdu_size bytes at the current file position and
+        return a single HDU, given an open iRods FITS file and its size.
+        Returns None if the unable to produce an HDU.
+
+        Note: the current file position is moved as a side-effect of this method!
+        """
+        hdu_data = self.read_chunk(irff_fd, irff_size, chunk_size=hdu_size)
+        if (hdu_data is None):
+            return None                     # signal failure
+
+        # create singleton list of HDU from the HDU data bytes
+        hdulist = HDUList.fromstring(hdu_data)
+        if (hdulist and len(hdulist) > 0):
+            return hdulist[0]               # return the solitary HDU
+        else:                               # just in case
+            return None                     # signal failure
+
+
     def read_header (self, irff_fd, irff_size):
         """
-        Read and return the FITS header from the given open file at the current offset.
+        Read and return the FITS header from the given open file at the current file position.
 
         Returns the header in a header information object (FitsHeaderInfo) along with
         the header offset (from the start of the stream) and header length.
 
-        Returns None if the file does not contain a full block of bytes from the given offset.
+        Returns None if the file does not contain a full block of bytes from
+        the current file position.
 
         Note: the current file position is moved as a side-effect of this method!
         """
         header_str = b''
         length = 0
-        start = irff_fd.tell()              # save absolute starting offset
-        pos = start                         # absolute current offset
+        start = irff_fd.tell()              # save absolute starting position
+        pos = start                         # absolute current position
 
         while True:
             if (pos >= irff_size):          # safety check: abort on empty or truncated file
