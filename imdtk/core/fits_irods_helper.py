@@ -1,7 +1,7 @@
 #
 # Class for manipulating FITS files within the the iRods filesystem.
 #   Written by: Tom Hicks. 11/1/20.
-#   Last Modified: Add methods to read a chunk, read an HDU, get a specific HDU.
+#   Last Modified: Implement get_column_info using an HDU.
 #
 import os
 import sys
@@ -13,7 +13,6 @@ from astropy.io import fits
 from astropy.io.fits.hdu.hdulist import HDUList
 
 import imdtk.core.fits_utils as fits_utils
-import imdtk.core.column_info as column_info
 from imdtk.core import FitsHeaderInfo
 from imdtk.core.fits_utils import FITS_BLOCK_SIZE, FITS_END_KEY, FITS_IGNORE_KEYS
 from imdtk.core.irods_helper import IRodsHelper
@@ -82,18 +81,18 @@ class FitsIRodsHelper (IRodsHelper):
         return (blocks * FITS_BLOCK_SIZE)
 
 
-    def get_column_info (self, irods_fits_file, header):
+    def get_column_info (self, irods_fits_file, hdu):
         """
         Return a dictionary of metadata describing the columns of the table in the
-        specified HDU. Per Astropy, the returned dictionary contains arrays of metadata,
+        given HDU. Per Astropy, the returned dictionary contains arrays of metadata,
         each containing values for a particular property for each table column (e.g., name,
         format, unit, bscale, etc).
         """
         col_md = None
         try:
-            if (header is not None):
-                column_info.get_column_info(header)
-        except AttributeError as ae:                  # probably wrong HDU was specified
+            if (hdu is not None):
+                col_md = hdu.columns.info(output=False)
+        except AttributeError as ae:        # probably wrong HDU was specified
             return None
         return col_md
 

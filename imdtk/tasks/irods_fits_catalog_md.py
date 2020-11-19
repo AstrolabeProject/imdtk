@@ -1,7 +1,7 @@
 #
 # Class to extract catalog metadata from iRods-resident FITS catalog files.
 #   Written by: Tom Hicks. 11/17/20.
-#   Last Modified: Initial creation.
+#   Last Modified: Update for implementation of get_column_info using an HDU.
 #
 import os
 import sys
@@ -69,9 +69,10 @@ class IRodsFitsCatalogMetadataTask (IImdTask):
                 errMsg = "File is too small to be a valid FITS file: '{}'".format(irff_path)
                 raise errors.UnsupportedTypeError(errMsg)
 
-            # actually read the file to get the specified header
-            header = self.irods.get_header(irff, catalog_hdu)
-            if (header):
+            # actually read the file to get the specified HDU
+            hdu = self.irods.get_hdu(irff, catalog_hdu)
+            if (hdu):
+                header = hdu.header
                 if (not self.irods.is_catalog_header(header)):
                     errMsg = "HDU {} is not a table header. Skipping FITS file '{}'.".format(catalog_hdu, irff_path)
                     raise errors.ProcessingError(errMsg)
@@ -80,7 +81,7 @@ class IRodsFitsCatalogMetadataTask (IImdTask):
                 file_info = self.irods.get_irods_file_info(irff)
 
                 # get and save metadata about the columns in the table
-                cinfo = self.irods.get_column_info(irff, header) # TODO: IMPLEMENT
+                cinfo = self.irods.get_column_info(irff, hdu)
 
                 # now try to read the FITS header from the FITS file
                 hdrs = fits_utils.get_fields_from_header(header, ignore_list)
