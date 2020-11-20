@@ -1,7 +1,7 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: Update for renames.
+#   Last Modified: Remove unused instance variable.
 #
 import os
 import sys
@@ -21,9 +21,6 @@ class FitsImageMetadataTask (IImdTask):
         Constructor for the class extracting header information from FITS files.
         """
         super().__init__(args)
-
-        # Path to a readable FITS image file from which to extract metadata.
-        self._fits_file = args.get('fits_file')
 
 
     #

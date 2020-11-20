@@ -1,7 +1,7 @@
 #
 # Class to extract catalog metadata from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 7/6/2020.
-#   Last Modified: Update for CLI utils redo.
+#   Last Modified: Remove unused instance variable.
 #
 import os
 import sys
@@ -21,9 +21,6 @@ class FitsCatalogMetadataTask (IImdTask):
         Constructor for the class to extract catalog metadata from a FITS file and output it as JSON.
         """
         super().__init__(args)
-
-        # Path to a readable FITS catalog file
-        self._fits_file = args.get('fits_file')
 
 
     #

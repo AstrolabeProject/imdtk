@@ -1,7 +1,7 @@
 #
 # Class to extract a catalog data table from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 8/12/2020.
-#   Last Modified: Update for data array conversion in FITS utils.
+#   Last Modified: Remove unused instance variable.
 #
 import os
 import sys
@@ -22,9 +22,6 @@ class FitsCatalogDataTask (IImdTask):
         Constructor for the class to a extract catalog data table from a FITS file and output it as JSON.
         """
         super().__init__(args)
-
-        # Path to a readable FITS catalog file
-        self._fits_file = args.get('fits_file')
 
 
     #

@@ -1,7 +1,7 @@
 #
 # Class to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/2020.
-#   Last Modified: Update for removal of images dir prefix.
+#   Last Modified: Remove unused instance variable.
 #
 import sys
 
@@ -34,9 +34,6 @@ class JWST_ObsCoreCalcTask (IObsCoreCalcTask):
         Constructor for class which calculates values for ObsCore fields in a metadata structure.
         """
         super().__init__(args)
-
-        # Path to a readable FITS image file from which to extract metadata.
-        self._fits_file = args.get('fits_file')
 
 
     #
