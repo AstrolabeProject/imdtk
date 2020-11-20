@@ -1,13 +1,13 @@
 #
 # Class to sink incoming data to a CSV file.
 #   Written by: Tom Hicks. 6/26/2020.
-#   Last Modified: Update for renames.
+#   Last Modified: Raise exception on missing calculated data.
 #
 import csv
 import sys
 
-import imdtk.core.misc_utils as misc_utils
 import imdtk.tasks.metadata_utils as md_utils
+from imdtk.core.misc_utils import remove_entries
 from imdtk.tasks.i_task import IImdTask, STDOUT_NAME
 
 # Default file extension for CSV output files
@@ -92,8 +92,13 @@ class CSVFileSink (IImdTask):
         """
 
         # copy the metadata and remove the fields in the skip list
-        selected = md_utils.get_calculated(metadata).copy()
-        misc_utils.remove_entries(selected, ignore=self.skipColumnList)
+        calculated = md_utils.get_calculated(metadata)
+        if (not calculated):
+            errMsg = "The 'calculated' data, required by this program, is missing from the input."
+            raise errors.ProcessingError(errMsg)
+
+        selected = calculated.copy()
+        remove_entries(selected, ignore=self.skipColumnList)
 
         # list the fields in alphabetical order and, optionally, make one field primary
         fieldnames = sorted(list(selected.keys()), key=str.lower)

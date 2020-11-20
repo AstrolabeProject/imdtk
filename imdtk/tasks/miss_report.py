@@ -1,7 +1,7 @@
 #
 # Class to report on the presence of missing fields in the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/2020.
-#   Last Modified: Remove unused import.
+#   Last Modified: Raise exception on missing calculated data.
 #
 import sys
 
@@ -52,6 +52,9 @@ class MissingFieldsTask (IImdTask):
         """
         report = []
         calculated = md_utils.get_calculated(metadata)
+        if (not calculated):
+            errMsg = "The 'calculated' data, required by this program, is missing from the input."
+            raise errors.ProcessingError(errMsg)
 
         fields_info = md_utils.get_fields_info(metadata)
         for field_name, props in fields_info.items():

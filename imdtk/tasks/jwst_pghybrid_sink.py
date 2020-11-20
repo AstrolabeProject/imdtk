@@ -1,7 +1,7 @@
 #
 # Class to sink incoming image metadata to a Hybrid (SQL/JSON) PostgreSQL database.
 #   Written by: Tom Hicks. 7/3/2020.
-#   Last Modified: Update for changes in PG SQL module.
+#   Last Modified: Raise exception on missing calculated data.
 #
 import psycopg2
 import sys
@@ -59,7 +59,12 @@ class JWST_HybridPostgreSQLSink (ISQLSink):
         Select a subset of data, from the given metadata, for output.
         Returns a single dictionary of selected data.
         """
-        selected = md_utils.get_calculated(metadata).copy()
+        calculated = md_utils.get_calculated(metadata)
+        if (not calculated):
+            errMsg = "The 'calculated' data, required by this program, is missing from the input."
+            raise errors.ProcessingError(errMsg)
+
+        selected = calculated.copy()
         return selected                     # return selected dataset
 
 
