@@ -18,6 +18,10 @@ fits_cat_mktbl -d --version
 fits_cat_table_pipe -d --version
 fits_img_md -d --version
 img_aliases -d --version
+irods_fits_cat_md -d --version
+irods_fits_img_md -d --version
+irods_jwst_oc_calc -d --version
+irods_md_pgsql_pipe -d --version
 jwst_oc_calc -d --version
 jwst_pghyb_sink -d --version
 jwst_pgsql_sink -d --version
@@ -46,6 +50,14 @@ echo "--------------------------------------------"
 fits_img_md --help
 echo "--------------------------------------------"
 img_aliases --help
+echo "--------------------------------------------"
+irods_fits_cat_md --help
+echo "--------------------------------------------"
+irods_fits_img_md --help
+echo "--------------------------------------------"
+irods_jwst_oc_calc --help
+echo "--------------------------------------------"
+irods_md_pgsql_pipe --help
 echo "--------------------------------------------"
 jwst_oc_calc --help
 echo "--------------------------------------------"
@@ -233,7 +245,7 @@ csv_sink -d -if /work/hafijocmr1 -of /work/hafijocmrcsv1
 
 
 echo "============================================"
-echo "Exception catching on bad files (ERROR EXPECTED):"
+echo "Exception catching on bad files (ERRORS EXPECTED):"
 echo "--------------------------------------------"
 fits_img_md -ff /vos/images/BAD.fits -g -v
 fits_img_md -ff /vos/images/small_table.fits -g -v
@@ -350,7 +362,6 @@ fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct noalias -
 
 echo "============================================"
 echo "iRods Image Metadata extraction:"
-echo ""
 echo "--------------------------------------------"
 echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 echo "--------------------------------------------"
@@ -363,11 +374,39 @@ irods_fits_img_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v -hdu 1
 irods_fits_img_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -v -hdu 1
 irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v -hdu 1
 echo "--------------------------------------------"
-irods_fits_img_md -iff /iplant/home/hickst/vos/images/m13.fits -v
-irods_fits_img_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v
-irods_fits_img_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -v
-irods_fits_img_md -iff /iplant/home/hickst/sample-data/egami-samp/test_mosaic_F356W_2018_03_19.fits -v
-irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v
+irods_fits_img_md -iff /iplant/home/hickst/vos/images/m13.fits -g -v
+irods_fits_img_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -g -v
+irods_fits_img_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -g -v
+irods_fits_img_md -iff /iplant/home/hickst/sample-data/egami-samp/test_mosaic_F356W_2018_03_19.fits -g -v
+irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -g -v
+
+
+echo "============================================"
+echo "iRods Catalog Metadata extraction:"
+echo "--------------------------------------------"
+echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
+echo "--------------------------------------------"
+irods_fits_cat_md -iff /iplant/home/hickst/vos/images/m14.fits -v
+irods_fits_cat_md -iff /iplant/home/hickst/vos/images/BAD.fits -v
+irods_fits_cat_md -iff /iplant/home/hickst/vos/images/m13.fits -v
+irods_fits_cat_md -iff /iplant/home/hickst/vos/images/m13.fits -v -chdu 1
+irods_fits_cat_md -iff /iplant/home/hickst/vos/images/m13.fits -v -chdu 0
+irods_fits_cat_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v -chdu 0
+irods_fits_cat_md -iff /iplant/home/hickst/vos/images/small_table.fits -v -chdu 0
+irods_fits_cat_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -v
+irods_fits_cat_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -v -chdu 1
+irods_fits_cat_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -v -chdu 0
+irods_fits_cat_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v
+irods_fits_cat_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v -chdu 0
+irods_fits_cat_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v -chdu 1
+irods_fits_cat_md -iff /iplant/home/hickst/vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -chdu 0
+echo "--------------------------------------------"
+irods_fits_cat_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v -g
+irods_fits_cat_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v -chdu 1 -g
+irods_fits_cat_md -iff /iplant/home/hickst/vos/images/small_table.fits -v -g
+irods_fits_cat_md -iff /iplant/home/hickst/vos/images/small_table.fits -v -chdu 1 -g
+irods_fits_cat_md -iff /iplant/home/hickst/vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -g
+irods_fits_cat_md -iff /iplant/home/hickst/vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -chdu 1 -g
 
 
 # echo "============================================"

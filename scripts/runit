@@ -18,7 +18,10 @@
 # fits_cat_table_pipe -d --version
 # fits_img_md -d --version
 # img_aliases -d --version
+# irods_fits_cat_md -d --version
 # irods_fits_img_md -d --version
+# irods_jwst_oc_calc -d --version
+# irods_md_pgsql_pipe -d --version
 # jwst_oc_calc -d --version
 # jwst_pghyb_sink -d --version
 # jwst_pgsql_sink -d --version
@@ -48,7 +51,13 @@
 # echo "--------------------------------------------"
 # img_aliases --help
 # echo "--------------------------------------------"
+# irods_fits_cat_md --help
+# echo "--------------------------------------------"
 # irods_fits_img_md --help
+# echo "--------------------------------------------"
+# irods_jwst_oc_calc --help
+# echo "--------------------------------------------"
+# irods_md_pgsql_pipe --help
 # echo "--------------------------------------------"
 # jwst_oc_calc --help
 # echo "--------------------------------------------"
@@ -353,7 +362,6 @@
 
 # echo "============================================"
 # echo "iRods Image Metadata extraction:"
-# echo ""
 # echo "--------------------------------------------"
 # echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 # echo "--------------------------------------------"
@@ -369,60 +377,14 @@
 # irods_fits_img_md -iff /iplant/home/hickst/vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -hdu 0
 # irods_fits_img_md -iff /iplant/home/hickst/vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -hdu 1
 # echo "--------------------------------------------"
-# irods_fits_img_md -iff /iplant/home/hickst/vos/images/m13.fits -v
-# irods_fits_img_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v
-# irods_fits_img_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -v
-# irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v
-
-
-# echo "============================================"
-# echo "Current development:"
-# echo "--------------------------------------------"
-# echo ""
-# echo "---------- Store image MD to SQL & Hybrid tables ----------"
-# fits_img_md -v -ff /vos/images/DC_191217/F356W.fits | img_aliases | fields_info | jwst_oc_calc -ff /vos/images/DC_191217/F356W.fits | miss_report -v | jwst_pgsql_sink -v
-# fits_img_md -v -ff /vos/images/DC_191217/F356W.fits | img_aliases | fields_info | jwst_oc_calc -ff /vos/images/DC_191217/F356W.fits | miss_report -v | jwst_pghyb_sink -v
-
-# echo "---------- Make table in DB: with aliases, w/o aliases, repetition failure  ----------"
-# fits_cat_md -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v
-# fits_cat_md -ff /vos/catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl2 -v
-# fits_cat_md -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v
-
-# echo "---------- Make table Pipeline ----------"
-# fits_cat_mktbl_pipe -ff /vos/catalogs/small_table.fits -ct test_tbl -sql -g -v
-# fits_cat_mktbl_pipe -ff /vos/catalogs/small_table.fits -ct test_tbl -v
-
-
-# fits_cat_md -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v
-# fits_cat_data -ff /vos/catalogs/small_table.fits -v | fits_cat_fill -ct test_tbl -v -sql -g
-# fits_cat_data -ff /vos/catalogs/small_table.fits -v | fits_cat_fill -ct test_tbl -v
-
-# echo "---------- Fill table Pipeline ----------"
-# fits_cat_table_pipe -ff /vos/catalogs/small_table.fits -ct test_tbl -v -sql -g
-
-# echo "---------- Make & Fill table Pipeline ----------"
-# fits_cat_md -ff /vos/catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl2 -v
-# fits_cat_mktbl_pipe -ff /vos/catalogs/small_table.fits -ct test_tbl2 -v
-# fits_cat_mktbl_pipe -ff /vos/catalogs/small_table.fits -a /imdtk/config/jwst-cat-aliases.ini -ct test_tbl2 -v
-# fits_cat_table_pipe -ff /vos/catalogs/small_table.fits -ct test_tbl2 -v
-
-# Medium sized (~1M) data file:
-# fits_cat_mktbl_pipe -ff /vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -a /imdtk/config/jwst-cat-aliases.ini -ct test_ez -v
-# fits_cat_mktbl_pipe -ff /vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -ct test_ez -v
-# fits_cat_table_pipe -ff /vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -ct test_ez -v
-
-# Medium sized (~2.9M) data file:
-# fits_cat_mktbl_pipe -ff /vos/catalogs/DC_191217/Photometric_Catalog.F200W_kron_f80.fits -a /imdtk/config/jwst-cat-aliases.ini -ct test_pho -v
-# fits_cat_mktbl_pipe -ff /vos/catalogs/DC_191217/Photometric_Catalog.F200W_kron_f80.fits -ct test_pho -v
-# fits_cat_table_pipe -ff /vos/catalogs/DC_191217/Photometric_Catalog.F200W_kron_f80.fits -ct test_pho -v
-
-
-# fits_cat_md -ff /vos/catalogs/small_table.fits    # REMOVE LATER
+# irods_fits_img_md -iff /iplant/home/hickst/vos/images/m13.fits -g -v
+# irods_fits_img_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -g -v
+# irods_fits_img_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -g -v
+# irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -g -v
 
 
 # echo "============================================"
 # echo "iRods Catalog Metadata extraction:"
-# echo ""
 # echo "--------------------------------------------"
 # echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 # echo "--------------------------------------------"
@@ -441,11 +403,67 @@
 # irods_fits_cat_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v -chdu 1
 # irods_fits_cat_md -iff /iplant/home/hickst/vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -chdu 0
 # echo "--------------------------------------------"
-# irods_fits_cat_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v
-# irods_fits_cat_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v -chdu 1
-# irods_fits_cat_md -iff /iplant/home/hickst/vos/images/small_table.fits -v
-# irods_fits_cat_md -iff /iplant/home/hickst/vos/images/small_table.fits -v -chdu 1
-# irods_fits_cat_md -iff /iplant/home/hickst/vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v
-# irods_fits_cat_md -iff /iplant/home/hickst/vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -chdu 1
+# irods_fits_cat_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -g -v
+# irods_fits_cat_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -g -v -chdu 1
+# irods_fits_cat_md -iff /iplant/home/hickst/vos/images/small_table.fits -g -v
+# irods_fits_cat_md -iff /iplant/home/hickst/vos/images/small_table.fits -g -v -chdu 1
+# irods_fits_cat_md -iff /iplant/home/hickst/vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -g -v
+# irods_fits_cat_md -iff /iplant/home/hickst/vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -g -v -chdu 1
+
+
+# echo "============================================"
+# echo "Current development:"
+# echo "--------------------------------------------"
+# echo ""
+# echo "---------- Make table in DB: with aliases, w/o aliases, repetition failure  ----------"
+# fits_cat_md -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v
+# fits_cat_md -ff /vos/catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl2 -v
+# fits_cat_md -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v
+
+
+# echo "---------- Make table Pipeline ----------"
+# fits_cat_mktbl_pipe -ff /vos/catalogs/small_table.fits -ct test_tbl -sql -g -v
+# fits_cat_mktbl_pipe -ff /vos/catalogs/small_table.fits -ct test_tbl -v
+
+# fits_cat_md -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v
+# fits_cat_data -ff /vos/catalogs/small_table.fits -v | fits_cat_fill -ct test_tbl -v -sql -g
+# fits_cat_data -ff /vos/catalogs/small_table.fits -v | fits_cat_fill -ct test_tbl -v
+
+
+# echo "---------- Fill table Pipeline ----------"
+# fits_cat_table_pipe -ff /vos/catalogs/small_table.fits -ct test_tbl -v -sql -g
+
+
+# echo "---------- Make & Fill table Pipeline ----------"
+# fits_cat_md -ff /vos/catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl2 -v
+# fits_cat_mktbl_pipe -ff /vos/catalogs/small_table.fits -ct test_tbl2 -v
+# fits_cat_mktbl_pipe -ff /vos/catalogs/small_table.fits -a /imdtk/config/jwst-cat-aliases.ini -ct test_tbl2 -v
+# fits_cat_table_pipe -ff /vos/catalogs/small_table.fits -ct test_tbl2 -v
+
+# Medium sized (~1M) data file:
+# fits_cat_mktbl_pipe -ff /vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -a /imdtk/config/jwst-cat-aliases.ini -ct test_ez -v
+# fits_cat_mktbl_pipe -ff /vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -ct test_ez -v
+# fits_cat_table_pipe -ff /vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -ct test_ez -v
+
+# Medium sized (~2.9M) data file:
+# fits_cat_mktbl_pipe -ff /vos/catalogs/DC_191217/Photometric_Catalog.F200W_kron_f80.fits -a /imdtk/config/jwst-cat-aliases.ini -ct test_pho -v
+# fits_cat_mktbl_pipe -ff /vos/catalogs/DC_191217/Photometric_Catalog.F200W_kron_f80.fits -ct test_pho -v
+# fits_cat_table_pipe -ff /vos/catalogs/DC_191217/Photometric_Catalog.F200W_kron_f80.fits -ct test_pho -v
+
+
+# echo "---------- Extract JWST ObsCore info from iRods FITS file ----------"
+# irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v | img_aliases -v | fields_info -v | irods_jwst_oc_calc -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v -g
+
+
+# echo "---------- Store iRods image MD to SQL & Hybrid tables ----------"
+# irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v | img_aliases -v | fields_info -v | irods_jwst_oc_calc -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v -g
+
+# irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v | img_aliases -v | fields_info -v | irods_jwst_oc_calc -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v | miss_report | jwst_pgsql_sink -v
+
+# irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v | img_aliases -v | fields_info -v | irods_jwst_oc_calc -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v | miss_report | jwst_pghyb_sink -v
+
+# irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits -v | img_aliases -v | fields_info -v | irods_jwst_oc_calc -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits -v | miss_report | jwst_pgsql_sink -v
+
+# irods_fits_img_md -v -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits | img_aliases | fields_info | irods_jwst_oc_calc -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits | miss_report | jwst_pghyb_sink -v
 
 # echo "============================================"
