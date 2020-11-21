@@ -1,7 +1,7 @@
 #
 # Class to extract image metadata from iRods-resident FITS image files.
 #   Written by: Tom Hicks. 10/15/20.
-#   Last Modified: Minor update to doc strings.
+#   Last Modified: Get and separately attach additional iRods/content metadata.
 #
 import os
 import sys
@@ -76,8 +76,14 @@ class IRodsFitsImageMetadataTask (IImdTask):
                     errMsg = "HDU {} is not an image header. Skipping FITS file '{}'.".format(which_hdu, irff_path)
                     raise errors.ProcessingError(errMsg)
 
-                # get and save some metadata ABOUT the iRods FITS file
+                # get and save some common file information
                 file_info = self.irods.get_irods_file_info(irff)
+
+                # get additional metadata ABOUT the iRods file itself
+                irods_metadata = self.irods.get_irods_metadata(irff)
+
+                # get any content metadata attached to the file
+                content_metadata = self.irods.get_content_metadata(irff)
 
                 # now try to read the FITS header from the FITS file
                 hdrs = fits_utils.get_fields_from_header(header, ignore_list)
@@ -96,6 +102,9 @@ class IRodsFitsImageMetadataTask (IImdTask):
 
         metadata = dict()                   # create overall metadata structure
         metadata['file_info'] = file_info   # add previously gathered remote file information
+        metadata['irods_metadata'] = irods_metadata
+        metadata['content_metadata'] = content_metadata
+
         if (hdrs is not None):
             metadata['headers'] = hdrs      # add the headers to the metadata
         return metadata                     # return the results of processing
