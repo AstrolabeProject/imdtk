@@ -1,7 +1,7 @@
 #
 # Class for manipulating FITS files within the the iRods filesystem.
 #   Written by: Tom Hicks. 11/1/20.
-#   Last Modified: Add get_WCS method taking only a header argument.
+#   Last Modified: Split iRods file metadata into file info, irods md, and content md.
 #
 import os
 import sys
@@ -96,6 +96,21 @@ class FitsIRodsHelper (IRodsHelper):
         except AttributeError as ae:        # probably wrong HDU was specified
             return None
         return col_md
+
+
+    def get_content_metadata (self, irff=None):
+        """
+        Return a dictionary of content metadata (if any) attached to the given iRods file.
+        Content metadata is about the content of the file, not about the iRods file itself.
+        """
+        cmd = dict()
+
+        if (irff):
+            cmd = getattr(irff, 'metadata', lambda: None)
+            if (cmd):
+                cmd = { md.name: md.value for md in cmd.items() }
+
+        return cmd
 
 
     def get_hdu (self, irods_fits_file, which_hdu=0):
@@ -197,31 +212,25 @@ class FitsIRodsHelper (IRodsHelper):
         file_info = dict()
 
         if (irff):
+            # attributes common to all file info structures
             file_info['file_path'] = irff.path
             file_info['file_name'] = irff.name
             file_info['file_size'] = irff.size
-            for attr in IRODS_FILE_ATTRIBUTES:
-                val = getattr(irff, attr, lambda: None)
-                if (val):
-                    file_info[attr] = str(val) if (isinstance(val, dt.datetime)) else val
-
-            md = self.get_irods_file_metadata(irff)
-            if (md):
-                file_info['irods_metadata'] = md
 
         return file_info
 
 
-    def get_irods_file_metadata (self, irff=None):
-        """ Return a dictionary of iRods file metadata (if any) FOR the given iRods file. """
-        metadata = dict()
+    def get_irods_metadata (self, irff=None):
+        """ Return a dictionary of metadata about the given iRods file (node) itself. """
+        irmd = dict()
 
         if (irff):
-            irmd = getattr(irff, 'metadata', lambda: None)
-            if (irmd):
-                metadata = { md.name: md.value for md in irmd.items() }
+            for attr in IRODS_FILE_ATTRIBUTES:
+                val = getattr(irff, attr, lambda: None)
+                if (val):
+                    irmd[attr] = str(val) if (isinstance(val, dt.datetime)) else val
 
-        return metadata
+        return irmd
 
 
     def get_WCS (self, header):
