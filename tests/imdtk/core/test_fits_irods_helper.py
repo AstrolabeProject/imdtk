@@ -1,6 +1,6 @@
 # Tests for the iRods interface module.
 #   Written by: Tom Hicks. 11/5/20.
-#   Last Modified: Redo tests for is_catalog_header.
+#   Last Modified: Update get_file_info test for separation of metadatas.
 #
 import os
 import pytest
@@ -142,11 +142,13 @@ class TestIRods(object):
         irff = ihelper.getf(self.irff_hh, absolute=True)
         finfo = ihelper.get_irods_file_info(irff)
         assert finfo is not None
-        assert len(finfo) > 3               # file path, name, size minimum
+        assert len(finfo) == 3              # file path, name, size
         assert 'file_path' in finfo
-        assert 'owner_zone' in finfo
-        assert 'name' in finfo
-        assert 'irods_metadata' in finfo
+        assert 'file_name' in finfo
+        assert 'file_size' in finfo
+        assert 'owner_zone' not in finfo
+        assert 'name' not in finfo
+        assert 'irods_metadata' not in finfo
 
 
     def test_is_catalog_header_m13 (self):
