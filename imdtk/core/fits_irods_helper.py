@@ -1,7 +1,7 @@
 #
 # Class for manipulating FITS files within the the iRods filesystem.
 #   Written by: Tom Hicks. 11/1/20.
-#   Last Modified: Implement get_column_info using an HDU.
+#   Last Modified: Add get_WCS method taking only a header argument.
 #
 import os
 import sys
@@ -11,6 +11,7 @@ from math import ceil
 
 from astropy.io import fits
 from astropy.io.fits.hdu.hdulist import HDUList
+from astropy import wcs
 
 import imdtk.core.fits_utils as fits_utils
 from imdtk.core import FitsHeaderInfo
@@ -221,6 +222,14 @@ class FitsIRodsHelper (IRodsHelper):
                 metadata = { md.name: md.value for md in irmd.items() }
 
         return metadata
+
+
+    def get_WCS (self, header):
+        """
+        Return a World Coordinate System structure from the given header or
+        return None, if unable to get the WCS info from the given header.
+        """
+        return wcs.WCS(header) if (header is not None) else None
 
 
     def is_catalog_header (self, header):
