@@ -2,12 +2,13 @@
 #
 # Python pipeline to extract image metadata from an iRods FITS file into a PostreSQL database.
 #   Written by: Tom Hicks. 11/20/20.
-#   Last Modified: Create correct task.
+#   Last Modified: Add filename check here.
 #
 import argparse
 import sys
 
 import imdtk.exceptions as errors
+import imdtk.core.fits_utils as fits_utils
 import imdtk.tools.cli_utils as cli_utils
 from imdtk.tasks.fields_info import FieldsInfoTask
 from imdtk.tasks.image_aliases import ImageAliasesTask
@@ -62,6 +63,14 @@ def main (argv=None):
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME
 
+    # get the iRods file path argument of the file to be opened
+    irff_path = args.get('irods_fits_file')
+
+    # the specified FITS file must have a valid FITS extension
+    if (not fits_utils.is_fits_filename(irff_path)):
+        errMsg = "A readable, valid FITS image filepath must be specified.".format(irff_path)
+        raise errors.ProcessingError(errMsg)
+
     # instantiate the tasks which form the pipeline
     irods_fits_image_mdTask = IRodsFitsImageMetadataTask(args)
     image_aliasesTask = ImageAliasesTask(args)
@@ -70,12 +79,10 @@ def main (argv=None):
     miss_reportTask = MissingFieldsTask(args)
     jwst_pgsql_sinkTask = JWST_ObsCorePostgreSQLSink(args)
 
+    if (args.get('verbose')):
+        print("({}): Processing iRods FITS file '{}'.".format(TOOL_NAME, irff_path), file=sys.stderr)
 
     # compose and call the pipeline tasks
-    irods_fits_file = args.get('irods_fits_file')
-    if (args.get('verbose')):
-        print("({}): Processing iRods FITS file '{}'.".format(TOOL_NAME, irods_fits_file), file=sys.stderr)
-
     try:
         jwst_pgsql_sinkTask.output_results(     # sink: nothing returned
             miss_reportTask.process(            # report: passes data through
@@ -97,7 +104,7 @@ def main (argv=None):
         sys.exit(pe.error_code)
 
     if (args.get('verbose')):
-        print("({}): Processed iRods FITS file '{}'.".format(TOOL_NAME, irods_fits_file), file=sys.stderr)
+        print("({}): Processed iRods FITS file '{}'.".format(TOOL_NAME, irff_path), file=sys.stderr)
 
 
 
