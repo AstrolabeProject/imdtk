@@ -1,7 +1,7 @@
 #
 # Class to calculate values for the ObsCore fields in an iRods FITS-file-derived metadata structure.
 #   Written by: Tom Hicks. 11/20/20.
-#   Last Modified: Initial creation.
+#   Last Modified: Fix: tool name reference.
 #
 import sys
 
@@ -69,7 +69,7 @@ class IRods_JWST_ObsCoreCalcTask (JWST_ObsCoreCalcTask):
                 raise errors.UnsupportedTypeError(errMsg)
 
             if (self._DEBUG):
-                print("({}): Reading iRods FITS file '{}'.".format(TOOL_NAME, irff_path), file=sys.stderr)
+                print("({}): Reading iRods FITS file '{}'.".format(self.TOOL_NAME, irff_path), file=sys.stderr)
 
             # try to get the specified header and read WCS info from it
             header = self.irods.get_header(irff, which_hdu)
