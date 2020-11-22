@@ -1,7 +1,7 @@
 #
 # Class to extract image metadata from iRods-resident FITS image files.
 #   Written by: Tom Hicks. 10/15/20.
-#   Last Modified: Get and separately attach additional iRods/content metadata.
+#   Last Modified: Move filename check to CLI tool.
 #
 import os
 import sys
@@ -51,11 +51,6 @@ class IRodsFitsImageMetadataTask (IImdTask):
 
         # get the iRods file path argument of the file to be opened
         irff_path = self.args.get('irods_fits_file')
-
-        # the specified FITS file must have a valid FITS extension
-        if (not fits_utils.is_fits_filename(irff_path)):
-            errMsg = "A readable, valid FITS image filepath must be specified.".format(irff_path)
-            raise errors.ProcessingError(errMsg)
 
         try:
             # get an instance of the iRods accessor class

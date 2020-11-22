@@ -2,12 +2,13 @@
 #
 # Module to extract image metadata from an iRods-resident FITS file and output it as JSON.
 #   Written by: Tom Hicks. 10/14/20.
-#   Last Modified: Add call to cleanup task.
+#   Last Modified: Move filename check here.
 #
 import argparse
 import sys
 
 import imdtk.exceptions as errors
+import imdtk.core.fits_utils as fits_utils
 import imdtk.tools.cli_utils as cli_utils
 from imdtk.tasks.irods_fits_image_md import IRodsFitsImageMetadataTask
 
@@ -51,10 +52,16 @@ def main (argv=None):
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME
 
-    # call the task layer to process the given, unvalidated remote iRods FITS file
-    irods_fits_file = args.get('irods_fits_file')
+    # get the iRods file path argument of the file to be opened
+    irff_path = args.get('irods_fits_file')
+
+    # the specified FITS file must have a valid FITS extension
+    if (not fits_utils.is_fits_filename(irff_path)):
+        errMsg = "A readable, valid FITS image filepath must be specified.".format(irff_path)
+        raise errors.ProcessingError(errMsg)
+
     if (args.get('verbose')):
-        print("({}): Processing iRods FITS file '{}'.".format(TOOL_NAME, irods_fits_file), file=sys.stderr)
+        print("({}): Processing iRods FITS file '{}'.".format(TOOL_NAME, irff_path), file=sys.stderr)
 
     try:
         task = IRodsFitsImageMetadataTask(args)
@@ -76,7 +83,7 @@ def main (argv=None):
         task.cleanup()
 
     if (args.get('verbose')):
-        print("({}): Processed iRods FITS file '{}'.".format(TOOL_NAME, irods_fits_file), file=sys.stderr)
+        print("({}): Processed iRods FITS file '{}'.".format(TOOL_NAME, irff_path), file=sys.stderr)
 
 
 if __name__ == "__main__":
