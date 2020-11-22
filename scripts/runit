@@ -466,4 +466,9 @@
 
 # irods_fits_img_md -v -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits | img_aliases | fields_info | irods_jwst_oc_calc -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits | miss_report | jwst_pghyb_sink -v
 
+# echo "---------- iRods image MD to SQL pipeline ----------"
+irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v -c TEST
+
+irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits -v -c TEST
+
 # echo "============================================"
