@@ -2,7 +2,7 @@
 #
 # Python pipeline to extract image metadata from an iRods FITS file into a PostreSQL database.
 #   Written by: Tom Hicks. 11/20/20.
-#   Last Modified: Initial creation.
+#   Last Modified: Create correct task.
 #
 import argparse
 import sys
@@ -63,7 +63,7 @@ def main (argv=None):
     args['TOOL_NAME'] = TOOL_NAME
 
     # instantiate the tasks which form the pipeline
-    fits_image_mdTask = FitsImageMetadataTask(args)
+    irods_fits_image_mdTask = IRodsFitsImageMetadataTask(args)
     image_aliasesTask = ImageAliasesTask(args)
     fields_infoTask = FieldsInfoTask(args)
     irods_jwst_oc_calcTask = IRods_JWST_ObsCoreCalcTask(args)
