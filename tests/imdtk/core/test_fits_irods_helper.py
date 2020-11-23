@@ -1,6 +1,6 @@
 # Tests for the iRods interface module.
 #   Written by: Tom Hicks. 11/5/20.
-#   Last Modified: Update get_file_info test for separation of metadatas.
+#   Last Modified: Add some tests for gen_fits_file_paths.
 #
 import os
 import pytest
@@ -15,7 +15,7 @@ from imdtk.core import FitsHeaderInfo
 from tests import TEST_DIR
 
 
-class TestIRods(object):
+class TestFitsIRodsHelper(object):
 
     defargs = { 'debug': True, 'verbose': True, 'TOOL_NAME': 'TestFitsIrodsHelper' }
 
@@ -200,3 +200,34 @@ class TestIRods(object):
 
         header = ihelper.get_header(irff, which_hdu=3)
         assert ihelper.is_catalog_header(header) is False
+
+
+
+    def test_gen_fits_file_paths_none (self):
+        empty_path = '/iplant/home/hickst/resources'
+
+        ihelper = firh.FitsIRodsHelper(self.defargs)
+        assert ihelper is not None
+
+        irdir = ihelper.getc(empty_path, absolute=True)
+        print("IRDIR={}".format(irdir))
+        assert irdir is not None
+
+        paths = [ fpath for fpath in ihelper.gen_fits_file_paths(irdir) ]
+        assert paths is not None
+        assert len(paths) < 1
+
+
+    def test_gen_fits_file_paths (self):
+        img_path = '/iplant/home/hickst/vos/images'
+
+        ihelper = firh.FitsIRodsHelper(self.defargs)
+        assert ihelper is not None
+
+        irdir = ihelper.getc(img_path, absolute=True)
+        print("IRDIR={}".format(irdir))
+        assert irdir is not None
+
+        paths = [ fpath for fpath in ihelper.gen_fits_file_paths(irdir) ]
+        assert paths is not None
+        assert len(paths) > 1
