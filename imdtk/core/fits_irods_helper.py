@@ -1,7 +1,7 @@
 #
 # Class for manipulating FITS files within the the iRods filesystem.
 #   Written by: Tom Hicks. 11/1/20.
-#   Last Modified: Split iRods file metadata into file info, irods md, and content md.
+#   Last Modified: Add gen_fits_file_paths method.
 #
 import os
 import sys
@@ -80,6 +80,13 @@ class FitsIRodsHelper (IRodsHelper):
             blocks = ceil(B * GCOUNT * (PCOUNT + product(N)) / FITS_BLOCK_SIZE)
 
         return (blocks * FITS_BLOCK_SIZE)
+
+
+    def gen_fits_file_paths (self, irods_root_dir, topdown=True):
+        """ Generator to yield all FITS files in the file tree under the given root directory. """
+        for file_path in self.gen_file_paths(irods_root_dir, topdown=topdown):
+            if (fits_utils.is_fits_filename(file_path)):
+                yield file_path
 
 
     def get_column_info (self, irods_fits_file, hdu):
