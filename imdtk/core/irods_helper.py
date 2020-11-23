@@ -1,7 +1,7 @@
 #
 # Helper class for iRods commands: manipulate the filesystem, including metadata.
 #   Written by: Tom Hicks. 10/15/20.
-#   Last Modified: Add file/collection exists methods. De-static some methods.
+#   Last Modified: Add gen_file_paths method. Replace get_dir with getc. Enhance walk with root arg.
 #
 import os
 import errno
@@ -136,7 +136,7 @@ class IRodsHelper:
             (default) OR relative to the users root directory, if the absolute argument is True.
         """
         try:
-            dirobj = self.get_dir(dir_path, absolute=absolute)
+            dirobj = self.getc(dir_path, absolute=absolute)
             dirobj.remove(force=force, recurse=recurse)
             return True
         except:                             # ignore any errors
@@ -173,6 +173,16 @@ class IRodsHelper:
             return False
 
 
+    def gen_file_paths (self, root_dir, topdown=True):
+        """
+        Generator to yield all absolute iRods file paths in the directory tree under the
+        given root directory.
+        """
+        for root, dirs, files in self.walk(root_dir, topdown=topdown):
+            for fyl in files:
+                yield fyl.path
+
+
     def get_authentication_file (self, args):
         """
         Return a path to the iRods authentication file read from the given arguments, or
@@ -198,20 +208,20 @@ class IRodsHelper:
         return auth_file                    # return the filepath
 
 
+    def getc (self, dir_path, absolute=False, rootrel=False):
+        """
+        Get the collection (directory) at the specified path, which is interpreted
+        based on the given absolute/relative flags.
+
+        :raises irods.exception.CollectionDoesNotExist if collection (dir) not found or not readable.
+        """
+        dirpath = self.path_to(dir_path, absolute, rootrel)
+        return self._session.collections.get(dirpath)
+
+
     def get_cwd (self):
         """ Get directory information for the current working directory. """
         return self._session.collections.get(self._cwdpath) if (self._cwdpath) else None
-
-
-    def get_dir (self, dir_path, absolute=False):
-        """ Get the specified directory relative to the iRods current working directory (default)
-            OR relative to the users root directory, if the absolute argument is True.
-        """
-        if (absolute):
-            dirpath = self.abs_path(dir_path)  # path is relative to root dir
-        else:
-            dirpath = self.rel_path(dir_path)  # path is relative to current working dir
-        return self._session.collections.get(dirpath)
 
 
     def get_environment_file (self, args):
@@ -254,7 +264,7 @@ class IRodsHelper:
             current working directory (default) OR relative to the users root directory,
             if the absolute argument is True.
         """
-        dirobj = self.get_dir(dir_path, absolute=absolute)
+        dirobj = self.getc(dir_path, absolute=absolute)
         return [Metadatum(item.name, item.value) for item in dirobj.metadata.items()]
 
 
@@ -391,11 +401,11 @@ class IRodsHelper:
         self.cd_root()                      # cd back to root after changing root dir
 
 
-    def walk (self, topdown=True):
-        """ Collection tree generator. For each subcollection in the dir tree,
-            starting at the current working directory, yield a 3-tuple of
-            (self, self.subcollections, self.data_objects)
+    def walk (self, root_dir=None, topdown=True):
         """
-        cwd = self.get_cwd()
-        if (cwd):
-            yield from cwd.walk(topdown=topdown)
+        Collection tree generator. For each subcollection in the root dir, yield a 3-tuple
+        of (self, self.subcollections, self.data_objects). If no root dir is provided,
+        then use the current directory.
+        """
+        root = self.get_cwd() if (root_dir is None) else root_dir
+        yield from root.walk(topdown=topdown)
