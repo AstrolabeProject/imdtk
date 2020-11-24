@@ -2,13 +2,15 @@
 #
 # Module to calculate values for the ObsCore fields from metadata derived from an iRods-resident FITS file.
 #   Written by: Tom Hicks. 1/20/20.
-#   Last Modified: Initial creation.
+#   Last Modified: Refactor: pass iRods helper in ctor.
 #
 import argparse
 import sys
 
 import imdtk.exceptions as errors
+import imdtk.core.fits_utils as fits_utils
 import imdtk.tools.cli_utils as cli_utils
+from imdtk.core.fits_irods_helper import FitsIRodsHelper
 from imdtk.tasks.irods_jwst_oc_calc import IRods_JWST_ObsCoreCalcTask
 
 
@@ -56,9 +58,25 @@ def main (argv=None):
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME
 
-    # call the task layer to process the given, validated files
+    # get the iRods file path argument of the file to be opened
+    irff_path = args.get('irods_fits_file')
+
+    # the specified FITS file must have a valid FITS extension
+    if (not fits_utils.is_fits_filename(irff_path)):
+        errMsg = "A readable, valid FITS image filepath must be specified.".format(irff_path)
+        raise errors.ProcessingError(errMsg)
+
+    # get an instance of the iRods accessor class
+    firh = FitsIRodsHelper(args)
+
+    # instantiate the task
+    task = IRods_JWST_ObsCoreCalcTask(args, firh)
+
+    if (args.get('verbose')):
+        print("({}): Processing iRods FITS file '{}'.".format(TOOL_NAME, irff_path), file=sys.stderr)
+
+    # call task layer to process the input stream using the unvalidated remote iRods FITS file
     try:
-        task = IRods_JWST_ObsCoreCalcTask(args)
         task.input_process_output()
 
     except errors.ProcessingError as pe:
@@ -66,6 +84,9 @@ def main (argv=None):
             TOOL_NAME, pe.error_code, pe.message)
         print(errMsg, file=sys.stderr)
         sys.exit(pe.error_code)
+
+    finally:
+        task.cleanup()
 
 
 

@@ -1,7 +1,7 @@
 #
 # Class to extract catalog metadata from iRods-resident FITS catalog files.
 #   Written by: Tom Hicks. 11/17/20.
-#   Last Modified: Update for implementation of get_column_info using an HDU.
+#   Last Modified: Refactor: pass iRods helper in ctor.
 #
 import os
 import sys
@@ -9,9 +9,7 @@ import sys
 from irods.exception import DataObjectDoesNotExist
 
 import imdtk.exceptions as errors
-import imdtk.core.fits_irods_helper as firh
 import imdtk.core.fits_utils as fits_utils
-
 from imdtk.core.fits_utils import FITS_BLOCK_SIZE, FITS_IGNORE_KEYS
 from imdtk.tasks.i_task import IImdTask
 
@@ -19,12 +17,12 @@ from imdtk.tasks.i_task import IImdTask
 class IRodsFitsCatalogMetadataTask (IImdTask):
     """ Class to extract catalog metadata from iRods-resident FITS catalog files."""
 
-    def __init__(self, args):
+    def __init__(self, args, fits_irods_helper):
         """
         Constructor for class to extract catalog metadata from iRods-resident FITS catalog files.
         """
         super().__init__(args)
-        self.irods = None                   # holder for IRodsHelper instance
+        self.irods = fits_irods_helper      # IRodsHelper instance
 
 
     def cleanup (self):
@@ -52,20 +50,12 @@ class IRodsFitsCatalogMetadataTask (IImdTask):
         # get the iRods file path argument of the file to be opened
         irff_path = self.args.get('irods_fits_file')
 
-        # the specified FITS file must have a valid FITS extension
-        if (not fits_utils.is_fits_filename(irff_path)):
-            errMsg = "A readable, valid FITS filepath must be specified.".format(irff_path)
-            raise errors.ProcessingError(errMsg)
-
         try:
-            # get an instance of the iRods accessor class
-            self.irods = firh.FitsIRodsHelper(self.args)
-
             # get the FITS file at the specified path
             irff = self.irods.getf(irff_path, absolute=True)
 
             # sanity check on the given FITS file
-            if (irff.size < firh.FITS_BLOCK_SIZE):
+            if (irff.size < FITS_BLOCK_SIZE):
                 errMsg = "File is too small to be a valid FITS file: '{}'".format(irff_path)
                 raise errors.UnsupportedTypeError(errMsg)
 
@@ -77,11 +67,17 @@ class IRodsFitsCatalogMetadataTask (IImdTask):
                     errMsg = "HDU {} is not a table header. Skipping FITS file '{}'.".format(catalog_hdu, irff_path)
                     raise errors.ProcessingError(errMsg)
 
-                # get and save some metadata ABOUT the iRods FITS file
+                # get and save some common file information
                 file_info = self.irods.get_irods_file_info(irff)
 
+                # get additional metadata ABOUT the iRods file itself
+                irods_metadata = self.irods.get_irods_metadata(irff)
+
+                # get any content metadata attached to the file
+                content_metadata = self.irods.get_content_metadata(irff)
+
                 # get and save metadata about the columns in the table
-                cinfo = self.irods.get_column_info(irff, hdu)
+                col_info = self.irods.get_column_info(irff, hdu)
 
                 # now try to read the FITS header from the FITS file
                 hdrs = fits_utils.get_fields_from_header(header, ignore_list)
@@ -100,8 +96,11 @@ class IRodsFitsCatalogMetadataTask (IImdTask):
 
         metadata = dict()                   # create overall metadata structure
         metadata['file_info'] = file_info   # add previously gathered remote file information
-        if (hdrs is not None):
-            metadata['headers'] = hdrs      # add the headers to the metadata
-        if (cinfo is not None):
-            metadata['column_info'] = cinfo  # add column metadata to the metadata
+        metadata['irods_metadata'] = irods_metadata
+        metadata['content_metadata'] = content_metadata
+
+        if (hdrs is not None):              # add the headers to the metadata
+            metadata['headers'] = hdrs
+        if (col_info is not None):          # add column metadata to the metadata
+            metadata['column_info'] = col_info
         return metadata                     # return the results of processing

@@ -2,7 +2,7 @@
 #
 # Module to extract image metadata from an iRods-resident FITS file and output it as JSON.
 #   Written by: Tom Hicks. 10/14/20.
-#   Last Modified: Move filename check here.
+#   Last Modified: Refactor: pass iRods helper in ctor.
 #
 import argparse
 import sys
@@ -10,6 +10,7 @@ import sys
 import imdtk.exceptions as errors
 import imdtk.core.fits_utils as fits_utils
 import imdtk.tools.cli_utils as cli_utils
+from imdtk.core.fits_irods_helper import FitsIRodsHelper
 from imdtk.tasks.irods_fits_image_md import IRodsFitsImageMetadataTask
 
 
@@ -60,11 +61,17 @@ def main (argv=None):
         errMsg = "A readable, valid FITS image filepath must be specified.".format(irff_path)
         raise errors.ProcessingError(errMsg)
 
+    # get an instance of the iRods accessor class
+    firh = FitsIRodsHelper(args)
+
+    # instantiate the task
+    task = IRodsFitsImageMetadataTask(args, firh)
+
     if (args.get('verbose')):
         print("({}): Processing iRods FITS file '{}'.".format(TOOL_NAME, irff_path), file=sys.stderr)
 
+    # call the task layer to process the given, unvalidated remote iRods FITS file
     try:
-        task = IRodsFitsImageMetadataTask(args)
         task.process_and_output()
 
     except errors.UnsupportedTypeError as ute:

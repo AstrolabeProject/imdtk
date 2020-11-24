@@ -2,13 +2,15 @@
 #
 # Module to extract catalog metadata from an iRods-resident FITS file and output it as JSON.
 #   Written by: Tom Hicks. 11/17/2020.
-#   Last Modified: Initial creation.
+#   Last Modified: Refactor: pass iRods helper in ctor.
 #
 import argparse
 import sys
 
 import imdtk.exceptions as errors
+import imdtk.core.fits_utils as fits_utils
 import imdtk.tools.cli_utils as cli_utils
+from imdtk.core.fits_irods_helper import FitsIRodsHelper
 from imdtk.tasks.irods_fits_catalog_md import IRodsFitsCatalogMetadataTask
 
 
@@ -51,13 +53,25 @@ def main (argv=None):
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME
 
-    # call the task layer to process the given, unvalidated remote iRods FITS file
-    irods_fits_file = args.get('irods_fits_file')
-    if (args.get('verbose')):
-        print("({}): Processing iRods FITS file '{}'.".format(TOOL_NAME, irods_fits_file), file=sys.stderr)
+    # get the iRods file path argument of the file to be opened
+    irff_path = args.get('irods_fits_file')
 
+    # the specified FITS file must have a valid FITS extension
+    if (not fits_utils.is_fits_filename(irff_path)):
+        errMsg = "A readable, valid FITS image filepath must be specified.".format(irff_path)
+        raise errors.ProcessingError(errMsg)
+
+    # get an instance of the iRods accessor class
+    firh = FitsIRodsHelper(args)
+
+    # instantiate the task
+    task = IRodsFitsCatalogMetadataTask(args, firh)
+
+    if (args.get('verbose')):
+        print("({}): Processing iRods FITS file '{}'.".format(TOOL_NAME, irff_path), file=sys.stderr)
+
+    # call the task layer to process the given, unvalidated remote iRods FITS file
     try:
-        task = IRodsFitsCatalogMetadataTask(args)
         task.process_and_output()
 
     except errors.UnsupportedTypeError as ute:
@@ -76,7 +90,7 @@ def main (argv=None):
         task.cleanup()
 
     if (args.get('verbose')):
-        print("({}): Processed iRods FITS file '{}'.".format(TOOL_NAME, irods_fits_file), file=sys.stderr)
+        print("({}): Processed iRods FITS file '{}'.".format(TOOL_NAME, irff_path), file=sys.stderr)
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@
 #
 # Python pipeline to extract image metadata from an iRods FITS file into a PostreSQL database.
 #   Written by: Tom Hicks. 11/20/20.
-#   Last Modified: Add filename check here.
+#   Last Modified: Refactor: pass iRods helper in ctor.
 #
 import argparse
 import sys
@@ -10,6 +10,8 @@ import sys
 import imdtk.exceptions as errors
 import imdtk.core.fits_utils as fits_utils
 import imdtk.tools.cli_utils as cli_utils
+
+from imdtk.core.fits_irods_helper import FitsIRodsHelper
 from imdtk.tasks.fields_info import FieldsInfoTask
 from imdtk.tasks.image_aliases import ImageAliasesTask
 from imdtk.tasks.irods_fits_image_md import IRodsFitsImageMetadataTask
@@ -71,11 +73,14 @@ def main (argv=None):
         errMsg = "A readable, valid FITS image filepath must be specified.".format(irff_path)
         raise errors.ProcessingError(errMsg)
 
+    # get an instance of the iRods accessor class
+    firh = FitsIRodsHelper(args)
+
     # instantiate the tasks which form the pipeline
-    irods_fits_image_mdTask = IRodsFitsImageMetadataTask(args)
+    irods_fits_image_mdTask = IRodsFitsImageMetadataTask(args, firh)
     image_aliasesTask = ImageAliasesTask(args)
     fields_infoTask = FieldsInfoTask(args)
-    irods_jwst_oc_calcTask = IRods_JWST_ObsCoreCalcTask(args)
+    irods_jwst_oc_calcTask = IRods_JWST_ObsCoreCalcTask(args, firh)
     miss_reportTask = MissingFieldsTask(args)
     jwst_pgsql_sinkTask = JWST_ObsCorePostgreSQLSink(args)
 
@@ -102,6 +107,12 @@ def main (argv=None):
             TOOL_NAME, pe.error_code, pe.message)
         print(errMsg, file=sys.stderr)
         sys.exit(pe.error_code)
+
+    finally:
+        # call cleanup method for tasks which opened resources
+        jwst_pgsql_sinkTask.cleanup()
+        irods_jwst_oc_calcTask.cleanup()
+        irods_fits_image_mdTask.cleanup()
 
     if (args.get('verbose')):
         print("({}): Processed iRods FITS file '{}'.".format(TOOL_NAME, irff_path), file=sys.stderr)

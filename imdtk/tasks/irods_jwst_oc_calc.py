@@ -1,13 +1,13 @@
 #
 # Class to calculate values for the ObsCore fields in an iRods FITS-file-derived metadata structure.
 #   Written by: Tom Hicks. 11/20/20.
-#   Last Modified: Fix: tool name reference.
+#   Last Modified: Refactor: pass iRods helper in ctor.
 #
 import sys
 
 import imdtk.exceptions as errors
-import imdtk.core.fits_irods_helper as firh
 import imdtk.core.fits_utils as fits_utils
+from imdtk.core.fits_utils import FITS_BLOCK_SIZE, FITS_IGNORE_KEYS
 from imdtk.tasks.jwst_oc_calc import JWST_ObsCoreCalcTask
 
 
@@ -17,13 +17,13 @@ class IRods_JWST_ObsCoreCalcTask (JWST_ObsCoreCalcTask):
     derived from an iRods-resident FITS file.
     """
 
-    def __init__(self, args):
+    def __init__(self, args, fits_irods_helper):
         """
         Constructor for class which calculates values for ObsCore fields from metadata
         derived from an iRods-resident FITS file.
         """
         super().__init__(args)
-        self.irods = None                   # holder for IRodsHelper instance
+        self.irods = fits_irods_helper      # IRodsHelper instance
 
 
     def cleanup (self):
@@ -51,20 +51,12 @@ class IRods_JWST_ObsCoreCalcTask (JWST_ObsCoreCalcTask):
         # get the iRods file path argument of the file to be opened
         irff_path = self.args.get('irods_fits_file')
 
-        # the specified FITS file must have a valid FITS extension
-        if (not fits_utils.is_fits_filename(irff_path)):
-            errMsg = "A readable, valid FITS image filepath must be specified.".format(irff_path)
-            raise errors.ProcessingError(errMsg)
-
         try:
-            # get an instance of the iRods accessor class
-            self.irods = firh.FitsIRodsHelper(self.args)
-
             # get the FITS file at the specified path
             irff = self.irods.getf(irff_path, absolute=True)
 
             # sanity check on the given FITS file
-            if (irff.size < firh.FITS_BLOCK_SIZE):
+            if (irff.size < FITS_BLOCK_SIZE):
                 errMsg = "File is too small to be a valid FITS file: '{}'".format(irff_path)
                 raise errors.UnsupportedTypeError(errMsg)
 
