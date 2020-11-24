@@ -2,7 +2,7 @@
 #
 # Python pipeline to extract image metadata from an iRods FITS file into a PostreSQL database.
 #   Written by: Tom Hicks. 11/20/20.
-#   Last Modified: Refactor: pass iRods helper in ctor.
+#   Last Modified: Call CLI exit instead of error.
 #
 import argparse
 import sys
@@ -70,8 +70,7 @@ def main (argv=None):
 
     # the specified FITS file must have a valid FITS extension
     if (not fits_utils.is_fits_filename(irff_path)):
-        errMsg = "A readable, valid FITS image filepath must be specified.".format(irff_path)
-        raise errors.ProcessingError(errMsg)
+        cli_utils.fits_file_exit(TOOL_NAME, irff_path)  # error exit out here: never returns
 
     # get an instance of the iRods accessor class
     firh = FitsIRodsHelper(args)

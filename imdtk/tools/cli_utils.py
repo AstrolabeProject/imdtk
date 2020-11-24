@@ -1,7 +1,7 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Add iRods FITS file argument.
+#   Last Modified: Add a couple of immediate exit routines.
 #
 import argparse
 import sys
@@ -293,7 +293,7 @@ def check_fits_file (fits_file, tool_name, exit_code=FITS_FILE_EXIT_CODE):
 
 def check_input_dir (input_dir, tool_name, exit_code=INPUT_DIR_EXIT_CODE):
     """
-    Check that the required input direct path is a valid path. If not, then exit
+    Check that the required input directory path is a valid path. If not, then exit
     the entire program here with the specified (or default) system exit code.
     """
     if (not good_dir_path(input_dir)):
@@ -312,3 +312,23 @@ def check_input_file (input_file, tool_name, exit_code=INPUT_FILE_EXIT_CODE):
             errMsg = "({}): A readable, valid input data file must be specified. Exiting...".format(tool_name)
             print(errMsg, file=sys.stderr)
             sys.exit(exit_code)
+
+
+def fits_file_exit (tool_name, exit_code=FITS_FILE_EXIT_CODE):
+    """
+    Some required FITS file path was not valid so exit the entire program here
+    with the specified (or default) system exit code.
+    """
+    errMsg = "({}): A readable, valid FITS image file must be specified. Exiting...".format(tool_name)
+    print(errMsg, file=sys.stderr)
+    sys.exit(exit_code)
+
+
+def irods_input_dir_exit (tool_name, input_dir, exit_code=INPUT_DIR_EXIT_CODE):
+    """
+    The specified and required input directory path was not valid so exit the
+    entire program here with the specified (or default) system exit code.
+    """
+    errMsg = "({}): ERROR: Unable to find the specified iRods directory '{}'. Exiting...".format(tool_name, input_dir)
+    print(errMsg, file=sys.stderr)
+    sys.exit(exit_code)
