@@ -274,6 +274,13 @@ echo "--------------------------------------------"
 md_pgsql_pipe -ff /vos/images/DC_191217/F356W.fits -v -sql -g
 
 
+echo "============================================"
+echo "Single FITS iRods metadata to PostgreSQL JWST table pipeline:"
+echo "--------------------------------------------"
+irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -sql -g -v
+irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits -sql -g -v
+
+
 # echo "============================================"
 # echo "Multiple FITS metadata to PostgreSQL JWST table pipeline:"
 # echo "--------------------------------------------"
