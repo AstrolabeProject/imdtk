@@ -24,6 +24,7 @@ setup(
             'irods_fits_img_md   = imdtk.tools.irods_fits_image_md_cli:main',
             'irods_jwst_oc_calc  = imdtk.tools.irods_jwst_oc_calc_cli:main',
             'irods_md_pgsql_pipe = imdtk.tools.irods_md_pgsql_pipe:main',
+            'irods_mmd_pgsql_pipe = imdtk.tools.irods_mmd_pgsql_pipe:main',
             'jwst_oc_calc    = imdtk.tools.jwst_oc_calc_cli:main',
             'jwst_pghyb_sink = imdtk.tools.jwst_pghybrid_sink_cli:main',
             'jwst_pgsql_sink = imdtk.tools.jwst_pgsql_sink_cli:main',
