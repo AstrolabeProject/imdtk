@@ -2,7 +2,7 @@
 #
 # Module to extract image metadata from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 5/21/2020.
-#   Last Modified: Reorder CLI arguments.
+#   Last Modified: Warn on unsupported file type error.
 #
 import argparse
 import sys
@@ -64,7 +64,7 @@ def main (argv=None):
         task.process_and_output()
 
     except errors.UnsupportedTypeError as ute:
-        errMsg = "({}): INFO: Unsupported File Type ({}): {}".format(
+        errMsg = "({}): WARNING: Unsupported File Type ({}): {}".format(
             TOOL_NAME, ute.error_code, ute.message)
         print(errMsg, file=sys.stderr)
         sys.exit(ute.error_code)

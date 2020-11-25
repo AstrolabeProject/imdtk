@@ -2,7 +2,7 @@
 #
 # Python pipeline to extract catalog metadata and create a PostreSQL database table from it.
 #   Written by: Tom Hicks. 8/20/20.
-#   Last Modified: Reorder CLI arguments.
+#   Last Modified: Warn on unsupported file type error.
 #
 import argparse
 import sys
@@ -77,7 +77,7 @@ def main (argv=None):
                 fits_catalog_mdTask.process(None)))  # metadata source
 
     except errors.UnsupportedTypeError as ute:
-        errMsg = "({}): INFO: Unsupported File Type ({}): {}".format(
+        errMsg = "({}): WARNING: Unsupported File Type ({}): {}".format(
             TOOL_NAME, ute.error_code, ute.message)
         print(errMsg, file=sys.stderr)
         sys.exit(ute.error_code)

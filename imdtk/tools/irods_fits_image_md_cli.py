@@ -2,7 +2,7 @@
 #
 # Module to extract image metadata from an iRods-resident FITS file and output it as JSON.
 #   Written by: Tom Hicks. 10/14/20.
-#   Last Modified: Call CLI exit instead of error.
+#   Last Modified: Warn on unsupported file type error.
 #
 import argparse
 import sys
@@ -74,7 +74,7 @@ def main (argv=None):
         task.process_and_output()
 
     except errors.UnsupportedTypeError as ute:
-        errMsg = "({}): INFO: Unsupported File Type ({}): {}".format(
+        errMsg = "({}): WARNING: Unsupported File Type ({}): {}".format(
             TOOL_NAME, ute.error_code, ute.message)
         print(errMsg, file=sys.stderr)
         sys.exit(ute.error_code)

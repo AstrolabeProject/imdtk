@@ -3,7 +3,7 @@
 # Python pipeline to extract image metadata from FITS images in an iRods directory,
 # storing the metadata into a PostreSQL/JSON hybrid database.
 #   Written by: Tom Hicks. 11/24/20.
-#   Last Modified: Initial creation.
+#   Last Modified: Warn on unsupported file type error.
 #
 import argparse
 import sys
@@ -110,7 +110,7 @@ def main (argv=None):
             proc_count += 1                       # increment count of processed files
 
         except errors.UnsupportedTypeError as ute:
-            errMsg = "({}): INFO: Unsupported File Type ({}): {}".format(
+            errMsg = "({}): WARNING: Unsupported File Type ({}): {}".format(
                 TOOL_NAME, ute.error_code, ute.message)
             print(errMsg, file=sys.stderr)
 

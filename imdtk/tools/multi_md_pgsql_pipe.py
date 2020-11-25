@@ -3,7 +3,7 @@
 # Python pipeline to extract image metadata from each FITS images in a directory, storing
 # the metadata into a PostreSQL database.
 #   Written by: Tom Hicks. 7/18/2020.
-#   Last Modified: Update for table name argument separation in CLI utils. Reorder CLI arguments.
+#   Last Modified: Warn on unsupported file type error.
 #
 import argparse
 import sys
@@ -99,7 +99,7 @@ def main (argv=None):
             proc_count += 1                       # increment count of processed files
 
         except errors.UnsupportedTypeError as ute:
-            errMsg = "({}): INFO: Unsupported File Type ({}): {}".format(
+            errMsg = "({}): WARNING: Unsupported File Type ({}): {}".format(
                 TOOL_NAME, ute.error_code, ute.message)
             print(errMsg, file=sys.stderr)
 
