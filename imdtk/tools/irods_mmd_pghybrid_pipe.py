@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 #
-# Python pipeline to extract image metadata from each FITS images in a directory, storing
-# the metadata into a Hybrid PostreSQL/JSON database.
-#   Written by: Tom Hicks. 7/20/2020.
-#   Last Modified: Update for table name argument separation in CLI utils. Reorder CLI arguments.
+# Python pipeline to extract image metadata from FITS images in an iRods directory,
+# storing the metadata into a PostreSQL/JSON hybrid database.
+#   Written by: Tom Hicks. 11/24/20.
+#   Last Modified: Initial creation.
 #
 import argparse
 import sys
@@ -13,17 +13,18 @@ from config.settings import DEFAULT_HYBRID_TABLE_NAME
 import imdtk.exceptions as errors
 import imdtk.tools.cli_utils as cli_utils
 
+from imdtk.core.fits_irods_helper import FitsIRodsHelper
 from imdtk.core.fits_utils import gen_fits_file_paths
 from imdtk.tasks.fields_info import FieldsInfoTask
-from imdtk.tasks.fits_image_md import FitsImageMetadataTask
 from imdtk.tasks.image_aliases import ImageAliasesTask
-from imdtk.tasks.jwst_oc_calc import JWST_ObsCoreCalcTask
+from imdtk.tasks.irods_fits_image_md import IRodsFitsImageMetadataTask
+from imdtk.tasks.irods_jwst_oc_calc import IRods_JWST_ObsCoreCalcTask
 from imdtk.tasks.jwst_pghybrid_sink import JWST_HybridPostgreSQLSink
 from imdtk.tasks.miss_report import MissingFieldsTask
 
 
 # Program name for this tool.
-TOOL_NAME = 'multi_md_pghybrid_pipe'
+TOOL_NAME = 'irods_mmd_pghyb_pipe'
 
 
 def main (argv=None):
@@ -41,7 +42,7 @@ def main (argv=None):
     parser = argparse.ArgumentParser(
         prog=TOOL_NAME,
         formatter_class=argparse.RawTextHelpFormatter,
-        description='Pipeline to extract image metadata and store it into a hybrid PostreSQL/JSON database.'
+        description='Pipeline to extract image metadata from iRods FITS files and store into a PostreSQL/JSON hybrid database.'
     )
 
     cli_utils.add_shared_arguments(parser, TOOL_NAME)
@@ -64,40 +65,47 @@ def main (argv=None):
         args['verbose'] = True              # if debug turn on verbose too
         print("({}.main): ARGS={}".format(TOOL_NAME, args), file=sys.stderr)
 
-    # check the required image directory path for validity
-    input_dir = args.get('input_dir')
-    cli_utils.check_input_dir(input_dir, TOOL_NAME)  # may system exit here and not return!
-
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME
 
+    # get an instance of the iRods accessor class
+    firh = FitsIRodsHelper(args)
+
     # instantiate the tasks which form the pipeline
-    fits_image_mdTask = FitsImageMetadataTask(args)
+    irods_fits_image_mdTask = IRodsFitsImageMetadataTask(args, firh)
     image_aliasesTask = ImageAliasesTask(args)
     fields_infoTask = FieldsInfoTask(args)
-    jwst_oc_calcTask = JWST_ObsCoreCalcTask(args)
+    irods_jwst_oc_calcTask = IRods_JWST_ObsCoreCalcTask(args, firh)
     miss_reportTask = MissingFieldsTask(args)
-    jwst_pghybrid_sinkTask = JWST_HybridPostgreSQLSink(args)
+    jwst_pghyb_sinkTask = JWST_HybridPostgreSQLSink(args)
+
+    # get and check the required image directory path for validity
+    input_dir = args.get('input_dir')
+    if (not firh.collection_exists(input_dir)):
+        cli_utils.irods_input_dir_exit(TOOL_NAME, input_dir)  # error exit out here: never returns
+
+    # make of list of absolute iRods file paths pointing to FITS files
+    ir_dir = firh.getc(input_dir, absolute=True)
+    irff_paths = [fpath for fpath in firh.gen_fits_file_paths(ir_dir)]
 
     # call the pipeline on each FITS file in the input directory:
     if (args.get('verbose')):
         print("({}): Processing FITS files in '{}'.".format(TOOL_NAME, input_dir), file=sys.stderr)
 
     proc_count = 0                                # initialize count of processed files
-
-    for img_file in gen_fits_file_paths(input_dir):
-        args['fits_file'] = img_file              # reset the FITS file argument to next file
+    for irff_path in irff_paths:
+        args['irods_fits_file'] = irff_path       # reset the FITS file argument to next file
 
         if (args.get('verbose')):
-            print("({}): Processing FITS file '{}'.".format(TOOL_NAME, img_file), file=sys.stderr)
+            print("({}): Processing FITS file '{}'.".format(TOOL_NAME, irff_path), file=sys.stderr)
 
         try:
-            jwst_pghybrid_sinkTask.output_results(  # sink: nothing returned
+            jwst_pghyb_sinkTask.output_results(   # sink: nothing returned
                 miss_reportTask.process(          # report: passes data through
-                    jwst_oc_calcTask.process(
+                    irods_jwst_oc_calcTask.process(
                         fields_infoTask.process(
                             image_aliasesTask.process(
-                                fits_image_mdTask.process(None))))))  # metadata source
+                                irods_fits_image_mdTask.process(None))))))  # metadata source
 
             proc_count += 1                       # increment count of processed files
 
@@ -111,8 +119,13 @@ def main (argv=None):
                 TOOL_NAME, pe.error_code, pe.message)
             print(errMsg, file=sys.stderr)
 
+    # call cleanup method for tasks which opened resources
+    jwst_pghyb_sinkTask.cleanup()
+    irods_jwst_oc_calcTask.cleanup()
+    irods_fits_image_mdTask.cleanup()
+
     if (args.get('verbose')):
-        print("({}): Processed {} FITS files.".format(TOOL_NAME, proc_count), file=sys.stderr)
+        print("({}): Processed iRods {} FITS files.".format(TOOL_NAME, proc_count), file=sys.stderr)
 
 
 
