@@ -32,8 +32,8 @@
 # jwst_pgsql_sink -d --version
 # md_pgsql_pipe -d --version
 # miss_report -d --version
-# multi_md_pghyb_pipe -d --version
-# multi_md_pgsql_pipe -d --version
+# mmd_pghyb_pipe -d --version
+# mmd_pgsql_pipe -d --version
 # no_op -d --version
 # pickle_sink -d --version
 
@@ -84,9 +84,9 @@
 # echo "--------------------------------------------"
 # miss_report --help
 # echo "--------------------------------------------"
-# multi_md_pghyb_pipe --help
+# mmd_pghyb_pipe --help
 # echo "--------------------------------------------"
-# multi_md_pgsql_pipe --help
+# mmd_pgsql_pipe --help
 # echo "--------------------------------------------"
 # no_op --help
 # echo "--------------------------------------------"
@@ -270,7 +270,7 @@
 # md_pgsql_pipe -ff /vos/images/small_table.fits -g -v
 # md_pgsql_pipe -ff /vos/images/NOSUCH.fits -g -v
 
-# multi_md_pgsql_pipe -idir /tmp/NOSUCH -g -v
+mmd_pgsql_pipe -idir /tmp/NOSUCH -g -v
 
 # fits_cat_md -ff /vos/images/BAD.fits -g -v
 # fits_cat_md -ff /vos/images/m13.fits -g -v
@@ -292,35 +292,35 @@
 # echo "========================================================="
 # echo "Multiple FITS metadata to PostgreSQL JWST table pipeline:"
 # echo "---------------------------------------------------------"
-# multi_md_pgsql_pipe -idir /tmp -c JADES -sql -g -v
+mmd_pgsql_pipe -idir /tmp -c JADES -sql -g -v
 # echo "--------------------------------------------"
-# multi_md_pgsql_pipe -idir /vos/images/JADES -v
-# multi_md_pgsql_pipe -idir /vos/images/JADES -c JADES -v
-# multi_md_pgsql_pipe -idir /vos/images/JADES -sql -g -v
+# mmd_pgsql_pipe -idir /vos/images/JADES -v
+# mmd_pgsql_pipe -idir /vos/images/JADES -c JADES -v
+ mmd_pgsql_pipe -idir /vos/images/JADES -sql -g -v
 # echo "--------------------------------------------"
-# multi_md_pgsql_pipe -idir /vos/images/DC_191217 -v
-# multi_md_pgsql_pipe -idir /vos/images/DC_191217 -c DC_191217 -v
-# multi_md_pgsql_pipe -idir /vos/images/DC_191217 -sql -g -v
+# mmd_pgsql_pipe -idir /vos/images/DC_191217 -v
+# mmd_pgsql_pipe -idir /vos/images/DC_191217 -c DC_191217 -v
+ mmd_pgsql_pipe -idir /vos/images/DC_191217 -sql -g -v
 # echo "--------------------------------------------"
-# multi_md_pgsql_pipe -idir /vos/images -v
-# multi_md_pgsql_pipe -idir /vos/images -sql -g -v
+# mmd_pgsql_pipe -idir /vos/images -c TEST_ALL -v
+# mmd_pgsql_pipe -idir /vos/images -c TEST_ALL -sql -g -v
 
 
 # echo "====================================================================="
 # echo "Multiple FITS metadata to hybrid PostgreSQL/JSON JWST table pipeline:"
 # echo "---------------------------------------------------------------------"
-# multi_md_pghyb_pipe -idir /tmp/nosuchdir -c JADES -sql -g -v
+mmd_pghyb_pipe -idir /tmp/nosuchdir -c JADES -sql -g -v
 # echo "--------------------------------------------"
-# multi_md_pghyb_pipe -idir /vos/images/JADES -v
-# multi_md_pgsql_pipe -idir /vos/images/JADES -c JADES -v
-# multi_md_pghyb_pipe -idir /vos/images/JADES -sql -g -v
+# mmd_pghyb_pipe -idir /vos/images/JADES -v
+# mmd_pgsql_pipe -idir /vos/images/JADES -c JADES -v
+ mmd_pghyb_pipe -idir /vos/images/JADES -sql -g -v
 # echo "--------------------------------------------"
-# multi_md_pghyb_pipe -idir /vos/images/DC_191217 -v
-# multi_md_pghyb_pipe -idir /vos/images/DC_191217 -c DC_191217 -v
-# multi_md_pghyb_pipe -idir /vos/images/DC_191217 -sql -g -v
+# mmd_pghyb_pipe -idir /vos/images/DC_191217 -v
+# mmd_pghyb_pipe -idir /vos/images/DC_191217 -c DC_191217 -v
+ mmd_pghyb_pipe -idir /vos/images/DC_191217 -sql -g -v
 # echo "--------------------------------------------"
-# multi_md_pghyb_pipe -idir /vos/images -c TEST_ALL -v
-# multi_md_pghyb_pipe -idir /vos/images -c TEST_ALL -sql -g -v
+# mmd_pghyb_pipe -idir /vos/images -c TEST_ALL -v
+# mmd_pghyb_pipe -idir /vos/images -c TEST_ALL -sql -g -v
 
 
 # echo "============================================"
@@ -436,11 +436,11 @@
 # echo "---------------------------------------------------------------"
 # echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 # echo "--------------------------------------------------"
-# irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/nosuchdir -v
+irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/nosuchdir -v
 # echo "---------------------------------------------------------------"
-# irods_mmd_pgsql_pipe -idir /iplant/home/hickst/resources -c EMPTY -v
-# irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/JADES -sql -g -v
-# irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/DC_191217 -sql -g -v
+irods_mmd_pgsql_pipe -idir /iplant/home/hickst/resources -c EMPTY -v
+irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/JADES -sql -g -v
+irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/DC_191217 -sql -g -v
 
 
 # echo "==========================================================================="
@@ -448,11 +448,11 @@
 # echo "---------------------------------------------------------------------------"
 # echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 # echo "--------------------------------------------------"
-# irods_mmd_pghyb_pipe -idir /iplant/home/hickst/vos/nosuchdir -v
+irods_mmd_pghyb_pipe -idir /iplant/home/hickst/vos/nosuchdir -v
 # echo "---------------------------------------------------------------------------"
-# irods_mmd_pghyb_pipe -idir /iplant/home/hickst/resources -c EMPTY -v
-# irods_mmd_pghyb_pipe -idir /iplant/home/hickst/vos/images/JADES -sql -g -v
-# irods_mmd_pghyb_pipe -idir /iplant/home/hickst/vos/images/DC_191217 -sql -g -v
+irods_mmd_pghyb_pipe -idir /iplant/home/hickst/resources -c EMPTY -v
+irods_mmd_pghyb_pipe -idir /iplant/home/hickst/vos/images/JADES -sql -g -v
+irods_mmd_pghyb_pipe -idir /iplant/home/hickst/vos/images/DC_191217 -sql -g -v
 
 
 # echo "============================================"

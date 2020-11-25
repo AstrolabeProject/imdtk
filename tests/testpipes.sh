@@ -32,8 +32,8 @@ jwst_pghyb_sink -d --version
 jwst_pgsql_sink -d --version
 md_pgsql_pipe -d --version
 miss_report -d --version
-multi_md_pghyb_pipe -d --version
-multi_md_pgsql_pipe -d --version
+mmd_pghyb_pipe -d --version
+mmd_pgsql_pipe -d --version
 no_op -d --version
 pickle_sink -d --version
 
@@ -84,9 +84,9 @@ md_pgsql_pipe --help
 echo "--------------------------------------------"
 miss_report --help
 echo "--------------------------------------------"
-multi_md_pghyb_pipe --help
+mmd_pghyb_pipe --help
 echo "--------------------------------------------"
-multi_md_pgsql_pipe --help
+mmd_pgsql_pipe --help
 echo "--------------------------------------------"
 no_op --help
 echo "--------------------------------------------"
@@ -259,9 +259,9 @@ jwst_pghyb_sink -d -sql -if /work/hafijocmr1 -of /work/hafijocmrhyb1
 csv_sink -d -if /work/hafijocmr1 -of /work/hafijocmrcsv1
 
 
-echo "============================================"
+echo "=================================================="
 echo "Exception catching on bad files (ERRORS EXPECTED):"
-echo "--------------------------------------------"
+echo "--------------------------------------------------"
 fits_img_md -ff /vos/images/BAD.fits -g -v
 fits_img_md -ff /vos/images/small_table.fits -g -v
 fits_img_md -ff /vos/images/NOSUCH.fits -g -v
@@ -270,57 +270,57 @@ md_pgsql_pipe -ff /vos/images/BAD.fits -g -v
 md_pgsql_pipe -ff /vos/images/small_table.fits -g -v
 md_pgsql_pipe -ff /vos/images/NOSUCH.fits -g -v
 
-multi_md_pgsql_pipe -idir /tmp/NOSUCH -g -v
+mmd_pgsql_pipe -idir /tmp/NOSUCH -g -v
 
 fits_cat_md -ff /vos/images/BAD.fits -g -v
 fits_cat_md -ff /vos/images/m13.fits -g -v
 fits_cat_md -ff /vos/images/NOSUCH.fits -g -v
 
 
-echo "============================================"
+echo "=========================================================="
 echo "Exception catching on bad task arguments (ERROR EXPECTED):"
-echo "--------------------------------------------"
+echo "----------------------------------------------------------"
 fits_img_md -ff /vos/images/m13.fits | pickle_sink -v
 
 
-echo "============================================"
+echo "======================================================="
 echo "Single FITS metadata to PostgreSQL JWST table pipeline:"
-echo "--------------------------------------------"
+echo "-------------------------------------------------------"
 md_pgsql_pipe -ff /vos/images/DC_191217/F356W.fits -v -sql -g
 
 
 # echo "========================================================="
 # echo "Multiple FITS metadata to PostgreSQL JWST table pipeline:"
 # echo "---------------------------------------------------------"
-# multi_md_pgsql_pipe -idir /tmp -c JADES -sql -g -v
+# mmd_pgsql_pipe -idir /tmp -c JADES -sql -g -v
 # echo "--------------------------------------------"
-# multi_md_pgsql_pipe -idir /vos/images/JADES -v
-# multi_md_pgsql_pipe -idir /vos/images/JADES -c JADES -v
-# multi_md_pgsql_pipe -idir /vos/images/JADES -sql -g -v
+# mmd_pgsql_pipe -idir /vos/images/JADES -v
+# mmd_pgsql_pipe -idir /vos/images/JADES -c JADES -v
+# mmd_pgsql_pipe -idir /vos/images/JADES -sql -g -v
 # echo "--------------------------------------------"
-# multi_md_pgsql_pipe -idir /vos/images/DC_191217 -v
-# multi_md_pgsql_pipe -idir /vos/images/DC_191217 -c DC_191217 -v
-# multi_md_pgsql_pipe -idir /vos/images/DC_191217 -sql -g -v
+# mmd_pgsql_pipe -idir /vos/images/DC_191217 -v
+# mmd_pgsql_pipe -idir /vos/images/DC_191217 -c DC_191217 -v
+# mmd_pgsql_pipe -idir /vos/images/DC_191217 -sql -g -v
 # echo "--------------------------------------------"
-# multi_md_pgsql_pipe -idir /vos/images -v
-# multi_md_pgsql_pipe -idir /vos/images -sql -g -v
+# mmd_pgsql_pipe -idir /vos/images -c TEST_ALL  -v
+# mmd_pgsql_pipe -idir /vos/images -c TEST_ALL -sql -g -v
 
 
 # echo "============================================"
 # echo "Multiple FITS metadata to hybrid PostgreSQL/JSON JWST table pipeline:"
 # echo "--------------------------------------------"
-# multi_md_pghyb_pipe -idir /tmp -c JADES -sql -g -v
+# mmd_pghyb_pipe -idir /tmp -c JADES -sql -g -v
 # echo "--------------------------------------------"
-# multi_md_pghyb_pipe -idir /vos/images/JADES -v
-# multi_md_pghyb_pipe -idir /vos/images/JADES -c JADES -v
-# multi_md_pghyb_pipe -idir /vos/images/JADES -sql -g -v
+# mmd_pghyb_pipe -idir /vos/images/JADES -v
+# mmd_pghyb_pipe -idir /vos/images/JADES -c JADES -v
+# mmd_pghyb_pipe -idir /vos/images/JADES -sql -g -v
 # echo "--------------------------------------------"
-# multi_md_pghyb_pipe -idir /vos/images/DC_191217 -v
-# multi_md_pghyb_pipe -idir /vos/images/DC_191217 -c DC_191217 -v
-# multi_md_pghyb_pipe -idir /vos/images/DC_191217 -sql -g -v
+# mmd_pghyb_pipe -idir /vos/images/DC_191217 -v
+# mmd_pghyb_pipe -idir /vos/images/DC_191217 -c DC_191217 -v
+# mmd_pghyb_pipe -idir /vos/images/DC_191217 -sql -g -v
 # echo "--------------------------------------------"
-# multi_md_pghyb_pipe -idir /vos/images -c TEST_ALL -v
-# multi_md_pghyb_pipe -idir /vos/images -c TEST_ALL -sql -g -v
+# mmd_pghyb_pipe -idir /vos/images -c TEST_ALL -v
+# mmd_pghyb_pipe -idir /vos/images -c TEST_ALL -sql -g -v
 
 
 echo "============================================"
