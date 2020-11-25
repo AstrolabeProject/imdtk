@@ -1,7 +1,7 @@
 #
 # Class to extract image metadata from iRods-resident FITS image files.
 #   Written by: Tom Hicks. 10/15/20.
-#   Last Modified: Refactor: pass iRods helper in ctor.
+#   Last Modified: Better "too small" error message.
 #
 import os
 import sys
@@ -56,7 +56,7 @@ class IRodsFitsImageMetadataTask (IImdTask):
 
             # sanity check on the given FITS file
             if (irff.size < FITS_BLOCK_SIZE):
-                errMsg = "File is too small to be a valid FITS file: '{}'".format(irff_path)
+                errMsg = "Skipping file too small to be a valid FITS file: '{}'".format(irff_path)
                 raise errors.UnsupportedTypeError(errMsg)
 
             # actually read the file to get the specified header

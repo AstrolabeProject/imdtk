@@ -1,7 +1,7 @@
 #
 # Class to calculate values for the ObsCore fields in an iRods FITS-file-derived metadata structure.
 #   Written by: Tom Hicks. 11/20/20.
-#   Last Modified: Refactor: pass iRods helper in ctor.
+#   Last Modified: Better "too small" error message.
 #
 import sys
 
@@ -57,7 +57,7 @@ class IRods_JWST_ObsCoreCalcTask (JWST_ObsCoreCalcTask):
 
             # sanity check on the given FITS file
             if (irff.size < FITS_BLOCK_SIZE):
-                errMsg = "File is too small to be a valid FITS file: '{}'".format(irff_path)
+                errMsg = "Skipping file too small to be a valid FITS file: '{}'".format(irff_path)
                 raise errors.UnsupportedTypeError(errMsg)
 
             if (self._DEBUG):
