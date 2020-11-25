@@ -2,13 +2,12 @@
 #
 # Module to extract image metadata from an iRods-resident FITS file and output it as JSON.
 #   Written by: Tom Hicks. 10/14/20.
-#   Last Modified: Warn on unsupported file type error.
+#   Last Modified: Use method to check iRods FITS filename.
 #
 import argparse
 import sys
 
 import imdtk.exceptions as errors
-import imdtk.core.fits_utils as fits_utils
 import imdtk.tools.cli_utils as cli_utils
 from imdtk.core.fits_irods_helper import FitsIRodsHelper
 from imdtk.tasks.irods_fits_image_md import IRodsFitsImageMetadataTask
@@ -57,8 +56,7 @@ def main (argv=None):
     irff_path = args.get('irods_fits_file')
 
     # the specified FITS file must have a valid FITS extension
-    if (not fits_utils.is_fits_filename(irff_path)):
-        cli_utils.fits_file_exit(TOOL_NAME, irff_path)  # error exit out here: never returns
+    cli_utils.check_irods_fits_file(irff_path, TOOL_NAME)  # may system exit here and not return!
 
     # get an instance of the iRods accessor class
     firh = FitsIRodsHelper(args)
