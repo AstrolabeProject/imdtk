@@ -3,7 +3,7 @@
 # Python pipeline to extract image metadata from each FITS images in a directory, storing
 # the metadata into a Hybrid PostreSQL/JSON database.
 #   Written by: Tom Hicks. 7/20/2020.
-#   Last Modified: Warn on unsupported file type error.
+#   Last Modified: Update for tool rename.
 #
 import argparse
 import sys
@@ -23,7 +23,7 @@ from imdtk.tasks.miss_report import MissingFieldsTask
 
 
 # Program name for this tool.
-TOOL_NAME = 'multi_md_pghybrid_pipe'
+TOOL_NAME = 'mmd_pghybrid_pipe'
 
 
 def main (argv=None):
