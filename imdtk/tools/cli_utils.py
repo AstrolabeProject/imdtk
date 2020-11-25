@@ -1,7 +1,7 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Add a couple of immediate exit routines.
+#   Last Modified: Add/use exit_with_error method, check_irods_fits_file methods.
 #
 import argparse
 import sys
@@ -10,7 +10,8 @@ from config.settings import DEFAULT_IMD_ALIASES_FILEPATH, DEFAULT_DBCONFIG_FILEP
 from config.settings import DEFAULT_FIELDS_FILEPATH, DEFAULT_METADATA_TABLE_NAME
 from imdtk.version import VERSION
 from imdtk.core.file_utils import good_dir_path, good_file_path, validate_file_path
-from imdtk.core.fits_utils import FITS_EXTENTS, FITS_IGNORE_KEYS
+from imdtk.core.fits_utils import FITS_EXTENTS, FITS_IGNORE_KEYS, is_fits_filename
+from imdtk.core.fits_irods_helper import IRODS_FITS_EXTENTS
 
 
 # required arguments:
@@ -239,9 +240,7 @@ def check_catalog_table (catalog_table_name, tool_name, exit_code=CATALOG_TABLE_
     the entire program here with the specified (or default) system exit code.
     """
     if (not catalog_table_name):
-        errMsg = "({}): A catalog table name must be specified. Exiting...".format(tool_name)
-        print(errMsg, file=sys.stderr)
-        sys.exit(exit_code)
+        exit_with_error(tool_name, exit_code, "A catalog table name must be specified.")
 
 
 def check_alias_file (alias_file, tool_name, exit_code=ALIAS_FILE_EXIT_CODE):
@@ -251,9 +250,7 @@ def check_alias_file (alias_file, tool_name, exit_code=ALIAS_FILE_EXIT_CODE):
     """
     if (alias_file):                        # if aliases file given, check it
         if (not good_file_path(alias_file)):
-            errMsg = "({}): A readable aliases file must be specified. Exiting...".format(tool_name)
-            print(errMsg, file=sys.stderr)
-            sys.exit(exit_code)
+            exit_with_error(tool_name, exit_code, "A readable aliases file must be specified.")
 
 
 def check_dbconfig_file (dbconfig_file, tool_name, exit_code=DBCONFIG_FILE_EXIT_CODE):
@@ -263,9 +260,8 @@ def check_dbconfig_file (dbconfig_file, tool_name, exit_code=DBCONFIG_FILE_EXIT_
     """
     if (dbconfig_file):                     # if DB configuration file given, check it
         if (not good_file_path(dbconfig_file)):
-            errMsg = "({}): A readable database configuration file must be specified. Exiting...".format(tool_name)
-            print(errMsg, file=sys.stderr)
-            sys.exit(exit_code)
+            exit_with_error(tool_name, exit_code,
+                            "A readable database configuration file must be specified.")
 
 
 def check_fields_file (fields_file, tool_name, exit_code=FIELDS_FILE_EXIT_CODE):
@@ -275,9 +271,8 @@ def check_fields_file (fields_file, tool_name, exit_code=FIELDS_FILE_EXIT_CODE):
     """
     if (fields_file):                       # if fields info file given, check it
         if (not good_file_path(fields_file)):
-            errMsg = "({}): A readable fields information file must be specified. Exiting...".format(tool_name)
-            print(errMsg, file=sys.stderr)
-            sys.exit(exit_code)
+            exit_with_error(tool_name, exit_code,
+                            "A readable fields information file must be specified")
 
 
 def check_fits_file (fits_file, tool_name, exit_code=FITS_FILE_EXIT_CODE):
@@ -286,9 +281,7 @@ def check_fits_file (fits_file, tool_name, exit_code=FITS_FILE_EXIT_CODE):
     the entire program here with the specified (or default) system exit code.
     """
     if (not validate_file_path(fits_file, FITS_EXTENTS)):
-        errMsg = "({}): A readable, valid FITS image file must be specified. Exiting...".format(tool_name)
-        print(errMsg, file=sys.stderr)
-        sys.exit(exit_code)
+        exit_with_error(tool_name, exit_code, "A readable, valid FITS image file must be specified.")
 
 
 def check_input_dir (input_dir, tool_name, exit_code=INPUT_DIR_EXIT_CODE):
@@ -297,9 +290,7 @@ def check_input_dir (input_dir, tool_name, exit_code=INPUT_DIR_EXIT_CODE):
     the entire program here with the specified (or default) system exit code.
     """
     if (not good_dir_path(input_dir)):
-        errMsg = "({}): A readable input directory must be specified. Exiting...".format(tool_name)
-        print(errMsg, file=sys.stderr)
-        sys.exit(exit_code)
+        exit_with_error(tool_name, exit_code, "A readable input directory must be specified.")
 
 
 def check_input_file (input_file, tool_name, exit_code=INPUT_FILE_EXIT_CODE):
@@ -309,17 +300,26 @@ def check_input_file (input_file, tool_name, exit_code=INPUT_FILE_EXIT_CODE):
     """
     if (input_file):                        # if input file given, check it
         if (not good_file_path(input_file)):
-            errMsg = "({}): A readable, valid input data file must be specified. Exiting...".format(tool_name)
-            print(errMsg, file=sys.stderr)
-            sys.exit(exit_code)
+            exit_with_error(tool_name, exit_code,
+                            "A readable, valid input data file must be specified.")
 
 
-def fits_file_exit (tool_name, exit_code=FITS_FILE_EXIT_CODE):
+def check_irods_fits_file (fits_file, tool_name, exit_code=FITS_FILE_EXIT_CODE):
     """
-    Some required FITS file path was not valid so exit the entire program here
-    with the specified (or default) system exit code.
+    Check that the required FITS file path is a valid path. If not, then exit
+    the entire program here with the specified (or default) system exit code.
     """
-    errMsg = "({}): A readable, valid FITS image file must be specified. Exiting...".format(tool_name)
+    if (not is_fits_filename(fits_file, IRODS_FITS_EXTENTS)):
+        exit_with_error(tool_name, exit_code,
+                        "A readable, valid, uncompressed FITS file must be specified.")
+
+
+def exit_with_error (tool_name, exit_code, exit_msg):
+    """
+    Exit the entire program here with the given exit code, after formatting the given
+    exit message and tool_name.
+    """
+    errMsg = "({}): ERROR: {} Exiting...".format(tool_name, exit_msg)
     print(errMsg, file=sys.stderr)
     sys.exit(exit_code)
 
@@ -329,6 +329,5 @@ def irods_input_dir_exit (tool_name, input_dir, exit_code=INPUT_DIR_EXIT_CODE):
     The specified and required input directory path was not valid so exit the
     entire program here with the specified (or default) system exit code.
     """
-    errMsg = "({}): ERROR: Unable to find the specified iRods directory '{}'. Exiting...".format(tool_name, input_dir)
-    print(errMsg, file=sys.stderr)
-    sys.exit(exit_code)
+    exit_with_error(tool_name, exit_code,
+                    "Unable to find the specified iRods directory '{}'.".format(input_dir))
