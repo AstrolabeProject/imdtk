@@ -1,7 +1,7 @@
 #
 # Class for manipulating FITS files within the the iRods filesystem.
 #   Written by: Tom Hicks. 11/1/20.
-#   Last Modified: Add gen_fits_file_paths method.
+#   Last Modified: Add variable for iRods FITS file extents.
 #
 import os
 import sys
@@ -21,6 +21,10 @@ from imdtk.core.misc_utils import product
 
 
 FITS_ENCODING = 'utf-8'
+
+# file suffixes for identifying FITS files
+IRODS_FITS_EXTENTS = [ '.fits' ]            # can only handle uncompressed iRods files
+
 IRODS_FILE_ATTRIBUTES =[ 'checksum', 'create_time', 'modify_time', 'name',
                          'owner_name', 'owner_zone', 'path', 'size',
                          'status', 'type', 'version' ]
