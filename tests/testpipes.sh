@@ -13,8 +13,11 @@ echo "--------------------------------------------"
 cat_aliases -d --version
 csv_sink -d --version
 fields_info -d --version
+fits_cat_data -d --version
+fits_cat_fill -d --version
 fits_cat_md -d --version
 fits_cat_mktbl -d --version
+fits_cat_mktbl_pipe -d --version
 fits_cat_table_pipe -d --version
 fits_img_md -d --version
 img_aliases -d --version
@@ -22,6 +25,8 @@ irods_fits_cat_md -d --version
 irods_fits_img_md -d --version
 irods_jwst_oc_calc -d --version
 irods_md_pgsql_pipe -d --version
+irods_mmd_pghyb_pipe -d --version
+irods_mmd_pgsql_pipe -d --version
 jwst_oc_calc -d --version
 jwst_pghyb_sink -d --version
 jwst_pgsql_sink -d --version
@@ -41,9 +46,15 @@ csv_sink --help
 echo "--------------------------------------------"
 fields_info --help
 echo "--------------------------------------------"
+fits_cat_data --help
+echo "--------------------------------------------"
+fits_cat_fill --help
+echo "--------------------------------------------"
 fits_cat_md --help
 echo "--------------------------------------------"
 fits_cat_mktbl --help
+echo "--------------------------------------------"
+fits_cat_mktbl_pipe --help
 echo "--------------------------------------------"
 fits_cat_table_pipe --help
 echo "--------------------------------------------"
@@ -58,6 +69,10 @@ echo "--------------------------------------------"
 irods_jwst_oc_calc --help
 echo "--------------------------------------------"
 irods_md_pgsql_pipe --help
+echo "--------------------------------------------"
+irods_mmd_pghyb_pipe --help
+echo "--------------------------------------------"
+irods_mmd_pgsql_pipe --help
 echo "--------------------------------------------"
 jwst_oc_calc --help
 echo "--------------------------------------------"
@@ -274,16 +289,9 @@ echo "--------------------------------------------"
 md_pgsql_pipe -ff /vos/images/DC_191217/F356W.fits -v -sql -g
 
 
-echo "============================================"
-echo "Single FITS iRods metadata to PostgreSQL JWST table pipeline:"
-echo "--------------------------------------------"
-irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -sql -g -v
-irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits -sql -g -v
-
-
-# echo "============================================"
+# echo "========================================================="
 # echo "Multiple FITS metadata to PostgreSQL JWST table pipeline:"
-# echo "--------------------------------------------"
+# echo "---------------------------------------------------------"
 # multi_md_pgsql_pipe -idir /tmp -c JADES -sql -g -v
 # echo "--------------------------------------------"
 # multi_md_pgsql_pipe -idir /vos/images/JADES -v
@@ -311,15 +319,8 @@ irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits -sq
 # multi_md_pghyb_pipe -idir /vos/images/DC_191217 -c DC_191217 -v
 # multi_md_pghyb_pipe -idir /vos/images/DC_191217 -sql -g -v
 # echo "--------------------------------------------"
-# multi_md_pghyb_pipe -idir /vos/images -c ALLIMGS -v
-# multi_md_pghyb_pipe -idir /vos/images -c ALLIMGS -sql -g -v
-
-
-# echo "============================================"
-# echo " SQL refactoring tests:"
-# echo "--------------------------------------------"
-# multi_md_pghyb_pipe -idir /vos/images -c HYB_ALLIMGS -v
-# multi_md_pgsql_pipe -idir /vos/images -c SQL_ALLIMGS -v
+# multi_md_pghyb_pipe -idir /vos/images -c TEST_ALL -v
+# multi_md_pghyb_pipe -idir /vos/images -c TEST_ALL -sql -g -v
 
 
 echo "============================================"
@@ -367,32 +368,34 @@ fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct noalias -
 # fits_cat_data -v -ff /vos/catalogs/DC_191217/photometry_table_psf_matched_v5.0.fits -v -g
 
 
-echo "============================================"
+echo "=================================================="
 echo "iRods Image Metadata extraction:"
-echo "--------------------------------------------"
+echo "--------------------------------------------------"
 echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
-echo "--------------------------------------------"
+echo "--------------------------------------------------"
 irods_fits_img_md -iff /iplant/home/hickst/vos/images/m14.fits -v
 irods_fits_img_md -iff /iplant/home/hickst/vos/images/BAD.fits -v
 irods_fits_img_md -iff /iplant/home/hickst/vos/images/m13.fits -v -hdu 1
+irods_fits_img_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v -hdu 1
 irods_fits_img_md -iff /iplant/home/hickst/vos/images/small_table.fits -v
 irods_fits_img_md -iff /iplant/home/hickst/vos/images/small_table.fits -v -hdu 1
-irods_fits_img_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v -hdu 1
 irods_fits_img_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -v -hdu 1
 irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v -hdu 1
-echo "--------------------------------------------"
+irods_fits_img_md -iff /iplant/home/hickst/vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v
+irods_fits_img_md -iff /iplant/home/hickst/vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -hdu 0
+irods_fits_img_md -iff /iplant/home/hickst/vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -hdu 1
+echo "--------------------------------------------------"
 irods_fits_img_md -iff /iplant/home/hickst/vos/images/m13.fits -g -v
 irods_fits_img_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -g -v
 irods_fits_img_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -g -v
-irods_fits_img_md -iff /iplant/home/hickst/sample-data/egami-samp/test_mosaic_F356W_2018_03_19.fits -g -v
 irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -g -v
 
 
-echo "============================================"
+echo "=================================================="
 echo "iRods Catalog Metadata extraction:"
-echo "--------------------------------------------"
+echo "--------------------------------------------------"
 echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
-echo "--------------------------------------------"
+echo "--------------------------------------------------"
 irods_fits_cat_md -iff /iplant/home/hickst/vos/images/m14.fits -v
 irods_fits_cat_md -iff /iplant/home/hickst/vos/images/BAD.fits -v
 irods_fits_cat_md -iff /iplant/home/hickst/vos/images/m13.fits -v
@@ -407,30 +410,49 @@ irods_fits_cat_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v
 irods_fits_cat_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v -chdu 0
 irods_fits_cat_md -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -v -chdu 1
 irods_fits_cat_md -iff /iplant/home/hickst/vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -chdu 0
-echo "--------------------------------------------"
-irods_fits_cat_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v -g
-irods_fits_cat_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v -chdu 1 -g
-irods_fits_cat_md -iff /iplant/home/hickst/vos/images/small_table.fits -v -g
-irods_fits_cat_md -iff /iplant/home/hickst/vos/images/small_table.fits -v -chdu 1 -g
-irods_fits_cat_md -iff /iplant/home/hickst/vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -g
-irods_fits_cat_md -iff /iplant/home/hickst/vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -chdu 1 -g
+echo "--------------------------------------------------"
+irods_fits_cat_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -g -v
+irods_fits_cat_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -g -v -chdu 1
+irods_fits_cat_md -iff /iplant/home/hickst/vos/images/small_table.fits -g -v
+irods_fits_cat_md -iff /iplant/home/hickst/vos/images/small_table.fits -g -v -chdu 1
+irods_fits_cat_md -iff /iplant/home/hickst/vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -g -v
+irods_fits_cat_md -iff /iplant/home/hickst/vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -g -v -chdu 1
 
 
-# echo "============================================"
-# echo "Current development:"
-# echo "--------------------------------------------"
-# echo ""
-# echo "---------- Store image MD to SQL & Hybrid tables ----------"
-# fits_img_md -v -ff /vos/images/DC_191217/F356W.fits | img_aliases | fields_info | jwst_oc_calc -ff /vos/images/DC_191217/F356W.fits | miss_report -v | jwst_pgsql_sink -v
-# fits_img_md -v -ff /vos/images/DC_191217/F356W.fits | img_aliases | fields_info | jwst_oc_calc -ff /vos/images/DC_191217/F356W.fits | miss_report -v | jwst_pghyb_sink -v
+echo "============================================================="
+echo "Single FITS iRods metadata to PostgreSQL JWST table pipeline:"
+echo "-------------------------------------------------------------"
+echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
+echo "--------------------------------------------------"
+irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images -v
+irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/BAD.fits -v
+echo "-------------------------------------------------------------"
+irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -sql -g -v
+irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits -sql -g -v
 
-# echo "---------- Make table in DB: with aliases, w/o aliases, repetition failure  ----------"
-# fits_cat_md -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v
-# fits_cat_md -ff /vos/catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl2 -v
-# fits_cat_md -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v
 
-# echo "---------- Make table Pipeline ----------"
-# fits_cat_mktbl_pipe -ff /vos/catalogs/small_table.fits -ct test_tbl -sql -g -v
-# fits_cat_mktbl_pipe -ff /vos/catalogs/small_table.fits -ct test_tbl -v
+echo "==============================================================="
+echo "Multiple FITS iRods metadata to PostgreSQL JWST table pipeline:"
+echo "---------------------------------------------------------------"
+echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
+echo "--------------------------------------------------"
+irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/nosuchdir -v
+echo "---------------------------------------------------------------"
+irods_mmd_pgsql_pipe -idir /iplant/home/hickst/resources -c EMPTY -v
+irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/JADES -sql -g -v
+irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/DC_191217 -sql -g -v
+
+
+echo "==========================================================================="
+echo "Multiple FITS iRods metadata to hybrid PostgreSQL/JSON JWST table pipeline:"
+echo "---------------------------------------------------------------------------"
+echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
+echo "--------------------------------------------------"
+irods_mmd_pghyb_pipe -idir /iplant/home/hickst/vos/nosuchdir -v
+echo "---------------------------------------------------------------------------"
+irods_mmd_pghyb_pipe -idir /iplant/home/hickst/resources -c EMPTY -v
+irods_mmd_pghyb_pipe -idir /iplant/home/hickst/vos/images/JADES -sql -g -v
+irods_mmd_pghyb_pipe -idir /iplant/home/hickst/vos/images/DC_191217 -sql -g -v
+
 
 echo "============================================"
