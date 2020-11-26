@@ -29,6 +29,7 @@ setup(
             'pickle_sink     = imdtk.tools.pickle_sink_cli:main',
             'fits_cat_mktbl_pipe  = imdtk.tools.fits_catalog_mktbl_pipe:main',
             'fits_cat_table_pipe  = imdtk.tools.fits_catalog_table_pipe:main',
+            'irods_md_pghyb_pipe  = imdtk.tools.irods_md_pghybrid_pipe:main',
             'irods_md_pgsql_pipe  = imdtk.tools.irods_md_pgsql_pipe:main',
             'irods_mmd_pghyb_pipe = imdtk.tools.irods_mmd_pghybrid_pipe:main',
             'irods_mmd_pgsql_pipe = imdtk.tools.irods_mmd_pgsql_pipe:main',
