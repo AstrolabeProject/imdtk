@@ -24,6 +24,7 @@ img_aliases -d --version
 irods_fits_cat_md -d --version
 irods_fits_img_md -d --version
 irods_jwst_oc_calc -d --version
+irods_md_pghyb_pipe -d --version
 irods_md_pgsql_pipe -d --version
 irods_mmd_pghyb_pipe -d --version
 irods_mmd_pgsql_pipe -d --version
@@ -68,6 +69,8 @@ echo "--------------------------------------------"
 irods_fits_img_md --help
 echo "--------------------------------------------"
 irods_jwst_oc_calc --help
+echo "--------------------------------------------"
+irods_md_pghyb_pipe --help
 echo "--------------------------------------------"
 irods_md_pgsql_pipe --help
 echo "--------------------------------------------"
@@ -268,16 +271,56 @@ echo "--------------------------------------------------"
 fits_img_md -ff /vos/images/BAD.fits -g -v
 fits_img_md -ff /vos/images/small_table.fits -g -v
 fits_img_md -ff /vos/images/NOSUCH.fits -g -v
-
+fits_img_md -ff /vos/images/m13.fits | pickle_sink -v
+echo "--------------------------------------------------"
 fits_cat_md -ff /vos/images/BAD.fits -g -v
 fits_cat_md -ff /vos/images/m13.fits -g -v
 fits_cat_md -ff /vos/images/NOSUCH.fits -g -v
 
 
-echo "=========================================================="
-echo "Exception catching on bad task arguments (ERROR EXPECTED):"
-echo "----------------------------------------------------------"
-fits_img_md -ff /vos/images/m13.fits | pickle_sink -v
+echo "============================================"
+echo "Catalog Metadata:"
+echo "--------------------------------------------"
+# fits_cat_md -ff /vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -d -g
+fits_cat_md -ff /vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -g
+fits_cat_md -ff /vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -of /work/ez_cat.json
+echo "--------------------------------------------"
+# fits_cat_md -ff /vos/catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -d -g
+fits_cat_md -v -ff /vos/catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -v -g
+fits_cat_md -ff /vos/catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -v -of /work/photo_cat.json
+
+
+echo "============================================"
+echo "Catalog Metadata with Aliases:"
+echo "--------------------------------------------"
+fits_cat_md -v -ff /vos/catalogs/small_table.fits | cat_aliases -v -g
+fits_cat_md -v -ff /vos/catalogs/small_table.fits | cat_aliases -v -of /work/small_table_fits_cat_md_alias.json
+
+
+echo "============================================"
+echo "Catalog Make Table:"
+echo "--------------------------------------------"
+fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v -sql -g
+fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v -sql -of /work/small_table_fits_cat_mktbl.sql
+echo "--------------------------------------------"
+fits_cat_md -v -ff /vos/catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -v -sql -g
+fits_cat_md -v -ff /vos/catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -v -sql -of /work/small_table_fits_cat_mktbl_alias.sql
+echo "--------------------------------------------"
+fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct noalias -v -sql -g
+fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct noalias -v -sql -of /work/small_table_fits_cat_mktbl_noalias.sql
+
+
+# echo "============================================"
+# echo "Catalog Data extraction:"
+# echo "--------------------------------------------"
+# Smallest (~60k) data file (with meta):
+# fits_cat_data -v -ff /vos/catalogs/small_table.fits -v -g
+# Medium sized (~1M) data file:
+# fits_cat_data -v -ff /vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -g
+# Medium sized (~2.9M) data file:
+# fits_cat_data -v -ff /vos/catalogs/DC_191217/Photometric_Catalog.F200W_kron_f80.fits -v -g
+# Largest (~4M) and most complex (nested fields) data file:
+# fits_cat_data -v -ff /vos/catalogs/DC_191217/photometry_table_psf_matched_v5.0.fits -v -g
 
 
 echo "======================================================="
@@ -340,51 +383,6 @@ md_pghyb_pipe -ff /vos/images/DC_191217/F444W.fits -v -sql -g
 # mmd_pghyb_pipe -idir /vos/images -c TEST_ALL -sql -g -v
 
 
-echo "============================================"
-echo "Catalog Metadata:"
-echo "--------------------------------------------"
-fits_cat_md -ff /vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -d -g
-fits_cat_md -ff /vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -g
-fits_cat_md -ff /vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -of /work/ez_cat.json
-echo "--------------------------------------------"
-fits_cat_md -ff /vos/catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -d -g
-fits_cat_md -v -ff /vos/catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -v -g
-fits_cat_md -ff /vos/catalogs/DC_191217/Photometric_Catalog.F356W_kron_f80.fits -v -of /work/photo_cat.json
-
-
-echo "============================================"
-echo "Catalog Metadata with Aliases:"
-echo "--------------------------------------------"
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | cat_aliases -v -g
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | cat_aliases -v -of /work/small_table_fits_cat_md_alias.json
-
-
-echo "============================================"
-echo "Catalog Make Table:"
-echo "--------------------------------------------"
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v -sql -g
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v -sql -of /work/small_table_fits_cat_mktbl.sql
-echo "--------------------------------------------"
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -v -sql -g
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -v -sql -of /work/small_table_fits_cat_mktbl_alias.sql
-echo "--------------------------------------------"
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct noalias -v -sql -g
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct noalias -v -sql -of /work/small_table_fits_cat_mktbl_noalias.sql
-
-
-# echo "============================================"
-# echo "Catalog Data extraction:"
-# echo "--------------------------------------------"
-# Smallest (~60k) data file (with meta):
-# fits_cat_data -v -ff /vos/catalogs/small_table.fits -v -g
-# Medium sized (~1M) data file:
-# fits_cat_data -v -ff /vos/catalogs/DC_191217/EAZY_results_summary_F356W.fits -v -g
-# Medium sized (~2.9M) data file:
-# fits_cat_data -v -ff /vos/catalogs/DC_191217/Photometric_Catalog.F200W_kron_f80.fits -v -g
-# Largest (~4M) and most complex (nested fields) data file:
-# fits_cat_data -v -ff /vos/catalogs/DC_191217/photometry_table_psf_matched_v5.0.fits -v -g
-
-
 echo "=================================================="
 echo "iRods Image Metadata extraction:"
 echo "--------------------------------------------------"
@@ -443,9 +441,27 @@ echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 echo "--------------------------------------------------"
 irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images -v
 irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/BAD.fits -v
+irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/small_table.fits -v
 echo "-------------------------------------------------------------"
+irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/m13.fits -sql -g -v
+irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/HorseHead.fits -sql -g -v
 irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -sql -g -v
 irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits -sql -g -v
+
+
+echo "========================================================================="
+echo "Single FITS iRods metadata to PostgreSQL/JSON hybrid JWST table pipeline:"
+echo "-------------------------------------------------------------------------"
+echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
+echo "--------------------------------------------------"
+irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images -v
+irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/BAD.fits -v
+irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/small_table.fits -v
+echo "-------------------------------------------------------------"
+irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/m13.fits -sql -g -v
+irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/HorseHead.fits -sql -g -v
+irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -sql -g -v
+irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits -sql -g -v
 
 
 echo "==============================================================="
