@@ -1,7 +1,7 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: Remove unused instance variable.
+#   Last Modified: Refactor file info gathering.
 #
 import os
 import sys
@@ -10,6 +10,7 @@ from astropy.io import fits
 
 import imdtk.exceptions as errors
 import imdtk.core.fits_utils as fits_utils
+from imdtk.core.file_utils import gather_file_info
 from imdtk.tasks.i_task import IImdTask
 
 
@@ -51,31 +52,10 @@ class FitsImageMetadataTask (IImdTask):
             errMsg = "Unable to read image metadata from FITS file '{}': {}.".format(fits_file, oserr)
             raise errors.ProcessingError(errMsg)
 
-        metadata = self.make_context()      # create overall metadata structure
-        metadata['headers'] = hdrs          # add the headers to the metadata
+        metadata = dict()                   # create overall metadata structure
+        finfo = gather_file_info(fits_file)
+        if (finfo is not None):             # add common file information
+            metadata['file_info'] = finfo
+        if (hdrs is not None):              # add the headers to the metadata
+            metadata['headers'] = hdrs
         return metadata                     # return the results of processing
-
-
-
-    #
-    # Non-interface and/or task-specific Methods
-    #
-
-    def add_file_info (self, results):
-        """ Add information about the input file to the given results map. """
-        file_info = dict()
-        fits_file = self.args.get('fits_file')
-        file_info['file_name'] = os.path.basename(fits_file)
-        file_info['file_path'] = os.path.abspath(fits_file)
-        file_info['file_size'] = os.path.getsize(fits_file)
-        results['file_info'] = file_info
-
-
-    def make_context (self):
-        """
-        Create the larger structure which holds the various information sections.
-        Start with file information.
-        """
-        results = dict()
-        self.add_file_info(results)
-        return results

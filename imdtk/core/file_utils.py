@@ -1,7 +1,7 @@
 #
 # Module to provide general file utility functions.
 #   Written by: Tom Hicks. 1/29/2020.
-#   Last Modified: Add full path expansion method.
+#   Last Modified: Refactor method to gather/add file info here.
 #
 import os
 
@@ -15,6 +15,15 @@ def filename_core (apath):
 def full_path (apath):
     """ Full expand the given path into an absolute path. Supports the home ('~') shortcut. """
     return os.path.abspath(os.path.normpath(os.path.expanduser(apath)))
+
+
+def gather_file_info (apath):
+    """ Return a dictionary of common file information given a filepath. """
+    file_info = dict()
+    file_info['file_name'] = os.path.basename(apath)
+    file_info['file_path'] = os.path.abspath(apath)
+    file_info['file_size'] = os.path.getsize(apath)
+    return file_info
 
 
 def gen_file_paths (root_dir):
