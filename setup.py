@@ -32,6 +32,7 @@ setup(
             'irods_md_pgsql_pipe  = imdtk.tools.irods_md_pgsql_pipe:main',
             'irods_mmd_pghyb_pipe = imdtk.tools.irods_mmd_pghybrid_pipe:main',
             'irods_mmd_pgsql_pipe = imdtk.tools.irods_mmd_pgsql_pipe:main',
+            'md_pghyb_pipe   = imdtk.tools.md_pghybrid_pipe:main',
             'md_pgsql_pipe   = imdtk.tools.md_pgsql_pipe:main',
             'mmd_pghyb_pipe  = imdtk.tools.mmd_pghybrid_pipe:main',
             'mmd_pgsql_pipe  = imdtk.tools.mmd_pgsql_pipe:main'

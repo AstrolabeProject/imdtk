@@ -30,6 +30,7 @@ irods_mmd_pgsql_pipe -d --version
 jwst_oc_calc -d --version
 jwst_pghyb_sink -d --version
 jwst_pgsql_sink -d --version
+md_pghyb_pipe -d --version
 md_pgsql_pipe -d --version
 miss_report -d --version
 mmd_pghyb_pipe -d --version
@@ -79,6 +80,8 @@ echo "--------------------------------------------"
 jwst_pghyb_sink --help
 echo "--------------------------------------------"
 jwst_pgsql_sink --help
+echo "--------------------------------------------"
+md_pghyb_pipe --help
 echo "--------------------------------------------"
 md_pgsql_pipe --help
 echo "--------------------------------------------"
@@ -266,12 +269,6 @@ fits_img_md -ff /vos/images/BAD.fits -g -v
 fits_img_md -ff /vos/images/small_table.fits -g -v
 fits_img_md -ff /vos/images/NOSUCH.fits -g -v
 
-md_pgsql_pipe -ff /vos/images/BAD.fits -g -v
-md_pgsql_pipe -ff /vos/images/small_table.fits -g -v
-md_pgsql_pipe -ff /vos/images/NOSUCH.fits -g -v
-
-mmd_pgsql_pipe -idir /tmp/NOSUCH -g -v
-
 fits_cat_md -ff /vos/images/BAD.fits -g -v
 fits_cat_md -ff /vos/images/m13.fits -g -v
 fits_cat_md -ff /vos/images/NOSUCH.fits -g -v
@@ -286,7 +283,27 @@ fits_img_md -ff /vos/images/m13.fits | pickle_sink -v
 echo "======================================================="
 echo "Single FITS metadata to PostgreSQL JWST table pipeline:"
 echo "-------------------------------------------------------"
+echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
+echo "--------------------------------------------------"
+md_pgsql_pipe -ff /vos/images/BAD.fits -g -v
+md_pgsql_pipe -ff /vos/images/small_table.fits -g -v
+md_pgsql_pipe -ff /vos/images/NOSUCH.fits -g -v
+echo "--------------------------------------------------"
 md_pgsql_pipe -ff /vos/images/DC_191217/F356W.fits -v -sql -g
+md_pgsql_pipe -ff /vos/images/DC_191217/F444W.fits -v -sql -g
+
+
+echo "==================================================================="
+echo "Single FITS metadata to PostgreSQL/JSON hybrid JWST table pipeline:"
+echo "-------------------------------------------------------------------"
+echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
+echo "--------------------------------------------------"
+md_pghyb_pipe -ff /vos/images/BAD.fits -g -v
+md_pghyb_pipe -ff /vos/images/small_table.fits -g -v
+md_pghyb_pipe -ff /vos/images/NOSUCH.fits -g -v
+echo "--------------------------------------------------"
+md_pghyb_pipe -ff /vos/images/DC_191217/F356W.fits -v -sql -g
+md_pghyb_pipe -ff /vos/images/DC_191217/F444W.fits -v -sql -g
 
 
 # echo "========================================================="
