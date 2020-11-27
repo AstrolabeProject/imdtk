@@ -1,7 +1,7 @@
 #
 # Helper class for iRods commands: manipulate the filesystem, including metadata.
 #   Written by: Tom Hicks. 10/15/20.
-#   Last Modified: Add gen_file_paths method. Replace get_dir with getc. Enhance walk with root arg.
+#   Last Modified: Remove unused is_connected method.
 #
 import os
 import errno
@@ -285,11 +285,6 @@ class IRodsHelper:
     def is_collection (self, node):
         """ Tell whether the given iRods node is a collection or not. """
         return isinstance(node, iRODSCollection)
-
-
-    def is_connected (self):
-        """ Tell whether this class is currently connected to iRods. """
-        return (bool(self._session))
 
 
     def is_dataobject (self, node):
