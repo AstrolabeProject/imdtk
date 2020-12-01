@@ -1,7 +1,7 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Add iRods metadata file argument and output only argument.
+#   Last Modified: Replace SQL only argument with more general output only argument.
 #
 import argparse
 import sys
@@ -76,11 +76,8 @@ def add_database_arguments (parser, tool_name,
         help="Path to database configuration file [default: {}]".format(default_msg)
     )
 
-    parser.add_argument(
-        '-sql', '--sql-only', dest='sql_only', action='store_true',
-        default=False,
-        help='If True, output SQL only and do NOT store the data in the database [default: False].'
-    )
+    # allow output of SQL only
+    add_output_only_argument(parser, tool_name)
 
 
 def add_fields_info_argument (parser, tool_name, default_msg=DEFAULT_FIELDS_FILEPATH):

@@ -1,7 +1,7 @@
 #
 # Class to sink incoming image metadata to a Hybrid (SQL/JSON) PostgreSQL database.
 #   Written by: Tom Hicks. 7/3/2020.
-#   Last Modified: Raise exception on missing calculated data.
+#   Last Modified: Replace SQL only argument with more general output only argument.
 #
 import psycopg2
 import sys
@@ -31,7 +31,7 @@ class JWST_HybridPostgreSQLSink (ISQLSink):
     def output_results (self, metadata):
         """
         Store the given data into the configured database OR just output SQL
-        to do so, depending on the 'sql-only' flag.
+        to do so, depending on the 'output-only' flag.
         """
         if (self._DEBUG):
             print("({}.output_results): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
@@ -43,7 +43,7 @@ class JWST_HybridPostgreSQLSink (ISQLSink):
         outdata = self.select_data_for_output(metadata)
 
         # decide whether we are storing data in the DB or just outputting SQL statements
-        sql_only = self.args.get('sql_only')
+        sql_only = self.args.get('output_only')
         if (sql_only):                      # if just outputting SQL
             self.write_results(outdata, file_info)
         else:                               # else storing data in a database

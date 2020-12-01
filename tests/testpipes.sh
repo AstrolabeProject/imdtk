@@ -24,8 +24,10 @@ img_aliases -d --version
 irods_fits_cat_md -d --version
 irods_fits_img_md -d --version
 irods_jwst_oc_calc -d --version
+irods_md_irods_pipe -d --version
 irods_md_pghyb_pipe -d --version
 irods_md_pgsql_pipe -d --version
+irods_mmd_irods_pipe -d --version
 irods_mmd_pghyb_pipe -d --version
 irods_mmd_pgsql_pipe -d --version
 jwst_oc_calc -d --version
@@ -70,9 +72,13 @@ irods_fits_img_md --help
 echo "--------------------------------------------"
 irods_jwst_oc_calc --help
 echo "--------------------------------------------"
+irods_md_irods_pipe --help
+echo "--------------------------------------------"
 irods_md_pghyb_pipe --help
 echo "--------------------------------------------"
 irods_md_pgsql_pipe --help
+echo "--------------------------------------------"
+irods_mmd_irods_pipe --help
 echo "--------------------------------------------"
 irods_mmd_pghyb_pipe --help
 echo "--------------------------------------------"
@@ -173,21 +179,21 @@ fits_img_md -ff /vos/images/DC_191217/F356W.fits | img_aliases | fields_info | j
 echo "============================================"
 echo "PG SQL pipeline, generated filename:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC_191217/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC_191217/F356W.fits | miss_report -v | jwst_pgsql_sink -v -sql -g
+fits_img_md -v -ff /vos/images/DC_191217/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC_191217/F356W.fits | miss_report -v | jwst_pgsql_sink -v -oo -g
 
 echo "============================================"
 echo "PG SQL pipeline, named filename:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC_191217/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC_191217/F356W.fits | miss_report -v | jwst_pgsql_sink -v -sql -of /work/testql.sql
+fits_img_md -v -ff /vos/images/DC_191217/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC_191217/F356W.fits | miss_report -v | jwst_pgsql_sink -v -oo -of /work/testql.sql
 
 echo "============================================"
 echo "PG SQL pipeline, all DEBUG:"
 echo "--------------------------------------------"
-fits_img_md -d -ff /vos/images/DC_191217/F356W.fits | img_aliases -d | fields_info -d | jwst_oc_calc -d -ff /vos/images/DC_191217/F356W.fits | miss_report -d | jwst_pgsql_sink -d -sql -g
+fits_img_md -d -ff /vos/images/DC_191217/F356W.fits | img_aliases -d | fields_info -d | jwst_oc_calc -d -ff /vos/images/DC_191217/F356W.fits | miss_report -d | jwst_pgsql_sink -d -oo -g
 
 echo "============================================"
 echo "PG SQL pipeline, all SILENT:"
-fits_img_md -ff /vos/images/DC_191217/F356W.fits | img_aliases | fields_info | jwst_oc_calc -ff /vos/images/DC_191217/F356W.fits | miss_report | jwst_pgsql_sink -sql -g
+fits_img_md -ff /vos/images/DC_191217/F356W.fits | img_aliases | fields_info | jwst_oc_calc -ff /vos/images/DC_191217/F356W.fits | miss_report | jwst_pgsql_sink -oo -g
 
 
 echo "============================================"
@@ -213,21 +219,21 @@ fits_img_md -ff /vos/images/DC_191217/F356W.fits | img_aliases | fields_info | j
 echo "============================================"
 echo "PG Hybrid pipeline, generated filename:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC_191217/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC_191217/F356W.fits | miss_report -v | jwst_pghyb_sink -v -sql -g
+fits_img_md -v -ff /vos/images/DC_191217/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC_191217/F356W.fits | miss_report -v | jwst_pghyb_sink -v -oo -g
 
 echo "============================================"
 echo "PG Hybrid pipeline, named filename:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC_191217/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC_191217/F356W.fits | miss_report -v | jwst_pghyb_sink -v -sql -of /work/hyb1.sql
+fits_img_md -v -ff /vos/images/DC_191217/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC_191217/F356W.fits | miss_report -v | jwst_pghyb_sink -v -oo -of /work/hyb1.sql
 
 echo "============================================"
 echo "PG Hybrid pipeline, all DEBUG:"
 echo "--------------------------------------------"
-fits_img_md -d -ff /vos/images/DC_191217/F356W.fits | img_aliases -d | fields_info -d | jwst_oc_calc -d -ff /vos/images/DC_191217/F356W.fits | miss_report -d | jwst_pghyb_sink -d -sql -g
+fits_img_md -d -ff /vos/images/DC_191217/F356W.fits | img_aliases -d | fields_info -d | jwst_oc_calc -d -ff /vos/images/DC_191217/F356W.fits | miss_report -d | jwst_pghyb_sink -d -oo -g
 
 echo "============================================"
 echo "PG Hybrid pipeline, all SILENT:"
-fits_img_md -ff /vos/images/DC_191217/F356W.fits | img_aliases | fields_info | jwst_oc_calc -ff /vos/images/DC_191217/F356W.fits | miss_report | jwst_pghyb_sink -sql -g
+fits_img_md -ff /vos/images/DC_191217/F356W.fits | img_aliases | fields_info | jwst_oc_calc -ff /vos/images/DC_191217/F356W.fits | miss_report | jwst_pghyb_sink -oo -g
 
 
 echo "============================================"
@@ -247,8 +253,8 @@ fields_info -d -if /work/ha.json -of /work/hafi.json
 jwst_oc_calc -d -ff /vos/images/DC_191217/F356W.fits -if /work/hafi.json -of /work/hafijoc.json
 miss_report -d -if /work/hafijoc.json -of /work/hafijocmr.json
 pickle_sink -d -if /work/hafijocmr.json -of /work/hafijocmrpk.pickle
-jwst_pgsql_sink -d -sql -if /work/hafijocmr.json -of /work/hafijocmrsql.sql
-jwst_pghyb_sink -d -sql -if /work/hafijocmr.json -of /work/hafijocmrhyb.sql
+jwst_pgsql_sink -d -oo -if /work/hafijocmr.json -of /work/hafijocmrsql.sql
+jwst_pghyb_sink -d -oo -if /work/hafijocmr.json -of /work/hafijocmrhyb.sql
 csv_sink -d -if /work/hafijocmr.json -of /work/hafijocmr.csv
 
 echo "============================================"
@@ -260,8 +266,8 @@ fields_info -d -if /work/ha1 -of /work/hafi1
 jwst_oc_calc -d -ff /vos/images/DC_191217/F356W.fits -if /work/hafi1 -of /work/hafijoc1
 miss_report -d -if /work/hafijoc1 -of /work/hafijocmr1
 pickle_sink -d -if /work/hafijocmr1 -of /work/hafijocmrpk1
-jwst_pgsql_sink -d -sql -if /work/hafijocmr1 -of /work/hafijocmrsql1
-jwst_pghyb_sink -d -sql -if /work/hafijocmr1 -of /work/hafijocmrhyb1
+jwst_pgsql_sink -d -oo -if /work/hafijocmr1 -of /work/hafijocmrsql1
+jwst_pghyb_sink -d -oo -if /work/hafijocmr1 -of /work/hafijocmrhyb1
 csv_sink -d -if /work/hafijocmr1 -of /work/hafijocmrcsv1
 
 
@@ -300,14 +306,14 @@ fits_cat_md -v -ff /vos/catalogs/small_table.fits | cat_aliases -v -of /work/sma
 echo "============================================"
 echo "Catalog Make Table:"
 echo "--------------------------------------------"
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v -sql -g
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v -sql -of /work/small_table_fits_cat_mktbl.sql
+fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v -oo -g
+fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v -oo -of /work/small_table_fits_cat_mktbl.sql
 echo "--------------------------------------------"
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -v -sql -g
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -v -sql -of /work/small_table_fits_cat_mktbl_alias.sql
+fits_cat_md -v -ff /vos/catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -v -oo -g
+fits_cat_md -v -ff /vos/catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -v -oo -of /work/small_table_fits_cat_mktbl_alias.sql
 echo "--------------------------------------------"
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct noalias -v -sql -g
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct noalias -v -sql -of /work/small_table_fits_cat_mktbl_noalias.sql
+fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct noalias -v -oo -g
+fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct noalias -v -oo -of /work/small_table_fits_cat_mktbl_noalias.sql
 
 
 # echo "============================================"
@@ -332,8 +338,8 @@ md_pgsql_pipe -ff /vos/images/BAD.fits -g -v
 md_pgsql_pipe -ff /vos/images/small_table.fits -g -v
 md_pgsql_pipe -ff /vos/images/NOSUCH.fits -g -v
 echo "--------------------------------------------------"
-md_pgsql_pipe -ff /vos/images/DC_191217/F356W.fits -v -sql -g
-md_pgsql_pipe -ff /vos/images/DC_191217/F444W.fits -v -sql -g
+md_pgsql_pipe -ff /vos/images/DC_191217/F356W.fits -v -oo -g
+md_pgsql_pipe -ff /vos/images/DC_191217/F444W.fits -v -oo -g
 
 
 echo "==================================================================="
@@ -345,42 +351,42 @@ md_pghyb_pipe -ff /vos/images/BAD.fits -g -v
 md_pghyb_pipe -ff /vos/images/small_table.fits -g -v
 md_pghyb_pipe -ff /vos/images/NOSUCH.fits -g -v
 echo "--------------------------------------------------"
-md_pghyb_pipe -ff /vos/images/DC_191217/F356W.fits -v -sql -g
-md_pghyb_pipe -ff /vos/images/DC_191217/F444W.fits -v -sql -g
+md_pghyb_pipe -ff /vos/images/DC_191217/F356W.fits -v -oo -g
+md_pghyb_pipe -ff /vos/images/DC_191217/F444W.fits -v -oo -g
 
 
 # echo "========================================================="
 # echo "Multiple FITS metadata to PostgreSQL JWST table pipeline:"
 # echo "---------------------------------------------------------"
-# mmd_pgsql_pipe -idir /tmp -c JADES -sql -g -v
+# mmd_pgsql_pipe -idir /tmp/nosuchdir -c JADES -oo -g -v
 # echo "--------------------------------------------"
 # mmd_pgsql_pipe -idir /vos/images/JADES -v
 # mmd_pgsql_pipe -idir /vos/images/JADES -c JADES -v
-# mmd_pgsql_pipe -idir /vos/images/JADES -sql -g -v
+# mmd_pgsql_pipe -idir /vos/images/JADES -oo -g -v
 # echo "--------------------------------------------"
 # mmd_pgsql_pipe -idir /vos/images/DC_191217 -v
 # mmd_pgsql_pipe -idir /vos/images/DC_191217 -c DC_191217 -v
-# mmd_pgsql_pipe -idir /vos/images/DC_191217 -sql -g -v
+# mmd_pgsql_pipe -idir /vos/images/DC_191217 -oo -g -v
 # echo "--------------------------------------------"
-# mmd_pgsql_pipe -idir /vos/images -c TEST_ALL  -v
-# mmd_pgsql_pipe -idir /vos/images -c TEST_ALL -sql -g -v
+# mmd_pgsql_pipe -idir /vos/images -c TEST_ALL -v
+# mmd_pgsql_pipe -idir /vos/images -c TEST_ALL -oo -g -v
 
 
 # echo "============================================"
 # echo "Multiple FITS metadata to hybrid PostgreSQL/JSON JWST table pipeline:"
 # echo "--------------------------------------------"
-# mmd_pghyb_pipe -idir /tmp -c JADES -sql -g -v
+# mmd_pghyb_pipe -idir /tmp/nosuchdir -c JADES -oo -g -v
 # echo "--------------------------------------------"
 # mmd_pghyb_pipe -idir /vos/images/JADES -v
 # mmd_pghyb_pipe -idir /vos/images/JADES -c JADES -v
-# mmd_pghyb_pipe -idir /vos/images/JADES -sql -g -v
+# mmd_pghyb_pipe -idir /vos/images/JADES -oo -g -v
 # echo "--------------------------------------------"
 # mmd_pghyb_pipe -idir /vos/images/DC_191217 -v
 # mmd_pghyb_pipe -idir /vos/images/DC_191217 -c DC_191217 -v
-# mmd_pghyb_pipe -idir /vos/images/DC_191217 -sql -g -v
+# mmd_pghyb_pipe -idir /vos/images/DC_191217 -oo -g -v
 # echo "--------------------------------------------"
 # mmd_pghyb_pipe -idir /vos/images -c TEST_ALL -v
-# mmd_pghyb_pipe -idir /vos/images -c TEST_ALL -sql -g -v
+# mmd_pghyb_pipe -idir /vos/images -c TEST_ALL -oo -g -v
 
 
 echo "=================================================="
@@ -443,10 +449,10 @@ irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images -v
 irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/BAD.fits -v
 irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/small_table.fits -v
 echo "-------------------------------------------------------------"
-irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/m13.fits -sql -g -v
-irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/HorseHead.fits -sql -g -v
-irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -sql -g -v
-irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits -sql -g -v
+irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/m13.fits -oo -g -v
+irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/HorseHead.fits -oo -g -v
+irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -oo -g -v
+irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits -oo -g -v
 
 
 echo "========================================================================="
@@ -458,10 +464,10 @@ irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images -v
 irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/BAD.fits -v
 irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/small_table.fits -v
 echo "-------------------------------------------------------------"
-irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/m13.fits -sql -g -v
-irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/HorseHead.fits -sql -g -v
-irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -sql -g -v
-irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits -sql -g -v
+irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/m13.fits -oo -g -v
+irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/HorseHead.fits -oo -g -v
+irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -oo -g -v
+irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits -oo -g -v
 
 
 echo "==============================================================="
@@ -472,8 +478,8 @@ echo "--------------------------------------------------"
 irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/nosuchdir -v
 echo "---------------------------------------------------------------"
 irods_mmd_pgsql_pipe -idir /iplant/home/hickst/resources -c EMPTY -v
-irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/JADES -sql -g -v
-irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/DC_191217 -sql -g -v
+irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/JADES -oo -g -v
+irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/DC_191217 -oo -g -v
 
 
 echo "==========================================================================="
@@ -484,8 +490,35 @@ echo "--------------------------------------------------"
 irods_mmd_pghyb_pipe -idir /iplant/home/hickst/vos/nosuchdir -v
 echo "---------------------------------------------------------------------------"
 irods_mmd_pghyb_pipe -idir /iplant/home/hickst/resources -c EMPTY -v
-irods_mmd_pghyb_pipe -idir /iplant/home/hickst/vos/images/JADES -sql -g -v
-irods_mmd_pghyb_pipe -idir /iplant/home/hickst/vos/images/DC_191217 -sql -g -v
+irods_mmd_pghyb_pipe -idir /iplant/home/hickst/vos/images/JADES -oo -g -v
+irods_mmd_pghyb_pipe -idir /iplant/home/hickst/vos/images/DC_191217 -oo -g -v
+
+
+echo "======================================================="
+echo "Single FITS iRods metadata back to iRods file pipeline:"
+echo "-------------------------------------------------------"
+echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
+echo "--------------------------------------------------"
+irods_md_irods_pipe -iff /iplant/home/hickst/vos/images -v
+irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/BAD.fits -v
+irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/small_table.fits -v
+echo "-------------------------------------------------------------"
+irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/m13.fits -oo -g -v
+irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/HorseHead.fits -oo -g -v
+irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -oo -g -v
+irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits -oo -g -v
+
+
+echo "=========================================================="
+echo "Multiple FITS iRods metadata back to iRods files pipeline:"
+echo "----------------------------------------------------------"
+echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
+echo "--------------------------------------------------"
+irods_mmd_irods_pipe -idir /iplant/home/hickst/vos/nosuchdir -v
+echo "---------------------------------------------------------------"
+irods_mmd_irods_pipe -idir /iplant/home/hickst/resources -c EMPTY -v
+irods_mmd_irods_pipe -idir /iplant/home/hickst/vos/images/JADES -oo -g -v
+irods_mmd_irods_pipe -idir /iplant/home/hickst/vos/images/DC_191217 -oo -g -v
 
 
 echo "============================================"

@@ -1,6 +1,6 @@
 # Tests for the CLI utilities module.
 #   Written by: Tom Hicks. 7/15/2020.
-#   Last Modified: Update for table name argument separation in CLI utils.
+#   Last Modified: Replace SQL only argument with more general output only argument.
 #
 import argparse
 import pytest
@@ -96,21 +96,21 @@ class TestCliUtils(object):
         args = vars(parser.parse_args([]))
         print(args)
         assert 'dbconfig_file' not in args  # no default
-        assert 'sql_only' in args           # it has a default
+        assert 'output_only' in args        # it has a default
         assert 'table_name' not in args     # was removed
 
         args = vars(parser.parse_args(['-db', 'dbconfig.ini']))
         print(args)
         assert 'dbconfig_file' in args
         assert args.get('dbconfig_file') == 'dbconfig.ini'
-        assert 'sql_only' in args           # it has a default
+        assert 'output_only' in args        # it has a default
         assert 'table_name' not in args     # was removed
 
-        args = vars(parser.parse_args(['--db-config', '/fake/dbconfig.ini', '--sql-only']))
+        args = vars(parser.parse_args(['--db-config', '/fake/dbconfig.ini', '--output-only']))
         print(args)
         assert 'dbconfig_file' in args
         assert args.get('dbconfig_file') == '/fake/dbconfig.ini'
-        assert 'sql_only' in args
+        assert 'output_only' in args
 
 
     def test_add_fields_info_argument(self):

@@ -1,7 +1,7 @@
 #
 # Class to fill a DB table from the data of a FITS catalog file.
 #   Written by: Tom Hicks. 8/24/2020
-#   Last Modified: Better error message.
+#   Last Modified: Replace SQL only argument with more general output only argument.
 #
 import sys
 
@@ -30,7 +30,7 @@ class FitsCatalogFillTableSink (ISQLSink):
     def output_results (self, indata):
         """
         Store the given data into the configured database OR just output SQL
-        to do so, depending on the 'sql-only' flag.
+        to do so, depending on the 'output-only' flag.
         """
         if (self._DEBUG):
             print("({}.output_results): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
@@ -52,7 +52,7 @@ class FitsCatalogFillTableSink (ISQLSink):
         data = md_utils.get_data(indata)
 
         # Decide whether we are creating a table in the DB or just outputting SQL statements.
-        sql_only = self.args.get('sql_only')
+        sql_only = self.args.get('output_only')
         if (sql_only):                      # if just outputting SQL
             self.write_table(dbconfig, data, catalog_table, file_info)
         else:                               # else creating the table in the database
