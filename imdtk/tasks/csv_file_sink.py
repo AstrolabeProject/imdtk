@@ -1,7 +1,7 @@
 #
 # Class to sink incoming data to a CSV file.
 #   Written by: Tom Hicks. 6/26/2020.
-#   Last Modified: Raise exception on missing calculated data.
+#   Last Modified: Enhance to get skip list from args first.
 #
 import csv
 import sys
@@ -21,7 +21,7 @@ class CSVFileSink (IImdTask):
     FIRST_FIELD = 'file_path'
 
     # List of column names to skip when outputting column values.
-    skipColumnList = [ 'file_size' ]
+    DEFAULT_SKIP_LIST = [ 'file_size' ]
 
 
     def __init__(self, args):
@@ -29,6 +29,7 @@ class CSVFileSink (IImdTask):
         Constructor for class to sink incoming data to a CSV file.
         """
         super().__init__(args)
+        self.skip_list = args.get('skip_list', self.DEFAULT_SKIP_LIST)
 
 
     #
@@ -98,7 +99,7 @@ class CSVFileSink (IImdTask):
             raise errors.ProcessingError(errMsg)
 
         selected = calculated.copy()
-        remove_entries(selected, ignore=self.skipColumnList)
+        remove_entries(selected, ignore=self.skip_list)
 
         # list the fields in alphabetical order and, optionally, make one field primary
         fieldnames = sorted(list(selected.keys()), key=str.lower)

@@ -1,7 +1,7 @@
 #
 # Class to sink incoming image metadata to a PostgreSQL database.
 #   Written by: Tom Hicks. 6/21/2020.
-#   Last Modified: Replace SQL only argument with more general output only argument.
+#   Last Modified: Enhance to get skip list from args first.
 #
 import psycopg2
 import sys
@@ -19,7 +19,7 @@ class JWST_ObsCorePostgreSQLSink (ISQLSink):
     """ Class to sink incoming image metadata to a PostgreSQL database. """
 
     # List of column names to skip when outputting column values.
-    skipColumnList = [ 'file_size' ]
+    DEFAULT_SKIP_LIST = [ 'file_size' ]
 
 
     def __init__(self, args):
@@ -27,6 +27,7 @@ class JWST_ObsCorePostgreSQLSink (ISQLSink):
         Constructor for class to sink incoming image metadata to a PostgreSQL database.
         """
         super().__init__(args)
+        self.skip_list = args.get('skip_list', self.DEFAULT_SKIP_LIST)
 
 
     #
@@ -70,7 +71,7 @@ class JWST_ObsCorePostgreSQLSink (ISQLSink):
             raise errors.ProcessingError(errMsg)
 
         selected = calculated.copy()
-        remove_entries(selected, ignore=self.skipColumnList)
+        remove_entries(selected, ignore=self.skip_list)
         return selected                     # return selected and filtered dataset
 
 
