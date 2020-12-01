@@ -1,7 +1,7 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Add/use exit_with_error method, check_irods_fits_file methods.
+#   Last Modified: Add iRods metadata file argument and output only argument.
 #
 import argparse
 import sys
@@ -98,7 +98,7 @@ def add_fits_file_argument (parser, tool_name):
         to the given argparse parser object. """
     parser.add_argument(
         '-ff', '--fits-file', dest='fits_file', required=True, metavar='filepath',
-        help='Path to a readable FITS image file from which to extract data or metadata [required]'
+        help='Path to a readable FITS image file from which to extract FITS data or metadata [required]'
     )
 
 
@@ -156,7 +156,17 @@ def add_irods_fits_file_argument (parser, tool_name):
         to the given argparse parser object. """
     parser.add_argument(
         '-iff', '--irods-fits-file', dest='irods_fits_file', required=True, metavar='filepath',
-        help='Full iRods path to a FITS image file from which to extract metadata [required]'
+        help='Full iRods path to a FITS image file from which to extract FITS metadata [required]'
+    )
+
+
+def add_irods_md_file_argument (parser, tool_name):
+    """ Add the argument to the given argparse parser object, specifying an absolute
+        iRods path to an iRods file whose metadata is to be read or written, . """
+    parser.add_argument(
+        '-imd', '--irods-md-file', dest='irods_md_file', metavar='filepath',
+        default=argparse.SUPPRESS,
+        help='Full iRods path to an iRods file whose metadata is to be read or written [required]'
     )
 
 
@@ -172,6 +182,16 @@ def add_output_arguments (parser, tool_name):
         '-of', '--output-file', dest='output_file', metavar='filepath',
         default=argparse.SUPPRESS,
         help='File path of file to hold the processing results [default: (standard output)]'
+    )
+
+
+def add_output_only_argument (parser, tool_name):
+    """ Add a flag to the given argparse parser object, specifying that final results
+        should be output but NOT sent to the associated Sink. Only used for Sinks. """
+    parser.add_argument(
+        '-oo', '--output-only', dest='output_only', action='store_true',
+        default=False,
+        help='If True, only output the results but do NOT send them to the sink [default: False].'
     )
 
 
