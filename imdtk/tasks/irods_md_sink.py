@@ -1,17 +1,22 @@
 #
 # Class to sink incoming metadata to an iRods file.
 #   Written by: Tom Hicks. 11/30/2020.
-#   Last Modified: WIP: Initial creation.
+#   Last Modified: Add skip list.
 #
 import sys
 
 import imdtk.exceptions as errors
 import imdtk.tasks.metadata_utils as md_utils
+from imdtk.core.misc_utils import remove_entries
 from imdtk.tasks.i_task import STDOUT_NAME, IImdTask
 
 
 class IRodsMetadataSink (IImdTask):
     """ Class to sink incoming image metadata to an iRods file. """
+
+    # List of metadata field names to skip when sinking metadata
+    DEFAULT_SKIP_LIST = [ 'file_name', 'file_path', 'file_size', 'access_url', 'obs_publisher_did' ]
+
 
     def __init__(self, args, fits_irods_helper):
         """
@@ -19,6 +24,7 @@ class IRodsMetadataSink (IImdTask):
         """
         super().__init__(args)
         self.irods = fits_irods_helper      # IRodsHelper instance
+        self.skip_list = args.get('skip_list', self.DEFAULT_SKIP_LIST)
 
 
     #
@@ -63,9 +69,7 @@ class IRodsMetadataSink (IImdTask):
             raise errors.ProcessingError(errMsg)
 
         selected = calculated.copy()
-        # TODO: IMPLEMENT ignore list (see csv sink)  
-        #       Should ignore file_name, file_path, file_size, access_url, obs_publisher_did
-        # remove_entries(selected, ignore=self.skipColumnList)
+        remove_entries(selected, ignore=self.skip_list)
         return selected                     # return selected dataset
 
 
