@@ -1,7 +1,7 @@
 #
 # Class to calculate values for the ObsCore fields in an iRods FITS-file-derived metadata structure.
 #   Written by: Tom Hicks. 11/20/20.
-#   Last Modified: Better "too small" error message.
+#   Last Modified: Fix: super cleanup call.
 #
 import sys
 
@@ -30,7 +30,7 @@ class IRods_JWST_ObsCoreCalcTask (JWST_ObsCoreCalcTask):
         """ Do any cleanup/shutdown tasks necessary for the task instance. """
         if (self.irods):
             self.irods.cleanup()
-        super().cleanup
+        super().cleanup()
 
 
     #

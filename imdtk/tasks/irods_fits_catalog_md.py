@@ -1,7 +1,7 @@
 #
 # Class to extract catalog metadata from iRods-resident FITS catalog files.
 #   Written by: Tom Hicks. 11/17/20.
-#   Last Modified: Better "too small" error message.
+#   Last Modified: Fix: super cleanup call.
 #
 import os
 import sys
@@ -29,7 +29,7 @@ class IRodsFitsCatalogMetadataTask (IImdTask):
         """ Do any cleanup/shutdown tasks necessary for the task instance. """
         if (self.irods):
             self.irods.cleanup()
-        super().cleanup
+        super().cleanup()
 
 
     #

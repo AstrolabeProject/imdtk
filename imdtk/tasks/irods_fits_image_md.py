@@ -1,7 +1,7 @@
 #
 # Class to extract image metadata from iRods-resident FITS image files.
 #   Written by: Tom Hicks. 10/15/20.
-#   Last Modified: Better "too small" error message.
+#   Last Modified: Fix: super cleanup call.
 #
 import os
 import sys
@@ -29,7 +29,7 @@ class IRodsFitsImageMetadataTask (IImdTask):
         """ Do any cleanup/shutdown tasks necessary for the task instance. """
         if (self.irods):
             self.irods.cleanup()
-        super().cleanup
+        super().cleanup()
 
 
     #
