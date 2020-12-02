@@ -1,9 +1,8 @@
 #
 # Class to sink incoming image metadata to a PostgreSQL database.
 #   Written by: Tom Hicks. 6/21/2020.
-#   Last Modified: Enhance to get skip list from args first.
+#   Last Modified: Remove unused DB import.
 #
-import psycopg2
 import sys
 
 from config.settings import DEFAULT_DBCONFIG_FILEPATH, DEFAULT_METADATA_TABLE_NAME

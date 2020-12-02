@@ -1,9 +1,8 @@
 #
 # Class to sink incoming image metadata to a Hybrid (SQL/JSON) PostgreSQL database.
 #   Written by: Tom Hicks. 7/3/2020.
-#   Last Modified: Replace SQL only argument with more general output only argument.
+#   Last Modified: Remove unused DB import.
 #
-import psycopg2
 import sys
 
 from config.settings import DEFAULT_DBCONFIG_FILEPATH, DEFAULT_HYBRID_TABLE_NAME
