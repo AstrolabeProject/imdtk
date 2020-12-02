@@ -1,7 +1,7 @@
 #
 # Helper class for iRods commands: manipulate the filesystem, including metadata.
 #   Written by: Tom Hicks. 10/15/20.
-#   Last Modified: Remove unused is_connected method.
+#   Last Modified: Update/fix put_metaf method. Add remove_metaf method.
 #
 import os
 import errno
@@ -10,6 +10,7 @@ import pathlib as pl
 from irods.session import iRODSSession
 from irods.collection import iRODSCollection
 from irods.data_object import iRODSDataObject
+from irods.meta import iRODSMeta
 
 from config.settings import DEFAULT_IRODS_ENV_FILENAME, DEFAULT_IRODS_ENV_FILEPATH
 from config.settings import DEFAULT_IRODS_AUTH_FILENAME, DEFAULT_IRODS_AUTH_FILEPATH
@@ -338,24 +339,34 @@ class IRodsHelper:
             if the absolute argument is True.
         """
         if (absolute):
-            filepath = self.abs_path(file_path)  # path is relative to root dir
+            filepath = self.abs_path(file_path)   # path is relative to root dir
         else:
-            filepath = self.rel_path(file_path)  # path is relative to current working dir
+            filepath = self.rel_path(file_path)   # path is relative to current working dir
         self._session.data_objects.put(local_file, filepath)
 
 
-    def put_metaf (self, metadata, file_path, absolute=False):
+    def put_metaf (self, file_path, metadata, absolute=False):
         """ Attach the given metadata on the file specified relative to the iRods
             current working directory (default) OR relative to the users root directory,
-            if the absolute argument is True. Returns the new number of metadata items.
+            if the absolute argument is True.
         """
         obj = self.getf(file_path, absolute=absolute)
-        keys = [item.keyword for item in metadata]
-        for key in keys:
-            del(obj.metadata[key])
-        for item in metadata:
-            obj.metadata.add(item.keyword, item.value)
-        return len(obj.metadata)
+        for key, val in metadata.items():
+            skey = str(key)
+            obj.metadata[skey] = iRODSMeta(skey, str(val))
+            # del(obj.metadata[key])                # deletes all metadata items with this key
+            # obj.metadata.add(str(key), str(val))  # iRods keys & values can only be strings
+        # obj.metadata._reset_metadata()            # critical: update the file node metadata
+
+
+    def remove_metaf (self, file_path, metadata, absolute=False):
+        """ Remove the given metadata from the file specified relative to the iRods
+            current working directory (default) OR relative to the users root directory,
+            if the absolute argument is True.
+        """
+        obj = self.getf(file_path, absolute=absolute)
+        for key in metadata.keys():
+            del(obj.metadata[key])                # deletes all metadata items with this key
 
 
     def root (self):

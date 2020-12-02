@@ -1,6 +1,6 @@
 # Tests for the iRods interface module.
 #   Written by: Tom Hicks. 10/20/20.
-#   Last Modified: Add 2 tests for new getc method.
+#   Last Modified: Add tests for put_metaf and remove_metaf.
 #
 import os
 import pytest
@@ -14,6 +14,20 @@ from config.settings import DEFAULT_IRODS_AUTH_FILEPATH, DEFAULT_IRODS_ENV_FILEP
 class TestIRodsHelper(object):
 
     defargs = { 'debug': True, 'verbose': True, 'TOOL_NAME': 'TestIrodsHelper' }
+
+    irff_m13 = '/iplant/home/hickst/vos/images/m13.fits'
+    hdr0_size_m13 = 2880                    # size of primary header
+    hdr0_datasize_m13 = 181440              # size of primary data table
+
+    irff_hh = '/iplant/home/hickst/vos/images/HorseHead.fits'
+    hdr0_size_hh = 14400                    # size of primary header
+    hdr0_datasize_hh = 1592640              # size of primary data table
+    hdr1_size_hh = 2880                     # size of first extension
+    hdr1_datasize_hh = 40320                # size of first extension data table
+
+    irff_BAD =      '/iplant/home/hickst/vos/images/BAD.fits'
+    irff_smallcat = '/iplant/home/hickst/vos/catalogs/small_table.fits'
+
 
     def test_create_helper_noconn (self):
         args = {}
@@ -87,3 +101,45 @@ class TestIRodsHelper(object):
         print("IRDIR={}".format(irdir))
         assert irdir is not None
         assert ihelper.is_collection(irdir)
+
+
+    def test_put_metaf (self):
+        ihelper = irh.IRodsHelper(self.defargs)
+        assert ihelper is not None
+
+        irff = ihelper.getf(self.irff_m13, absolute=True)
+        assert irff is not None
+
+        for md in ihelper.get_metaf(self.irff_m13, absolute=True):
+            print("{}={}".format(md.keyword, md.value))
+        print("---------------------------------------------")
+
+        newmd = { 'testkey': '88', 'testkey2': '99', 'A': '1', 'a': 'lower1' }
+
+        ihelper.put_metaf(self.irff_m13, newmd, absolute=True)
+
+        irmd = ihelper.get_metaf(self.irff_m13, absolute=True)
+        for md in irmd:
+            print("{}={}".format(md.keyword, md.value))
+        assert len(irmd) >= len(newmd)
+
+
+    def test_remove_metaf (self):
+        ihelper = irh.IRodsHelper(self.defargs)
+        assert ihelper is not None
+
+        irff = ihelper.getf(self.irff_m13, absolute=True)
+        assert irff is not None
+
+        for md in ihelper.get_metaf(self.irff_m13, absolute=True):
+            print("{}={}".format(md.keyword, md.value))
+        print("---------------------------------------------")
+
+        oldmd = { 'testkey': '88', 'testkey2': '99', 'A': '1', 'a': 'lower1' }
+
+        ihelper.remove_metaf(self.irff_m13, oldmd, absolute=True)
+
+        irmd = ihelper.get_metaf(self.irff_m13, absolute=True)
+        for md in irmd:
+            print("{}={}".format(md.keyword, md.value))
+        assert len(irmd) <= len(irmd) + len(oldmd)
