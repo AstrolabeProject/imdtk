@@ -1,9 +1,11 @@
 #
 # Class to sink incoming metadata to an iRods file.
 #   Written by: Tom Hicks. 11/30/2020.
-#   Last Modified: Add skip list.
+#   Last Modified: Implement metadata updating.
 #
 import sys
+
+from irods.exception import CollectionDoesNotExist, DataObjectDoesNotExist, NoResultFound
 
 import imdtk.exceptions as errors
 import imdtk.tasks.metadata_utils as md_utils
@@ -39,18 +41,30 @@ class IRodsMetadataSink (IImdTask):
         if (self._DEBUG):
             print("({}.output_results): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
 
+        # get the iRods file path arguments of the files to be opened
+        irff_path = self.args.get('irods_fits_file')
+        imd_path = self.args.get('irods_md_file', irff_path)  # default is iRods input file
+
+        # check the iRods metadata target file path for validity
+        try:
+            self.irods.getf(imd_path, absolute=True)
+
+        except (CollectionDoesNotExist, DataObjectDoesNotExist, NoResultFound):
+            errMsg = "Unable to find iRods metadata attachment file at '{}'.".format(imd_path)
+            raise errors.ProcessingError(errMsg)
+
         # select and/or filter the metadata for output
-        outdata = self.select_data_for_output(metadata)
+        selected = self.select_data_for_output(metadata)
 
         # decide whether we are storing metadata in iRods or just outputting it
         output_only = self.args.get('output_only')
         if (not output_only):               # if storing metadata to iRods
-            self.store_results(metadata, outdata)
+            self.store_results(imd_path, selected)
 
         else:                               # else just outputting metadata
             oodata = dict()
             oodata['file_info'] = md_utils.get_file_info(metadata)
-            oodata['to_sink'] = outdata
+            oodata['to_sink'] = selected
             super().output_results(oodata)
 
 
@@ -73,18 +87,20 @@ class IRodsMetadataSink (IImdTask):
         return selected                     # return selected dataset
 
 
-    def store_results (self, metadata, outdata):
+    def store_results (self, imd_path, selected):
         """
-        Attach the output data dictionary to the specified or default iRods file.
+        Attach the output data dictionary to the iRods file at the specified path.
         """
         if (self._DEBUG):
-            print("({}.store_results)".format(self.TOOL_NAME), file=sys.stderr)
+            print("({}.store_results): imd_path={}, metadata={}".format(self.TOOL_NAME, imd_path, selected), file=sys.stderr)
 
-        # get the iRods file path arguments of the files to be opened
-        irff_path = self.args.get('irods_fits_file')
-        imd_path = self.args.get('irods_md_file', irff_path)  # default is iRods input file
+        try:
+            # try to store the selected metadata onto the iRods file node
+            self.irods.put_metaf(imd_path, selected, absolute=True)
 
-        # TODO: IMPLEMENT LATER  
+        except Exception as ex:
+            errMsg = "Unable to write metadata to the iRods file at '{}'. Exception: {}".format(imd_path, ex)
+            raise errors.ProcessingError(errMsg)
 
         if (self._VERBOSE):
-            print("({}): Metadata attached to '{}'".format(self.TOOL_NAME, imd_path), file=sys.stderr)
+            print("({}): Metadata attached to iRods file '{}'".format(self.TOOL_NAME, imd_path), file=sys.stderr)
