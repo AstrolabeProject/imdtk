@@ -278,7 +278,6 @@
 # fits_img_md -ff /vos/images/small_table.fits -g -v
 # fits_img_md -ff /vos/images/NOSUCH.fits -g -v
 # fits_img_md -ff /vos/images/m13.fits | pickle_sink -v
-# echo "--------------------------------------------------"
 # fits_cat_md -ff /vos/images/BAD.fits -g -v
 # fits_cat_md -ff /vos/images/m13.fits -g -v
 # fits_cat_md -ff /vos/images/NOSUCH.fits -g -v
