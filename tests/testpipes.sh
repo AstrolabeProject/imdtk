@@ -499,14 +499,20 @@ echo "Single FITS iRods metadata back to iRods file pipeline:"
 echo "-------------------------------------------------------"
 echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 echo "--------------------------------------------------"
+irods_md_irods_pipe -iff /iplant/home/hickst/nosuchdir -v
 irods_md_irods_pipe -iff /iplant/home/hickst/vos/images -v
 irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/BAD.fits -v
 irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/small_table.fits -v
+irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/m13.fits -imd /iplant/tmp/nosuchfile -v
 echo "-------------------------------------------------------------"
 irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/m13.fits -oo -g -v
 irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/HorseHead.fits -oo -g -v
 irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F444W.fits -oo -g -v
 irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits -oo -g -v
+# echo "-------------------------------------------------------------"
+# irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/HorseHead.fits -imd /iplant/home/hickst/testDir/empty2.txt -v
+# irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/JADES/SubDir/m13_2.fits -v
+# irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/HorseHead.fits -v
 
 
 echo "=========================================================="
