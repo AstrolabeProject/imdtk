@@ -581,7 +581,7 @@
 
 # irods_fits_img_md -v -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits | img_aliases | fields_info | irods_jwst_oc_calc -iff /iplant/home/hickst/vos/images/DC_191217/F356W.fits | miss_report | jwst_pghyb_sink -v
 
-mmd_pghyb_pipe -idir /vos/images/JADES -c JADES -v
-mmd_pghyb_pipe -idir /vos/images/DC_191217 -c DC_191217 -v
+# mmd_pghyb_pipe -idir /vos/images/JADES -c JADES -v
+# mmd_pghyb_pipe -idir /vos/images/DC_191217 -c DC_191217 -v
 
 # echo "============================================"
