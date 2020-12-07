@@ -1,0 +1,48 @@
+#!/bin/bash
+#
+# Shell script to run a JWST iRods image metadata processing pipeline from inside the
+# ImdTk Docker container using the tools it contains. This script launches the
+# ImdTk container and runs the pipeline in the container environment.
+#
+
+# echo "ARGS=$*"
+
+PROG=`basename $0`
+EP=irods_mmd_pgsql_pipe
+
+Usage () {
+   echo "Usage: $PROG [-h] [-t] irods_image_directory collection_name [other-args]"
+   echo "where:"
+   echo "   -h or --help = print usage message and exit."
+   echo "   -t = use test (development) container [default: latest production container]."
+   echo "   irods_image_directory = the path to an iRods dir of FITS images to be processed."
+   echo "   collection_name = the name for this collection of images in the DB."
+   echo "   other-args = additional arguments to the $EP program."
+}
+
+IMG='imdtk:latest'
+
+while :; do
+    case "$1" in
+        -h | --help)
+            Usage; exit 0;;
+        -t)
+            IMG='imdtk:test' ;;
+        *) break;;
+    esac
+    shift
+done
+
+# echo "ARGS=$*"
+
+if [ $# -lt 2 ]; then
+    Usage
+    exit 2
+fi
+
+IMG_DIR=${1}
+COLLECTION=${2}
+shift
+shift
+
+docker run -it --rm --network vos_net --name imdtk$$ -v ${HOME}/.irods:/imdtk/.irods:ro -v ${PWD}/work:/work --entrypoint ${EP} ${IMG} -idir ${IMG_DIR} -c ${COLLECTION} $@
