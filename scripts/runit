@@ -1,0 +1,24 @@
+#!/bin/bash
+#
+# Shell script to run pipelines from inside the imdtk Docker file
+# using the tools it contains. This script should be mounted by
+# the container and runs within its environment.
+#
+
+# echo "ARGS=$*"
+
+echo "============================================"
+echo " Demonstration"
+echo "--------------------------------------------"
+
+# iRods to DB pipeline, from command line:
+# ./irods_mds_to_db -t /iplant/home/hickst/vos/images/JADES/SubDir IMPORT -v
+
+# irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/JADES/SubDir -c IMPORT -v
+# mmd_pgsql_pipe -idir /vos/images/JADES -c LOCAL -v
+# irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/JADES/goods_s_F200W_2018_08_29.fits -v
+# irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/JADES -c IMPORT -v
+# irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/DC_191217 -c IMPORT -v
+# irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images -c TESTALL -v
+
+echo "============================================"
