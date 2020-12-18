@@ -1,7 +1,7 @@
 #
 # Class to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/14/2020.
-#   Last Modified: Remove unused imports.
+#   Last Modified: Make sure new file size field is calculated.
 #
 import abc
 
@@ -118,7 +118,7 @@ class IObsCoreCalcTask (IImdTask):
         elif (field_name == 'im_pixtype'):
             occ_utils.calc_pixtype(metadata, calculations)
 
-        elif (field_name == 'access_estsize'):
+        elif (field_name in ['access_estsize', 'file_size']):
             occ_utils.calc_access_estsize(metadata, calculations)
 
         elif (field_name == 'access_url'):

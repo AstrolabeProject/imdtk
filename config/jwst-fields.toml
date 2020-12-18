@@ -111,6 +111,7 @@ im_wcsaxes2 = { required = true }
 #
 file_name = { required = true }
 file_path = { required = true }
+file_size = { required = true }
 
 #
 # JWST-specific fieldnames

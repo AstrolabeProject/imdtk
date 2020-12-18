@@ -1,7 +1,7 @@
 #
 # Utilities to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/11/2020.
-#   Last Modified: Revamp error handling.
+#   Last Modified: Fill new file size field, recalculate access_estsize as kB.
 #
 import imdtk.exceptions as errors
 import imdtk.core.fits_utils as fits_utils
@@ -10,11 +10,12 @@ import imdtk.tasks.metadata_utils as md_utils
 
 def calc_access_estsize (metadata, calculations):
     """
-    Calculate the estimated size of the FITS image file to be accessed.
+    Calculate the file size and estimated size (in kB) of the FITS image file to be accessed.
     """
     file_info = md_utils.get_file_info(metadata)
     file_size = file_info.get('file_size') if file_info else 0
-    calculations['access_estsize'] = file_size
+    calculations['file_size'] = file_size
+    calculations['access_estsize'] = round(file_size / 1000)
 
 
 def calc_corners (wcs_info, calculations):

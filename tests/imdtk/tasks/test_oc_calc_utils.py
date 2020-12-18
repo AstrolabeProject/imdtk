@@ -1,6 +1,6 @@
 # Tests for the ObsCore Calculation utilities module.
 #   Written by: Tom Hicks. 7/16/2020.
-#   Last Modified: Revamp error handling.
+#   Last Modified: Test revised access_estsize and new file_size.
 #
 import pytest
 from pytest import approx
@@ -30,8 +30,9 @@ class TestOcCalcUtils(object):
         calcs = dict()
         utils.calc_access_estsize(md, calcs)
         print(calcs)
-        assert len(calcs) == 1                  # it has default
+        assert len(calcs) == 2
         assert calcs.get('access_estsize') == 0
+        assert calcs.get('file_size') == 0
 
 
     def test_calc_access_estsize(self):
@@ -39,8 +40,19 @@ class TestOcCalcUtils(object):
         calcs = dict()
         utils.calc_access_estsize(md, calcs)
         print(calcs)
-        assert len(calcs) == 1
-        assert calcs.get('access_estsize') == 4242
+        assert len(calcs) == 2
+        assert calcs.get('access_estsize') == 4  # file_size in kB
+        assert calcs.get('file_size') == 4242
+
+
+    def test_calc_access_estsize_bigfile(self):
+        md = { 'file_info': { 'file_name': 'nonesuch', 'file_size': 2666568960 }}
+        calcs = dict()
+        utils.calc_access_estsize(md, calcs)
+        print(calcs)
+        assert len(calcs) == 2
+        assert calcs.get('access_estsize') == 2666569  # file_size in kB
+        assert calcs.get('file_size') == 2666568960
 
 
 

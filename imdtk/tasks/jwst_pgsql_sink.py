@@ -1,7 +1,7 @@
 #
 # Class to sink incoming image metadata to a PostgreSQL database.
 #   Written by: Tom Hicks. 6/21/2020.
-#   Last Modified: Remove unused DB import.
+#   Last Modified: Retain and output file size now.
 #
 import sys
 
@@ -18,7 +18,7 @@ class JWST_ObsCorePostgreSQLSink (ISQLSink):
     """ Class to sink incoming image metadata to a PostgreSQL database. """
 
     # List of column names to skip when outputting column values.
-    DEFAULT_SKIP_LIST = [ 'file_size' ]
+    DEFAULT_SKIP_LIST = []
 
 
     def __init__(self, args):
