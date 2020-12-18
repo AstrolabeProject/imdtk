@@ -8,17 +8,41 @@
 # echo "ARGS=$*"
 
 echo "============================================"
-echo " Demonstration"
+echo " ImdTk Demonstration of iRods capabilities  "
 echo "--------------------------------------------"
 
-# iRods to DB pipeline, from command line:
-# ./irods_mds_to_db -t /iplant/home/hickst/vos/images/JADES/SubDir IMPORT -v
+# echo "------ Extract metadata from iRods FITS files ------"
+# echo "----------------------------------------------------"
+# irods_fits_img_md -iff /iplant/home/hickst/vos/images/m13.fits -v
+# irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC19/F444W.fits -v
+# echo "----------------------------------------------------"
 
-# irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/JADES/SubDir -c IMPORT -v
-# mmd_pgsql_pipe -idir /vos/images/JADES -c LOCAL -v
-# irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/JADES/goods_s_F200W_2018_08_29.fits -v
-# irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/JADES -c IMPORT -v
-# irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/DC_191217 -c IMPORT -v
-# irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images -c TESTALL -v
+
+# echo "--- iRods FITS metadata to PostgreSQL DB pipeline --"
+# echo "----------------------------------------------------"
+# irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/HorseHead.fits -c DEMO -v
+# irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/JADES/SubDir -c DEMO -v
+# # irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/DC19 -c DEMO -v
+# echo "----------------------------------------------------"
+
+# echo "---- iRods FITS metadata to iRods file metadata ----"
+# echo "----------------------------------------------------"
+# # from one file to another:
+# irods_md_irods_pipe -iff /iplant/home/hickst/testDir/F444W.fits -imd /iplant/home/hickst/testDir/empty.txt -v
+# # from file to same file:
+# irods_md_irods_pipe -iff /iplant/home/hickst/testDir/F444W.fits -v
+# echo "----------------------------------------------------"
+
+echo "============================================"
+
+echo "============================================"
+echo " Pipelines to restore image metadata DB     "
+echo "--------------------------------------------"
+
+mmd_pgsql_pipe -idir /vos/images/JADES -c JADES -v
+mmd_pgsql_pipe -idir /vos/images/DC19 -c DC19 -v
+
+# mmd_pghyb_pipe -idir /vos/images/JADES -c JADES -v
+# mmd_pghyb_pipe -idir /vos/images/DC19 -c DC19 -v
 
 echo "============================================"
