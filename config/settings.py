@@ -38,7 +38,7 @@ DEFAULT_HYBRID_TABLE_NAME = 'hybrid'
 LOG_LEVEL = 'INFO'  # CRITICAL / ERROR / WARNING / INFO / DEBUG
 
 # Image and Cutout Server information
-IMAGE_FETCH_PREFIX = 'https://hector.cyverse.org/cuts/image_fetch?path='
+IMAGE_FETCH_PREFIX = 'https://hector.cyverse.org/cuts/img/fetch_by_filepath?path='
 
 # Name of this program: used programmatically so keeping it lower case.
 PROGRAM_NAME = 'imdtk'
