@@ -1,16 +1,17 @@
 #
 # Module to provide FITS utility functions for Astrolabe code.
 #   Written by: Tom Hicks. 1/26/2020.
-#   Last Modified: Move FITS block size and end key here.
+#   Last Modified: Add fits_file_exists method. Update is_fits_filename.
 #
 import fnmatch
-# import pandas
+import os
+
 from astropy import wcs
 from astropy.time import Time
 from astropy.table import Table
 from astropy.wcs.utils import proj_plane_pixel_scales
 
-from imdtk.core.file_utils import gen_file_paths, validate_file_path
+from imdtk.core.file_utils import is_acceptable_filename, gen_file_paths, validate_file_path
 from imdtk.core.misc_utils import to_JSON
 
 
@@ -46,6 +47,11 @@ def bitpix_size (bitpix):
     Return the size in bits for the given FITS header code value from the BITPIX field.
     """
     return abs(int(bitpix))
+
+
+def fits_file_exists (filepath):
+    """ Tell whether the given filepath names an existing, readable FITS file or not. """
+    return validate_file_path(filepath, FITS_EXTENTS)
 
 
 def fits_utc_date (value_str, scale='utc'):
@@ -190,7 +196,7 @@ def is_fits_file (fyl):
 
 def is_fits_filename (filename, extents=FITS_EXTENTS):
     """ Return True if the given filename string names a FITS file, else False. """
-    return (filename.endswith(tuple(extents)))
+    return is_acceptable_filename(filename, extents)
 
 
 def lookup_pixtype (bitpix, default='UNKNOWN'):
