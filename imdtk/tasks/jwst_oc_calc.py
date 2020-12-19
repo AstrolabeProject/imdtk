@@ -1,7 +1,7 @@
 #
 # Class to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/2020.
-#   Last Modified: Remove unused instance variable.
+#   Last Modified: Refactor to allow abstract calc and default setting methods.
 #
 import sys
 
@@ -84,16 +84,6 @@ class JWST_ObsCoreCalcTask (IObsCoreCalcTask):
             calculations['access_url'] = access_url
 
 
-    def calc_instrument_name (self, metadata, calculations):
-        """
-        Use the given metadata to create re/create an instrument name.
-        This version creates the instrument name from NIRCam + MODULE value
-        """
-        module = calculations.get('nircam_module')
-        inst_name = "NIRCam-{}".format(module) if (module is not None) else "NIRCam"
-        calculations['instrument_name'] = inst_name
-
-
     def calc_spatial_resolution (self, calculations, filter_resolutions=JWST_FILTER_RESOLUTIONS):
         """
         Use the filter value to determine the spatial resolution based on the
@@ -102,9 +92,22 @@ class JWST_ObsCoreCalcTask (IObsCoreCalcTask):
         occ_utils.calc_spatial_resolution(calculations, filter_resolutions)
 
 
-    def calc_target_name (self, metadata, calculations):
+    def set_default_instrument_name (self, defaults, metadata, calculations):
         """
-        Use the given metadata to create re/create a target name.
+        Use the given metadata to create a fallback/default instrument name.
+        This version is heuristic to create the instrument name from NIRCam + MODULE values.
+        """
+        module = calculations.get('nircam_module')
+        if (module is not None):
+            inst_name = f"NIRCam-{module}"
+        else:
+            inst_name = "UNKNOWN"
+        calculations['instrument_name'] = inst_name
+
+
+    def set_default_target_name (self, defaults, metadata, calculations):
+        """
+        Use the given metadata to create a fallback/default target name.
         This version is a crude heuristic based on early JWST filenames.
         """
         file_info = md_utils.get_file_info(metadata)

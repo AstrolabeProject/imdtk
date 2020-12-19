@@ -1,7 +1,7 @@
 #
 # Class to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/14/2020.
-#   Last Modified: Make sure new file size field is calculated.
+#   Last Modified: Refactor to allow abstract calc and default setting methods.
 #
 import abc
 
@@ -35,8 +35,14 @@ class IObsCoreCalcTask (IImdTask):
 
 
     @abc.abstractmethod
-    def calc_target_name (self, metadata, calculations):
-        """ Use the given metadata to create re/create a target name. """
+    def set_default_instrument_name (self, defaults, metadata, calculations):
+        """ Use the given metadata to create create a default instrument name. """
+        pass
+
+
+    @abc.abstractmethod
+    def set_default_target_name (self, defaults, metadata, calculations):
+        """ Use the given metadata to create create a default target name. """
         pass
 
 
@@ -87,21 +93,23 @@ class IObsCoreCalcTask (IImdTask):
         If a value is produced for a field, store the field and its value into
         the given calculations structure.
         """
-        defaults = md_utils.get_defaults(metadata)
+        defaults = md_utils.get_defaults(metadata)  # get defaults once
+
+        # make a list of the desired fields (as listed in the fields info file)
         fields_info = md_utils.get_fields_info(metadata)
-
-        # make list of desired fields
         desired = fields_info.keys() if fields_info else []
-        for fieldname in desired:
-            self.calc_field_value(fieldname, wcs_info, metadata, calculations)
-            if (fieldname not in calculations): # if field still has no value
-                occ_utils.set_default(fieldname, defaults, calculations)
+
+        # try to calculate a value for each desired field
+        for field_name in desired:
+            self.calc_field_value(field_name, defaults, wcs_info, metadata, calculations)
+            if (field_name not in calculations):  # if field still has no value
+                self.set_default_value(field_name, defaults, wcs_info, metadata, calculations)
 
 
-    def calc_field_value (self, field_name, wcs_info, metadata, calculations):
+    def calc_field_value (self, field_name, defaults, wcs_info, metadata, calculations):
         """
         Provide the opportunity to calculate (or recalculate) a value for the named field.
-        This version calls abstract methods which call down to the child concrete methods.
+        This version may call abstract methods which call down to the concrete methods.
         """
         if (field_name in ['s_ra', 's_dec']):
             occ_utils.calc_wcs_coordinates(wcs_info, calculations)
@@ -124,8 +132,18 @@ class IObsCoreCalcTask (IImdTask):
         elif (field_name == 'access_url'):
             self.calc_access_url(metadata, calculations)
 
-        elif (field_name == 'instrument_name'):
-            self.calc_instrument_name(metadata, calculations)
 
-        elif (field_name == 'target_name'):
-            self.calc_target_name(metadata, calculations)
+    def set_default_value (self, field_name, defaults, wcs_info, metadata, calculations):
+        """
+        Final effort to calculate or set a fallback/default value for the named field.
+        This version may call abstract methods which call down to child concrete methods.
+        """
+        if (field_name == 'target_name'):
+            self.set_default_target_name(defaults, metadata, calculations)
+
+        elif (field_name == 'instrument_name'):
+            self.set_default_instrument_name(defaults, metadata, calculations)
+
+        # if field still has no value, try to set a default from the fields info
+        if (field_name not in calculations):
+            occ_utils.set_default(field_name, defaults, calculations)
