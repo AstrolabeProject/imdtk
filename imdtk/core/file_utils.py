@@ -1,7 +1,7 @@
 #
 # Module to provide general file utility functions.
 #   Written by: Tom Hicks. 1/29/2020.
-#   Last Modified: Refactor method to gather/add file info here.
+#   Last Modified: Update is_acceptable_filename.
 #
 import os
 
@@ -50,15 +50,12 @@ def good_file_path (apath, writeable=False):
             ((not writeable) or is_writable(apath)) )
 
 
-def is_acceptable_filename (filename, extensions):
+def is_acceptable_filename (filename, extents):
     """ Tell whether the given filename has one of the given set of accepatable
         file extensions or not. """
     if (filename is None):                  # sanity check
         return False
-    for ext in extensions:
-        if (filename.endswith(ext)):
-            return True
-    return False
+    return (filename.endswith(tuple(extents)))
 
 
 def is_readable (apath):
