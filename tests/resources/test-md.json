@@ -1,0 +1,16 @@
+{
+  "calculated": {
+    "aardvark": 8.3333333333333e-06,
+    "bandicoot": -2,
+    "chinchilla": 27150,
+    "dingo": "Bruce",
+    "elan": null,
+    "fangtooth": 0,
+    "grasshopper": true,
+    "access_url": "https://nowhere.org/this/URL/should/be/removed",
+    "file_name": "F090W.fits",
+    "file_path": "/fake/images/m13.fits",
+    "file_size": 2666568960,
+    "obs_publisher_did": "ivo://astrolabe.arizona.edu/toberemoved"
+  }
+}

@@ -27,6 +27,7 @@
 # irods_md_irods_pipe -d --version
 # irods_md_pghyb_pipe -d --version
 # irods_md_pgsql_pipe -d --version
+# irods_md_sink -d --version
 # irods_mmd_irods_pipe -d --version
 # irods_mmd_pghyb_pipe -d --version
 # irods_mmd_pgsql_pipe -d --version
@@ -77,6 +78,8 @@
 # irods_md_pghyb_pipe --help
 # echo "--------------------------------------------"
 # irods_md_pgsql_pipe --help
+# echo "--------------------------------------------"
+# irods_md_sink --help
 # echo "--------------------------------------------"
 # irods_mmd_irods_pipe --help
 # echo "--------------------------------------------"
@@ -524,6 +527,18 @@
 # irods_mmd_irods_pipe -idir /iplant/home/hickst/resources -c EMPTY -v
 # irods_mmd_irods_pipe -idir /iplant/home/hickst/vos/images/JADES -oo -g -v
 # irods_mmd_irods_pipe -idir /iplant/home/hickst/vos/images/DC19 -oo -g -v
+
+
+# echo "=================================================="
+# echo "Sink input metadata to iRods file:"
+# echo "--------------------------------------------------"
+# echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
+# echo "--------------------------------------------------"
+# irods_md_sink -if ./tests/resources/test-md.json -imd /iplant/tmp/nosuchfile -v
+# echo "--------------------------------------------------"
+# irods_md_sink -if ./tests/resources/test-md-empty.json -imd /iplant/home/hickst/testDir/empty.txt -v
+# irods_md_sink -if ./tests/resources/test-md.json -imd /iplant/home/hickst/testDir/empty.txt -v
+# irods_md_sink -if ./tests/resources/test-md-full.json -imd /iplant/home/hickst/testDir/empty.txt -v
 
 
 # echo "============================================"

@@ -25,24 +25,38 @@ echo "--------------------------------------------"
 # # irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/DC19 -c DEMO -v
 # echo "----------------------------------------------------"
 
-# echo "---- iRods FITS metadata to iRods file metadata ----"
-# echo "----------------------------------------------------"
-# # from one file to another:
-# irods_md_irods_pipe -iff /iplant/home/hickst/testDir/F444W.fits -imd /iplant/home/hickst/testDir/empty.txt -v
+echo "---- iRods FITS metadata to iRods file metadata ----"
+echo "----------------------------------------------------"
+# from one file to another:
+irods_md_irods_pipe -iff /iplant/home/hickst/testDir/F444W.fits -imd /iplant/home/hickst/testDir/empty.txt -v
 # # from file to same file:
-# irods_md_irods_pipe -iff /iplant/home/hickst/testDir/F444W.fits -v
+irods_md_irods_pipe -iff /iplant/home/hickst/testDir/F444W.fits -v
 # echo "----------------------------------------------------"
 
-echo "============================================"
+# echo "============================================"
+# echo " Pipelines to restore image metadata DB     "
+# echo "--------------------------------------------"
 
-echo "============================================"
-echo " Pipelines to restore image metadata DB     "
-echo "--------------------------------------------"
-
-mmd_pgsql_pipe -idir /vos/images/JADES -c JADES -v
-mmd_pgsql_pipe -idir /vos/images/DC19 -c DC19 -v
+# mmd_pgsql_pipe -idir /vos/images/JADES -c JADES -v
+# mmd_pgsql_pipe -idir /vos/images/DC19 -c DC19 -v
+# mmd_pgsql_pipe -idir /vos/images/DC20 -c DC20 -v
 
 # mmd_pghyb_pipe -idir /vos/images/JADES -c JADES -v
 # mmd_pghyb_pipe -idir /vos/images/DC19 -c DC19 -v
+# mmd_pghyb_pipe -idir /vos/images/DC20 -c DC20 -v
+
+# fits_img_md -v -ff /vos/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC19/F356W.fits -g
+# fits_img_md -v -ff /vos/images/DC20/F090W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC20/F090W.fits -g
+
+echo "=========================================================="
+echo "Sink input metadata to iRods file:"
+echo "--------------------------------------------------"
+echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
+echo "--------------------------------------------------"
+irods_md_sink -if ./tests/resources/test-md.json -imd /iplant/tmp/nosuchfile -v
+echo "--------------------------------------------------"
+irods_md_sink -if ./tests/resources/test-md-empty.json -imd /iplant/home/hickst/testDir/empty2.txt -v
+irods_md_sink -if ./tests/resources/test-md.json -imd /iplant/home/hickst/testDir/empty2.txt -v
+irods_md_sink -if ./tests/resources/test-md-full.json -imd /iplant/home/hickst/testDir/empty3.txt -v
 
 echo "============================================"
