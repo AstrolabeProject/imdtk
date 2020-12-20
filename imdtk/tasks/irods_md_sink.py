@@ -1,7 +1,7 @@
 #
 # Class to sink incoming metadata to an iRods file.
 #   Written by: Tom Hicks. 11/30/2020.
-#   Last Modified: Implement metadata updating.
+#   Last Modified: Check that some metadata target path is specified.
 #
 import sys
 
@@ -41,9 +41,13 @@ class IRodsMetadataSink (IImdTask):
         if (self._DEBUG):
             print("({}.output_results): ARGS={}".format(self.TOOL_NAME, self.args), file=sys.stderr)
 
-        # get the iRods file path arguments of the files to be opened
-        irff_path = self.args.get('irods_fits_file')
-        imd_path = self.args.get('irods_md_file', irff_path)  # default is iRods input file
+        # get the iRods file path argument of the file to be annotated
+        imd_path = self.args.get('irods_md_file',
+                                 self.args.get('irods_fits_file'))  # default is iRods input file
+
+        if ((imd_path is None) or (not imd_path.strip())):
+            errMsg = "A full iRods path to an annotatable iRods file must be specified."
+            raise errors.ProcessingError(errMsg)
 
         # check the iRods metadata target file path for validity
         try:

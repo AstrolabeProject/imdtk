@@ -1,7 +1,7 @@
 #
 # Class defining utility methods for tool components CLI.
 #   Written by: Tom Hicks. 6/1/2020.
-#   Last Modified: Replace SQL only argument with more general output only argument.
+#   Last Modified: Correct doc string: iRods metadata file argument not required.
 #
 import argparse
 import sys
@@ -163,7 +163,7 @@ def add_irods_md_file_argument (parser, tool_name):
     parser.add_argument(
         '-imd', '--irods-md-file', dest='irods_md_file', metavar='filepath',
         default=argparse.SUPPRESS,
-        help='Full iRods path to an iRods file whose metadata is to be read or written [required]'
+        help='Full iRods path to an iRods file whose metadata is to be read or written'
     )
 
 

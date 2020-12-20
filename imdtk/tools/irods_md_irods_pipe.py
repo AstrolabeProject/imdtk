@@ -65,10 +65,9 @@ def main (argv=None):
     # add additional arguments to args
     args['TOOL_NAME'] = TOOL_NAME
 
-    # get the iRods file path arguments of the files to be opened
-    irff_path = args.get('irods_fits_file')
-
+    # get and check the iRods file path argument of the file to be read
     # the specified FITS file must have a valid FITS extension
+    irff_path = args.get('irods_fits_file')
     cli_utils.check_irods_fits_file(irff_path, TOOL_NAME)  # may system exit here and not return!
 
     # get an instance of the iRods accessor class
