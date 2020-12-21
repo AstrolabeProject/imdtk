@@ -1,11 +1,11 @@
 #
 # Class to sink incoming metadata to an iRods file.
 #   Written by: Tom Hicks. 11/30/2020.
-#   Last Modified: Check that some metadata target path is specified.
+#   Last Modified: Add capability to just remove metadata items.
 #
 import sys
 
-from irods.exception import CollectionDoesNotExist, DataObjectDoesNotExist, NoResultFound
+from irods.exception import CollectionDoesNotExist, DataObjectDoesNotExist, NetworkException, NoResultFound
 
 import imdtk.exceptions as errors
 import imdtk.tasks.metadata_utils as md_utils
@@ -54,21 +54,27 @@ class IRodsMetadataSink (IImdTask):
             self.irods.getf(imd_path, absolute=True)
 
         except (CollectionDoesNotExist, DataObjectDoesNotExist, NoResultFound):
-            errMsg = "Unable to find iRods metadata attachment file at '{}'.".format(imd_path)
+            errMsg = "Unable to find iRods file for metadata alteration at '{}'.".format(imd_path)
             raise errors.ProcessingError(errMsg)
 
-        # select and/or filter the metadata for output
-        selected = self.select_data_for_output(metadata)
+        # extract the data to be output from the given metadata
+        sink_data = self.get_data_for_output(metadata)
 
-        # decide whether we are storing metadata in iRods or just outputting it
+        # When adding/replacing metadata, skip items in the skip list,
+        # otherwise do not skip any items: remove all user specified items
+        remove_only = self.args.get('remove_only') or False
+        if (not remove_only):
+            remove_entries(sink_data, ignore=self.skip_list)
+
+        # decide whether we are changing metadata in iRods or just outputting it
         output_only = self.args.get('output_only')
         if (not output_only):               # if storing metadata to iRods
-            self.store_results(imd_path, selected)
+            self.update_metadata(imd_path, sink_data, remove_only)
 
         else:                               # else just outputting metadata
             oodata = dict()
             oodata['file_info'] = md_utils.get_file_info(metadata)
-            oodata['to_sink'] = selected
+            oodata['to_sink'] = sink_data
             super().output_results(oodata)
 
 
@@ -76,35 +82,42 @@ class IRodsMetadataSink (IImdTask):
     # Non-interface and/or task-specific Methods
     #
 
-    def select_data_for_output (self, metadata):
+    def get_data_for_output (self, metadata):
         """
-        Select a subset of data, from the given metadata, for output.
-        Returns a single dictionary of selected data.
+        Extract the data to be output from the given metadata. Currently, just returns a
+        copy of the "calculated" dictionary.
         """
         calculated = md_utils.get_calculated(metadata)
         if (not calculated):
             errMsg = "The 'calculated' data, required by this program, is missing from the input."
             raise errors.ProcessingError(errMsg)
 
-        selected = calculated.copy()
-        remove_entries(selected, ignore=self.skip_list)
-        return selected                     # return selected dataset
+        copied = calculated.copy()
+        return copied
 
 
-    def store_results (self, imd_path, selected):
+    def update_metadata (self, imd_path, sink_data, remove_only=False):
         """
-        Attach the output data dictionary to the iRods file at the specified path.
+        Attach or remove the items in the given data dictionary to/from the iRods file
+        at the specified path. If the remove_only flag is True, file metadata items with
+        keys matching input item keys are removed from the iRods file.
         """
         if (self._DEBUG):
-            print("({}.store_results): imd_path={}, metadata={}".format(self.TOOL_NAME, imd_path, selected), file=sys.stderr)
+            print(f"({self.TOOL_NAME}.update_metadata): imd_path={imd_path}, remove_only={remove_only} metadata={sink_data}", file=sys.stderr)
 
         try:
-            # try to store the selected metadata onto the iRods file node
-            self.irods.put_metaf(imd_path, selected, absolute=True)
+            if (remove_only):
+                # try to remove the specified metadata from the iRods file node
+                self.irods.remove_metaf(imd_path, sink_data, absolute=True)
+                action = 'removed from'
+            else:
+                # try to attach the given metadata to the iRods file node
+                self.irods.put_metaf(imd_path, sink_data, absolute=True)
+                action = 'attached to'
 
-        except Exception as ex:
-            errMsg = "Unable to write metadata to the iRods file at '{}'. Exception: {}".format(imd_path, ex)
+        except (NetworkException, Exception) as ex:
+            errMsg = f"Unable to alter the metadata of the iRods file at '{imd_path}'. Exception: {ex}"
             raise errors.ProcessingError(errMsg)
 
         if (self._VERBOSE):
-            print("({}): Metadata attached to iRods file '{}'".format(self.TOOL_NAME, imd_path), file=sys.stderr)
+            print(f"({self.TOOL_NAME}): Metadata {action} iRods file '{imd_path}'", file=sys.stderr)
