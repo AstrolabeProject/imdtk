@@ -3,7 +3,7 @@
 # Python pipeline to extract FITS image metadata from an iRods FITS file and attach it
 # to an iRods file as iRods metadata.
 #   Written by: Tom Hicks. 11/30/20.
-#   Last Modified: Initial creation.
+#   Last Modified: Call cleanup on fits irods helper.
 #
 import argparse
 import sys
@@ -110,6 +110,7 @@ def main (argv=None):
         irods_md_sinkTask.cleanup()
         irods_jwst_oc_calcTask.cleanup()
         irods_fits_image_mdTask.cleanup()
+        firh.cleanup()                      # cleanup resources opened here
 
     if (args.get('verbose')):
         print("({}): Processed iRods FITS file '{}'.".format(TOOL_NAME, irff_path), file=sys.stderr)

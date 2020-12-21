@@ -2,7 +2,7 @@
 #
 # Module to extract image metadata from an iRods-resident FITS file and output it as JSON.
 #   Written by: Tom Hicks. 10/14/20.
-#   Last Modified: Use method to check iRods FITS filename.
+#   Last Modified: Call cleanup on fits irods helper.
 #
 import argparse
 import sys
@@ -85,6 +85,7 @@ def main (argv=None):
 
     finally:
         task.cleanup()
+        firh.cleanup()                      # cleanup resources opened here
 
     if (args.get('verbose')):
         print("({}): Processed iRods FITS file '{}'.".format(TOOL_NAME, irff_path), file=sys.stderr)

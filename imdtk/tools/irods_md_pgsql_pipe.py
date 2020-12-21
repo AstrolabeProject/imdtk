@@ -2,7 +2,7 @@
 #
 # Python pipeline to extract image metadata from an iRods FITS file into a PostreSQL database.
 #   Written by: Tom Hicks. 11/20/20.
-#   Last Modified: Use method to check iRods FITS filename.
+#   Last Modified: Call cleanup on fits irods helper.
 #
 import argparse
 import sys
@@ -110,6 +110,7 @@ def main (argv=None):
         jwst_pgsql_sinkTask.cleanup()
         irods_jwst_oc_calcTask.cleanup()
         irods_fits_image_mdTask.cleanup()
+        firh.cleanup()                      # cleanup resources opened here
 
     if (args.get('verbose')):
         print("({}): Processed iRods FITS file '{}'.".format(TOOL_NAME, irff_path), file=sys.stderr)

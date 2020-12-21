@@ -3,7 +3,7 @@
 # Python pipeline to extract image metadata from FITS images in an iRods directory,
 # storing the metadata into a PostreSQL database.
 #   Written by: Tom Hicks. 11/22/20.
-#   Last Modified: Warn on unsupported file type error.
+#   Last Modified: Call cleanup on fits irods helper.
 #
 import argparse
 import sys
@@ -121,6 +121,8 @@ def main (argv=None):
     jwst_pgsql_sinkTask.cleanup()
     irods_jwst_oc_calcTask.cleanup()
     irods_fits_image_mdTask.cleanup()
+    firh.cleanup()                          # cleanup resources opened here
+
 
     if (args.get('verbose')):
         print("({}): Processed iRods {} FITS files.".format(TOOL_NAME, proc_count), file=sys.stderr)

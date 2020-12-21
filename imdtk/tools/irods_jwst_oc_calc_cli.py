@@ -2,7 +2,7 @@
 #
 # Module to calculate values for the ObsCore fields from metadata derived from an iRods-resident FITS file.
 #   Written by: Tom Hicks. 1/20/20.
-#   Last Modified: Use method to check iRods FITS filename.
+#   Last Modified: Call cleanup on fits irods helper.
 #
 import argparse
 import sys
@@ -84,6 +84,7 @@ def main (argv=None):
 
     finally:
         task.cleanup()
+        firh.cleanup()                      # cleanup resources opened here
 
 
 
