@@ -1,7 +1,7 @@
 #
 # Helper class for iRods commands: manipulate the filesystem, including metadata.
 #   Written by: Tom Hicks. 10/15/20.
-#   Last Modified: Update/fix put_metaf method. Add remove_metaf method.
+#   Last Modified: Remove class enter/exit methods causing iRods error. Remove obsolete lines.
 #
 import os
 import errno
@@ -45,14 +45,6 @@ class IRodsHelper:
         self._session = None                # current session - None until connected
         if (connect):                       # connect now unless specified otherwise
             self.connect()
-
-
-    def __enter__ (self):
-        return self
-
-
-    def __exit__ (self, exc_type, exc_value, traceback):
-        self.cleanup()
 
 
     def cleanup (self):
@@ -354,9 +346,6 @@ class IRodsHelper:
         for key, val in metadata.items():
             skey = str(key)
             obj.metadata[skey] = iRODSMeta(skey, str(val))
-            # del(obj.metadata[key])                # deletes all metadata items with this key
-            # obj.metadata.add(str(key), str(val))  # iRods keys & values can only be strings
-        # obj.metadata._reset_metadata()            # critical: update the file node metadata
 
 
     def remove_metaf (self, file_path, metadata, absolute=False):
