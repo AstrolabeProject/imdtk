@@ -7,6 +7,7 @@
 
 # echo "ARGS=$*"
 
+
 # echo "============================================"
 # echo " ImdTk Demonstration of iRods capabilities  "
 # echo "--------------------------------------------"
@@ -48,17 +49,17 @@
 # fits_img_md -v -ff /vos/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC19/F356W.fits -g
 # fits_img_md -v -ff /vos/images/DC20/F090W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC20/F090W.fits -g
 
-echo "=========================================================="
-echo "Sink input metadata to iRods file:"
+# echo "=========================================================="
+# echo "Sink input metadata to iRods file:"
 # echo "--------------------------------------------------"
 # echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 # echo "--------------------------------------------------"
 # irods_md_sink -if ./tests/resources/test-md.json -imd /iplant/tmp/nosuchfile -v
-echo "--------------------------------------------------"
+# echo "--------------------------------------------------"
 # irods_md_sink -if ./tests/resources/test-md-empty.json -imd /iplant/home/hickst/testDir/empty2.txt -v
 # irods_md_sink -if ./tests/resources/test-md.json -imd /iplant/home/hickst/testDir/empty2.txt -v
 # irods_md_sink -if ./tests/resources/test-md.json -imd /iplant/home/hickst/testDir/empty2.txt -rm -v
 # irods_md_sink -if ./tests/resources/test-md-full.json -imd /iplant/home/hickst/testDir/empty3.txt -v
 # irods_md_sink -if ./tests/resources/test-md-full.json -imd /iplant/home/hickst/testDir/empty3.txt --remove -v
 
-echo "============================================"
+# echo "============================================"
