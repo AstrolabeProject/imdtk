@@ -2,7 +2,7 @@
 #
 # Module to sink incoming metadata by attaching it to an iRods file.
 #   Written by: Tom Hicks. 12/20/20.
-#   Last Modified: Initial creation.
+#   Last Modified: Add capability to just remove metadata items. Call cleanup on fits irods helper.
 #
 import argparse
 import sys
@@ -40,6 +40,13 @@ def main (argv=None):
     cli_utils.add_input_file_argument(parser, TOOL_NAME)
     cli_utils.add_irods_md_file_argument(parser, TOOL_NAME)
 
+    # add arguments specific to this module
+    parser.add_argument(
+        '-rm', '--remove', dest='remove_only', action='store_true',
+        default=False,
+        help='If True, remove matching input items from iRods file metadata [default: False].'
+    )
+
     # actually parse the arguments from the command line
     args = vars(parser.parse_args(argv))
 
@@ -76,8 +83,8 @@ def main (argv=None):
         sys.exit(pe.error_code)
 
     finally:
-        # call cleanup method for tasks which opened resources
-        task.cleanup()
+        task.cleanup()                      # cleanup any task resources
+        firh.cleanup()                      # cleanup resources opened here
 
 
 
