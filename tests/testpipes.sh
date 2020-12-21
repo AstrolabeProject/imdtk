@@ -536,9 +536,10 @@ echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 echo "--------------------------------------------------"
 irods_md_sink -if ./tests/resources/test-md.json -imd /iplant/tmp/nosuchfile -v
 echo "--------------------------------------------------"
-irods_md_sink -if ./tests/resources/test-md-empty.json -imd /iplant/home/hickst/testDir/empty.txt -v
-irods_md_sink -if ./tests/resources/test-md.json -imd /iplant/home/hickst/testDir/empty.txt -v
-irods_md_sink -if ./tests/resources/test-md-full.json -imd /iplant/home/hickst/testDir/empty.txt -v
-
+# irods_md_sink -if ./tests/resources/test-md-empty.json -imd /iplant/home/hickst/testDir/empty2.txt -v
+# irods_md_sink -if ./tests/resources/test-md.json -imd /iplant/home/hickst/testDir/empty2.txt -v
+# irods_md_sink -if ./tests/resources/test-md.json -imd /iplant/home/hickst/testDir/empty2.txt -rm -v
+# irods_md_sink -if ./tests/resources/test-md-full.json -imd /iplant/home/hickst/testDir/empty3.txt -v
+# irods_md_sink -if ./tests/resources/test-md-full.json -imd /iplant/home/hickst/testDir/empty3.txt --remove -v
 
 echo "============================================"

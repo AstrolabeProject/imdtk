@@ -7,9 +7,9 @@
 
 # echo "ARGS=$*"
 
-echo "============================================"
-echo " ImdTk Demonstration of iRods capabilities  "
-echo "--------------------------------------------"
+# echo "============================================"
+# echo " ImdTk Demonstration of iRods capabilities  "
+# echo "--------------------------------------------"
 
 # echo "------ Extract metadata from iRods FITS files ------"
 # echo "----------------------------------------------------"
@@ -25,12 +25,12 @@ echo "--------------------------------------------"
 # # irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/DC19 -c DEMO -v
 # echo "----------------------------------------------------"
 
-echo "---- iRods FITS metadata to iRods file metadata ----"
-echo "----------------------------------------------------"
+# echo "---- iRods FITS metadata to iRods file metadata ----"
+# echo "----------------------------------------------------"
 # from one file to another:
-irods_md_irods_pipe -iff /iplant/home/hickst/testDir/F444W.fits -imd /iplant/home/hickst/testDir/empty.txt -v
+# irods_md_irods_pipe -iff /iplant/home/hickst/testDir/F444W.fits -imd /iplant/home/hickst/testDir/empty.txt -v
 # # from file to same file:
-irods_md_irods_pipe -iff /iplant/home/hickst/testDir/F444W.fits -v
+# irods_md_irods_pipe -iff /iplant/home/hickst/testDir/F444W.fits -v
 # echo "----------------------------------------------------"
 
 # echo "============================================"
@@ -50,13 +50,15 @@ irods_md_irods_pipe -iff /iplant/home/hickst/testDir/F444W.fits -v
 
 echo "=========================================================="
 echo "Sink input metadata to iRods file:"
+# echo "--------------------------------------------------"
+# echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
+# echo "--------------------------------------------------"
+# irods_md_sink -if ./tests/resources/test-md.json -imd /iplant/tmp/nosuchfile -v
 echo "--------------------------------------------------"
-echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
-echo "--------------------------------------------------"
-irods_md_sink -if ./tests/resources/test-md.json -imd /iplant/tmp/nosuchfile -v
-echo "--------------------------------------------------"
-irods_md_sink -if ./tests/resources/test-md-empty.json -imd /iplant/home/hickst/testDir/empty2.txt -v
-irods_md_sink -if ./tests/resources/test-md.json -imd /iplant/home/hickst/testDir/empty2.txt -v
-irods_md_sink -if ./tests/resources/test-md-full.json -imd /iplant/home/hickst/testDir/empty3.txt -v
+# irods_md_sink -if ./tests/resources/test-md-empty.json -imd /iplant/home/hickst/testDir/empty2.txt -v
+# irods_md_sink -if ./tests/resources/test-md.json -imd /iplant/home/hickst/testDir/empty2.txt -v
+# irods_md_sink -if ./tests/resources/test-md.json -imd /iplant/home/hickst/testDir/empty2.txt -rm -v
+# irods_md_sink -if ./tests/resources/test-md-full.json -imd /iplant/home/hickst/testDir/empty3.txt -v
+# irods_md_sink -if ./tests/resources/test-md-full.json -imd /iplant/home/hickst/testDir/empty3.txt --remove -v
 
 echo "============================================"
