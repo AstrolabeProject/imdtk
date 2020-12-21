@@ -3,7 +3,7 @@
 # Python pipeline to extract image metadata from FITS images in an iRods directory,
 # and attach it to the same files as iRods metadata.
 #   Written by: Tom Hicks. 11/30/20.
-#   Last Modified: Call cleanup on fits irods helper.
+#   Last Modified: More cleanup on fits irods helper.
 #
 import argparse
 import sys
@@ -79,6 +79,7 @@ def main (argv=None):
     # get and check the required image directory path for validity
     input_dir = args.get('input_dir')
     if (not firh.collection_exists(input_dir)):
+        firh.cleanup()                            # cleanup resources opened here
         cli_utils.irods_input_dir_exit(TOOL_NAME, input_dir)  # error exit out here: never returns
 
     # make of list of absolute iRods file paths pointing to FITS files
