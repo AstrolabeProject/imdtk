@@ -57,7 +57,7 @@ class IRodsFitsImageMetadataTask (IImdTask):
             # sanity check on the given FITS file
             if (irff.size < FITS_BLOCK_SIZE):
                 errMsg = "Skipping file too small to be a valid FITS file: '{}'".format(irff_path)
-                raise errors.UnsupportedTypeError(errMsg)
+                raise errors.UnsupportedType(errMsg)
 
             # actually read the file to get the specified header
             header = self.irods.get_header(irff, which_hdu)

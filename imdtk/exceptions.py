@@ -1,23 +1,27 @@
 #
-# User defined exceptions for the ImdTk system.
-#   Written by: Tom Hicks. 7/19/2020.
-#   Last Modified: Initial creation.
+# Implement exceptions used throughout the app.
+#
+#   Written by: Tom Hicks. 11/2/2019.
+#   Last Modified: Combine with Image MetaData ToolKit errors.
 #
 class ProcessingError (Exception):
     """
-    Base class for exceptions in this module.
+    Base class for exceptions in this module. Overridden by more specific exceptions.
 
-    Attributes:
-        message -- explanation of the error
-        error_code -- integer identifying the error
+    attributes:
+        message -- explanation of the error.
+        error_code -- optional integer identifying the exception type: all exception
+                      types defined here have a default status/error code.
     """
     ERROR_CODE = 500
 
-    def __init__(self, message, error_code=ERROR_CODE):
+    def __init__(self, message, error_code=None):
         Exception.__init__(self)
         self.message = message
         if error_code is not None:
             self.error_code = error_code
+        else:
+            self.error_code = self.ERROR_CODE
 
 
     def __str__(self):
@@ -35,8 +39,37 @@ class ProcessingError (Exception):
         return (self.message, self.error_code)
 
 
+class ImageNotFound (ProcessingError):
+    """
+    Class for exceptions due to specification of missing or unreadable image paths.
+    """
+    ERROR_CODE = 404
 
-class UnsupportedTypeError (ProcessingError):
+    def __init__(self, message, error_code=ERROR_CODE):
+        super().__init__(message, error_code)
+
+
+class RequestException (ProcessingError):
+    """
+    Class for exceptions due to requests with missing or invalid arguments.
+    """
+    ERROR_CODE = 400
+
+    def __init__(self, message, error_code=ERROR_CODE):
+        super().__init__(message, error_code)
+
+
+class ServerError (ProcessingError):
+    """
+    Class for exceptions caused by unrecoverable internal server errors.
+    """
+    ERROR_CODE = 500
+
+    def __init__(self, message, error_code=ERROR_CODE):
+        super().__init__(message, error_code)
+
+
+class UnsupportedType (ProcessingError):
     """
     Class for exceptions caused by unsupported file or media types.
     """

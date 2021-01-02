@@ -70,7 +70,7 @@ def main (argv=None):
         task = IRodsMetadataSink(args, firh)
         task.input_process_output()
 
-    except errors.UnsupportedTypeError as ute:
+    except errors.UnsupportedType as ute:
         errMsg = "({}): WARNING: Unsupported File Type ({}): {}".format(
             TOOL_NAME, ute.error_code, ute.message)
         print(errMsg, file=sys.stderr)

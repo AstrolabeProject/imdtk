@@ -62,7 +62,7 @@ def main (argv=None):
         task = FitsCatalogMetadataTask(args)
         task.process_and_output()
 
-    except errors.UnsupportedTypeError as ute:
+    except errors.UnsupportedType as ute:
         errMsg = "({}): WARNING: Unsupported File Type ({}): {}".format(
             TOOL_NAME, ute.error_code, ute.message)
         print(errMsg, file=sys.stderr)

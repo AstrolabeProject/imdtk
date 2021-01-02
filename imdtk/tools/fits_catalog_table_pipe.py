@@ -84,7 +84,7 @@ def main (argv=None):
         fits_catalog_fillTask.output_results(     # sink to DB: nothing returned
             fits_catalog_dataTask.process(None))  # data source
 
-    except errors.UnsupportedTypeError as ute:
+    except errors.UnsupportedType as ute:
         errMsg = "({}): WARNING: Unsupported File Type ({}): {}".format(
             TOOL_NAME, ute.error_code, ute.message)
         print(errMsg, file=sys.stderr)

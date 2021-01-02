@@ -93,7 +93,7 @@ def main (argv=None):
                         image_aliasesTask.process(
                             irods_fits_image_mdTask.process(None))))))  # metadata source
 
-    except errors.UnsupportedTypeError as ute:
+    except errors.UnsupportedType as ute:
         errMsg = "({}): WARNING: Unsupported File Type ({}): {}".format(
             TOOL_NAME, ute.error_code, ute.message)
         print(errMsg, file=sys.stderr)

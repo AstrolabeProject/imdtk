@@ -58,7 +58,7 @@ class IRods_JWST_ObsCoreCalcTask (JWST_ObsCoreCalcTask):
             # sanity check on the given FITS file
             if (irff.size < FITS_BLOCK_SIZE):
                 errMsg = "Skipping file too small to be a valid FITS file: '{}'".format(irff_path)
-                raise errors.UnsupportedTypeError(errMsg)
+                raise errors.UnsupportedType(errMsg)
 
             if (self._DEBUG):
                 print("({}): Reading iRods FITS file '{}'.".format(self.TOOL_NAME, irff_path), file=sys.stderr)

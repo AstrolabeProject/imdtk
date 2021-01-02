@@ -101,7 +101,7 @@ def main (argv=None):
 
             proc_count += 1                       # increment count of processed files
 
-        except errors.UnsupportedTypeError as ute:
+        except errors.UnsupportedType as ute:
             errMsg = "({}): WARNING: Unsupported File Type ({}): {}".format(
                 TOOL_NAME, ute.error_code, ute.message)
             print(errMsg, file=sys.stderr)

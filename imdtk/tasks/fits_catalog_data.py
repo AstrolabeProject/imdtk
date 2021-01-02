@@ -45,7 +45,7 @@ class FitsCatalogDataTask (IImdTask):
             with fits.open(fits_file) as hdus_list:
                 if (not fits_utils.is_catalog_file(hdus_list)):
                     errMsg = "Skipping non-catalog FITS file '{}'".format(fits_file)
-                    raise errors.UnsupportedTypeError(errMsg)
+                    raise errors.UnsupportedType(errMsg)
                 hdrs = fits_utils.get_header_fields(hdus_list, catalog_hdu, ignore_list)
                 cinfo = fits_utils.get_column_info(hdus_list, catalog_hdu)
 

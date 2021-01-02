@@ -44,7 +44,7 @@ class FitsImageMetadataTask (IImdTask):
             with fits.open(fits_file) as hdus_list:
                 if (fits_utils.is_catalog_file(hdus_list)):
                     errMsg = "Skipping FITS catalog '{}'".format(fits_file)
-                    raise errors.UnsupportedTypeError(errMsg)
+                    raise errors.UnsupportedType(errMsg)
 
                 hdrs = fits_utils.get_header_fields(hdus_list, which_hdu, ignore_list)
 

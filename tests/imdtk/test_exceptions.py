@@ -48,26 +48,26 @@ class TestExceptions(object):
 
 
     def test_ute (self):
-        ute = xcpt.UnsupportedTypeError(self.EMSG)
+        ute = xcpt.UnsupportedType(self.EMSG)
         print(ute)
         print(type(ute))
-        assert ute.error_code == xcpt.UnsupportedTypeError.ERROR_CODE
+        assert ute.error_code == xcpt.UnsupportedType.ERROR_CODE
         utedict = ute.to_dict()
         assert 'message' in utedict
         assert 'error_code' in utedict
         assert utedict.get('message') == self.EMSG
-        assert utedict.get('error_code') == xcpt.UnsupportedTypeError.ERROR_CODE
+        assert utedict.get('error_code') == xcpt.UnsupportedType.ERROR_CODE
         utetup = ute.to_tuple()
         assert utetup[0] == self.EMSG
-        assert utetup[1] == xcpt.UnsupportedTypeError.ERROR_CODE
+        assert utetup[1] == xcpt.UnsupportedType.ERROR_CODE
         utestr = str(ute)
         print(utestr)
-        assert str(xcpt.UnsupportedTypeError.ERROR_CODE) in utestr
+        assert str(xcpt.UnsupportedType.ERROR_CODE) in utestr
         assert 'wrong' in utestr
 
 
     def test_ute_code (self):
-        ute = xcpt.UnsupportedTypeError(self.EMSG, self.ECODE)
+        ute = xcpt.UnsupportedType(self.EMSG, self.ECODE)
         print(ute)
         print(type(ute))
         assert ute.error_code == self.ECODE
