@@ -1,9 +1,10 @@
 #
 # Helper class for iRods commands: manipulate the filesystem, including metadata.
 #   Written by: Tom Hicks. 10/15/20.
-#   Last Modified: Remove class enter/exit methods causing iRods error. Remove obsolete lines.
+#   Last Modified: Move iRods default files/paths here. Pass iRods root dir in args. Use fStrings.
 #
 import os
+import sys
 import errno
 import pathlib as pl
 
@@ -12,13 +13,21 @@ from irods.collection import iRODSCollection
 from irods.data_object import iRODSDataObject
 from irods.meta import iRODSMeta
 
-from config.settings import DEFAULT_IRODS_ENV_FILENAME, DEFAULT_IRODS_ENV_FILEPATH
-from config.settings import DEFAULT_IRODS_AUTH_FILENAME, DEFAULT_IRODS_AUTH_FILEPATH
 from imdtk.core import Metadatum
 
 
+# Default directory for iRods configuration files
+DEFAULT_IRODS_CONFIG_DIR = '.irods'
+
+# Default authentication file for iRods.
+DEFAULT_IRODS_AUTH_FILENAME = '.irodsA'
+
+# Default environment configuration file for iRods.
+DEFAULT_IRODS_ENV_FILENAME = 'irods_environment.json'
+
+
 class IRodsHelper:
-    """ Helper class for iRods commands """
+    """ Helper class for managing an iRods client connection. """
 
     @staticmethod
     def cleanup_session (session):
@@ -38,8 +47,32 @@ class IRodsHelper:
 
 
     def __init__ (self, args={}, connect=True):
+        """ Class constructor. """
         self.args = args                    # save arguments passed to this instance
         self._DEBUG = args.get('debug', False)
+
+        # try to get the path to the iRods configuration directory:
+        conf_dir = args.get('irods_config_directory')
+        if (conf_dir is None):             # if config dir path not provided
+            # default to subdirectory of the current working directory
+            self.irods_config_dir = pl.Path().absolute().joinpath(DEFAULT_IRODS_CONFIG_DIR)
+        else:                               # else use given directory path
+            self.irods_config_dir = pl.Path(conf_dir)
+        if (self._DEBUG):
+            print(f"(IRodsHelper.__init__): irods_config_directory={self.irods_config_dir}",
+                  file=sys.stderr)
+
+        # set defaults for authentication & environment files, based on config directory:
+        self.default_irods_auth_file = pl.PurePath.joinpath(self.irods_config_dir,
+                                                            DEFAULT_IRODS_AUTH_FILENAME)
+        self.default_irods_env_file = pl.PurePath.joinpath(self.irods_config_dir,
+                                                           DEFAULT_IRODS_ENV_FILENAME)
+        if (self._DEBUG):
+            print(f"(IRodsHelper.__init__): default_irods_auth_file={self.default_irods_auth_file}",
+                  file=sys.stderr)
+            print(f"(IRodsHelper.__init__): default_irods_env_file={self.default_irods_env_file}",
+                  file=sys.stderr)
+
         self._cwdpath = None                # current working directory - a PurePath
         self._root = None                   # root directory path - a PurePath
         self._session = None                # current session - None until connected
@@ -55,12 +88,13 @@ class IRodsHelper:
     def connect (self):
         """ Open and remember an iRods session using the instantiation arguments. """
         if (self._DEBUG):
-            print("(IRodsHelper.connect): args={}".format(self.args))
+            print(f"(IRodsHelper.connect): args={self.args}", file=sys.stderr)
 
         self._session = self.make_session()
 
         if (self._DEBUG):
-            print("(IRodsHelper.connect): SESSION={}".format(self._session))
+            print(f"(IRodsHelper.connect): SESSION={self._session}", file=sys.stderr)
+
 
         # users root directory is set to their iRods home directory
         self.set_root()
@@ -189,14 +223,14 @@ class IRodsHelper:
             try:
                 auth_file = os.environ["IRODS_AUTHENTICATION_FILE"]
             except KeyError:
-                auth_file = DEFAULT_IRODS_AUTH_FILEPATH
+                auth_file = self.default_irods_auth_file
                 if (not auth_file):
                     # raise a custom FileNotFound error:
-                    errMsg("No iRods authentication file specified.")
+                    errMsg("A path to an iRods authentication file must be specified.")
                     raise OSError(errno.ENOENT, errMsg, DEFAULT_IRODS_AUTH_FILENAME)
 
         if (self._DEBUG):
-            print("(IRodsHelper.get_authentication_file): auth_file={}".format(auth_file))
+            print(f"(IRodsHelper.get_authentication_file): auth_file={auth_file}", file=sys.stderr)
 
         return auth_file                    # return the filepath
 
@@ -230,14 +264,14 @@ class IRodsHelper:
             try:
                 env_file = os.environ["IRODS_ENVIRONMENT_FILE"]
             except KeyError:
-                env_file = DEFAULT_IRODS_ENV_FILEPATH
+                env_file = self.default_irods_env_file
                 if (not env_file):
                     # raise a custom FileNotFound error:
-                    errMsg("No iRods environment file specified.")
+                    errMsg("A path to an iRods environment file must be specified.")
                     raise OSError(errno.ENOENT, errMsg, DEFAULT_IRODS_ENV_FILENAME)
 
         if (self._DEBUG):
-            print("(IRodsHelper.get_environment_file): env_file={}".format(env_file))
+            print(f"(IRodsHelper.get_environment_file): env_file={env_file}", file=sys.stderr)
 
         return env_file                     # return the filepath
 

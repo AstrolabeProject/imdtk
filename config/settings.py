@@ -20,14 +20,6 @@ DEFAULT_DBCONFIG_FILEPATH = "{}/jwst-dbconfig.ini".format(CONFIG_DIR)
 # Default resource file for default field values.
 DEFAULT_FIELDS_FILEPATH = "{}/jwst-fields.toml".format(CONFIG_DIR)
 
-# Default configuration file for iRods.
-DEFAULT_IRODS_ENV_FILENAME = 'irods_environment.json'
-DEFAULT_IRODS_ENV_FILEPATH = "{}/{}".format(IRODS_DIR, DEFAULT_IRODS_ENV_FILENAME)
-
-# Default authentication file for iRods.
-DEFAULT_IRODS_AUTH_FILENAME = '.irodsA'
-DEFAULT_IRODS_AUTH_FILEPATH = "{}/{}".format(IRODS_DIR, DEFAULT_IRODS_AUTH_FILENAME)
-
 # Default schema and table name in which to store image metadata in a database.
 DEFAULT_METADATA_TABLE_NAME = 'jwst'
 

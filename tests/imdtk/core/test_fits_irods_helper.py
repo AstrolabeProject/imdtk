@@ -1,6 +1,6 @@
 # Tests for the iRods interface module.
 #   Written by: Tom Hicks. 11/5/20.
-#   Last Modified: Add some tests for gen_fits_file_paths.
+#   Last Modified: Update for refactor of iRods default files/paths.
 #
 import os
 import pytest
@@ -10,7 +10,6 @@ import astropy
 import imdtk.exceptions as errors
 import imdtk.core.fits_irods_helper as firh
 
-from config.settings import DEFAULT_IRODS_AUTH_FILEPATH, DEFAULT_IRODS_ENV_FILEPATH
 from imdtk.core import FitsHeaderInfo
 from tests import TEST_DIR
 
@@ -56,7 +55,7 @@ class TestFitsIRodsHelper(object):
         auth_file = ihelper.get_authentication_file(args)
         print(auth_file)
         assert auth_file is not None
-        assert auth_file == DEFAULT_IRODS_AUTH_FILEPATH
+        assert auth_file == ihelper.default_irods_auth_file
 
 
     def test_get_environment_file (self):
@@ -68,7 +67,7 @@ class TestFitsIRodsHelper(object):
         env_file = ihelper.get_environment_file(args)
         print(env_file)
         assert env_file is not None
-        assert env_file == DEFAULT_IRODS_ENV_FILEPATH
+        assert env_file == ihelper.default_irods_env_file
 
 
     def test_get_header_primary (self):

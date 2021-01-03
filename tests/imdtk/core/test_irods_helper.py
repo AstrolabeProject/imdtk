@@ -1,15 +1,13 @@
 # Tests for the iRods interface module.
 #   Written by: Tom Hicks. 10/20/20.
-#   Last Modified: Add tests for put_metaf and remove_metaf.
+#   Last Modified: Update for refactor of iRods default files/paths.
 #
 import os
 import pytest
 
 import imdtk.exceptions as errors
-import imdtk.core.irods_helper as irh
+from imdtk.core.irods_helper import IRodsHelper
 from irods.exception import CollectionDoesNotExist
-
-from config.settings import DEFAULT_IRODS_AUTH_FILEPATH, DEFAULT_IRODS_ENV_FILEPATH
 
 class TestIRodsHelper(object):
 
@@ -29,47 +27,75 @@ class TestIRodsHelper(object):
     irff_smallcat = '/iplant/home/hickst/vos/catalogs/small_table.fits'
 
 
+    def test_ctor_defaults (self):
+        """ Test defaults for iRods config directory, thus auth and env file locations. """
+        args = {}
+        ihelper = IRodsHelper({}, connect=False)
+        print(ihelper)
+        assert ihelper is not None
+        assert ihelper.irods_config_dir is not None
+        assert str(ihelper.irods_config_dir) == '/imdtk/.irods'
+        assert ihelper.default_irods_auth_file is not None
+        assert str(ihelper.default_irods_auth_file) == '/imdtk/.irods/.irodsA'
+        assert ihelper.default_irods_env_file is not None
+        assert str(ihelper.default_irods_env_file) == '/imdtk/.irods/irods_environment.json'
+
+
+    def test_ctor_with_irdir (self):
+        """ Test given path for iRods config directory, thus auth and env file locations. """
+        args = {}
+        ihelper = IRodsHelper({'irods_config_directory': '/tmp/.irods'}, connect=False)
+        print(ihelper)
+        assert ihelper is not None
+        assert ihelper.irods_config_dir is not None
+        assert str(ihelper.irods_config_dir) == '/tmp/.irods'
+        assert ihelper.default_irods_auth_file is not None
+        assert str(ihelper.default_irods_auth_file) == '/tmp/.irods/.irodsA'
+        assert ihelper.default_irods_env_file is not None
+        assert str(ihelper.default_irods_env_file) == '/tmp/.irods/irods_environment.json'
+
+
     def test_create_helper_noconn (self):
         args = {}
-        ihelper = irh.IRodsHelper(args, connect=False)
+        ihelper = IRodsHelper(args, connect=False)
         print(ihelper)
         assert ihelper is not None
 
 
     def test_create_helper_noargs (self):
         args = {}
-        ihelper = irh.IRodsHelper(args)
+        ihelper = IRodsHelper(args)
         print(ihelper)
         assert ihelper is not None
 
 
     def test_get_authentication_file (self):
         args = {}
-        ihelper = irh.IRodsHelper(args, connect=False)
+        ihelper = IRodsHelper(args, connect=False)
         print(ihelper)
         assert ihelper is not None
 
         auth_file = ihelper.get_authentication_file(args)
         print(auth_file)
         assert auth_file is not None
-        assert auth_file == DEFAULT_IRODS_AUTH_FILEPATH
+        assert auth_file == ihelper.default_irods_auth_file
 
 
     def test_get_environment_file (self):
         args = {}
-        ihelper = irh.IRodsHelper(args, connect=False)
+        ihelper = IRodsHelper(args, connect=False)
         print(ihelper)
         assert ihelper is not None
 
         env_file = ihelper.get_environment_file(args)
         print(env_file)
         assert env_file is not None
-        assert env_file == DEFAULT_IRODS_ENV_FILEPATH
+        assert env_file == ihelper.default_irods_env_file
 
 
     def test_to_dirpath (self):
         args = {}
-        ihelper = irh.IRodsHelper(args, connect=False)
+        ihelper = IRodsHelper(args, connect=False)
 
         ihelper.to_dirpath('/') == '/'
         ihelper.to_dirpath('.') == './'
@@ -84,7 +110,7 @@ class TestIRodsHelper(object):
     def test_getc_badpath (self):
         bad_path = '/iplant/home/hickst/vos/images2'
 
-        ihelper = irh.IRodsHelper(self.defargs)
+        ihelper = IRodsHelper(self.defargs)
         assert ihelper is not None
 
         with pytest.raises(CollectionDoesNotExist):
@@ -94,7 +120,7 @@ class TestIRodsHelper(object):
     def test_getc (self):
         img_path = '/iplant/home/hickst/vos/images'
 
-        ihelper = irh.IRodsHelper(self.defargs)
+        ihelper = IRodsHelper(self.defargs)
         assert ihelper is not None
 
         irdir = ihelper.getc(img_path, absolute=True)
@@ -104,7 +130,7 @@ class TestIRodsHelper(object):
 
 
     def test_put_metaf (self):
-        ihelper = irh.IRodsHelper(self.defargs)
+        ihelper = IRodsHelper(self.defargs)
         assert ihelper is not None
 
         irff = ihelper.getf(self.irff_m13, absolute=True)
@@ -125,7 +151,7 @@ class TestIRodsHelper(object):
 
 
     def test_remove_metaf (self):
-        ihelper = irh.IRodsHelper(self.defargs)
+        ihelper = IRodsHelper(self.defargs)
         assert ihelper is not None
 
         irff = ihelper.getf(self.irff_m13, absolute=True)

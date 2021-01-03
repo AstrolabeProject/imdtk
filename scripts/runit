@@ -23,7 +23,7 @@
 # echo "----------------------------------------------------"
 # irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/HorseHead.fits -c DEMO -v
 # irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/JADES/SubDir -c DEMO -v
-# # irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/DC19 -c DEMO -v
+# irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/DC19 -c DEMO -v
 # echo "----------------------------------------------------"
 
 # echo "---- iRods FITS metadata to iRods file metadata ----"
