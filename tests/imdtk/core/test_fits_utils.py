@@ -1,12 +1,12 @@
 # Tests of the FITS specific utilities module.
 #   Written by: Tom Hicks. 4/7/2020.
-#   Last Modified: Update test_table_to_JSON, comment it out.
+#   Last Modified: Update tests for image/catalog files tests. Add additional tests for coverage.
 #
 import json
 import pytest
 
 from astropy import wcs
-# from astropy.table import Table
+from astropy.table import Table
 from astropy.time.core import Time
 from astropy.io import fits
 
@@ -17,10 +17,18 @@ from tests import TEST_DIR
 class TestFitsUtils(object):
 
     empty_tstfyl = "{}/resources/empty.txt".format(TEST_DIR)
+    hh_tstfyl = "{}/resources/HorseHead.fits".format(TEST_DIR)
     m13_tstfyl = "{}/resources/m13.fits".format(TEST_DIR)
     mdkeys_tstfyl = "{}/resources/mdkeys.txt".format(TEST_DIR)
     table_tstfyl = "{}/resources/small_table.fits".format(TEST_DIR)
     resources_tstdir = "{}/resources".format(TEST_DIR)
+
+
+    def test_fits_file_exist(self):
+        assert utils.fits_file_exists('/tmp/nosuchfile.txt') is False
+        assert utils.fits_file_exists('/tmp/nosuchfile.fits') is False
+        assert utils.fits_file_exists(self.m13_tstfyl) is True
+
 
 
     # TODO: update tests when better implementation is used (see tested code for details):
@@ -217,30 +225,83 @@ class TestFitsUtils(object):
 
 
 
-    def test_is_catalog_file(self):
+    def test_has_catalog_data_default(self):
+        """ Check default HDU of catalog file for catalog data. """
         with fits.open(self.table_tstfyl) as hdus:
-            assert utils.is_catalog_file(hdus) is True
+            assert utils.has_catalog_data(hdus) is True
 
 
-    def test_is_catalog_file_good_hdu(self):
+    def test_has_catalog_data_good_hdu(self):
+        """ Check explicit HDU of catalog file for catalog data. """
         with fits.open(self.table_tstfyl) as hdus:
-            assert utils.is_catalog_file(hdus, which_hdu=1) is True
+            assert utils.has_catalog_data(hdus, which_hdu=1) is True
 
 
-    def test_is_catalog_file_no_cat(self):
+    def test_has_catalog_data_nonex_hdu(self):
+        """ Check non-existant extension of image file for catalog data. """
         with fits.open(self.m13_tstfyl) as hdus:
-            assert utils.is_catalog_file(hdus) is False
+            assert utils.has_catalog_data(hdus) is False
 
 
-    def test_is_catalog_file_bad_low_hdu(self):
+    def test_has_catalog_data_bad_low_hdu(self):
+        """ Check primary HDU of catalog file for catalog data. """
         with fits.open(self.table_tstfyl) as hdus:
-            assert utils.is_catalog_file(hdus, which_hdu=0) is False
+            assert utils.has_catalog_data(hdus, which_hdu=0) is False
 
 
-    def test_is_catalog_file_bad_high_hdu(self):
+    def test_has_catalog_data_bad_high_hdu(self):
+        """ Check non-existant extension of catalog file for catalog data. """
         with fits.open(self.table_tstfyl) as hdus:
-            assert utils.is_catalog_file(hdus, which_hdu=2) is False
+            assert utils.has_catalog_data(hdus, which_hdu=2) is False
 
+
+    def test_has_catalog_data_mixed_primary(self):
+        """ Check primary of mixed image/cat file for image data. """
+        with fits.open(self.hh_tstfyl) as hdus:
+            assert utils.has_catalog_data(hdus, which_hdu=0) is False
+
+
+    def test_has_catalog_data_mixed(self):
+        """ Check catalog extension of mixed image/cat file for image data. """
+        with fits.open(self.hh_tstfyl) as hdus:
+            assert utils.has_catalog_data(hdus) is True
+
+
+
+    def test_has_image_data(self):
+        """ Check primary of catalog file for image data. """
+        with fits.open(self.table_tstfyl) as hdus:
+            assert utils.has_image_data(hdus) is False
+
+
+    def test_has_image_data_cat(self):
+        """ Check catalog extension of catalog file for image data. """
+        with fits.open(self.table_tstfyl) as hdus:
+            assert utils.has_image_data(hdus, which_hdu=1) is False
+
+
+    def test_has_image_data_good(self):
+        """ Check primary of image file for image data. """
+        with fits.open(self.m13_tstfyl) as hdus:
+            assert utils.has_image_data(hdus) is True
+
+
+    def test_has_image_data_bad_high_hdu(self):
+        """ Check non-existant extension of image file for image data. """
+        with fits.open(self.m13_tstfyl) as hdus:
+            assert utils.has_image_data(hdus, which_hdu=1) is False
+
+
+    def test_has_image_data_mixed(self):
+        """ Check primary (default) of mixed image/cat file for image data. """
+        with fits.open(self.hh_tstfyl) as hdus:
+            assert utils.has_image_data(hdus) is True
+
+
+    def test_has_image_data_mixed_cat(self):
+        """ Check catalog extension of mixed image/cat file for image data. """
+        with fits.open(self.hh_tstfyl) as hdus:
+            assert utils.has_image_data(hdus, which_hdu=1) is False
 
 
 
@@ -311,6 +372,36 @@ class TestFitsUtils(object):
         assert utils.lookup_pixtype('-32') == 'float'
         assert utils.lookup_pixtype(-64) == 'double'
         assert utils.lookup_pixtype('-64') == 'double'
+
+
+
+    def test_rows_from_data(self):
+        with fits.open(self.table_tstfyl) as hdus_list:
+            fits_rec = hdus_list[1].data
+            data = utils.rows_from_data(fits_rec)
+            assert data is not None
+            assert len(data) == 326         # number of data rows in test file
+
+
+
+    def test_get_table_meta_attribute(self):
+        with fits.open(self.table_tstfyl) as hdus_list:
+            table = Table.read(hdus_list, hdu=1)
+            meta = utils.get_table_meta_attribute(table)
+            print(meta)
+            assert meta is not None
+            assert len(meta) == 4
+            assert 'EXTNAME' in meta
+            assert 'DATE-HDU' in meta
+
+
+    def test_get_table_meta_attribute_nometa(self):
+        with fits.open(self.table_tstfyl) as hdus_list:
+            table = Table.read(hdus_list, hdu=1)
+            table.meta = None
+            meta = utils.get_table_meta_attribute(table)
+            assert meta is not None
+            assert meta == {}
 
 
 
