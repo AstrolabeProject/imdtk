@@ -1,7 +1,7 @@
 #
 # Class to extract a catalog data table from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 8/12/2020.
-#   Last Modified: Refactor file info gathering.
+#   Last Modified: Redo image/catalog files tests.
 #
 import os
 import sys
@@ -43,8 +43,8 @@ class FitsCatalogDataTask (IImdTask):
 
         try:
             with fits.open(fits_file) as hdus_list:
-                if (not fits_utils.is_catalog_file(hdus_list)):
-                    errMsg = "Skipping non-catalog FITS file '{}'".format(fits_file)
+                if (not fits_utils.has_catalog_data(hdus_list)):
+                    errMsg = f"Skipping FITS file '{fits_file}': no catalog in HDU 1"
                     raise errors.UnsupportedType(errMsg)
                 hdrs = fits_utils.get_header_fields(hdus_list, catalog_hdu, ignore_list)
                 cinfo = fits_utils.get_column_info(hdus_list, catalog_hdu)

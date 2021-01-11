@@ -1,7 +1,7 @@
 #
 # Class for extracting header information from FITS files.
 #   Written by: Tom Hicks. 5/23/2020.
-#   Last Modified: Refactor file info gathering.
+#   Last Modified: Redo image/catalog files tests.
 #
 import os
 import sys
@@ -42,8 +42,8 @@ class FitsImageMetadataTask (IImdTask):
 
         try:
             with fits.open(fits_file) as hdus_list:
-                if (fits_utils.is_catalog_file(hdus_list)):
-                    errMsg = "Skipping FITS catalog '{}'".format(fits_file)
+                if (not fits_utils.has_image_data(hdus_list)):
+                    errMsg = f"Skipping FITS file '{fits_file}': no image data in primary HDU"
                     raise errors.UnsupportedType(errMsg)
 
                 hdrs = fits_utils.get_header_fields(hdus_list, which_hdu, ignore_list)
