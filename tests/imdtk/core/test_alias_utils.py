@@ -1,12 +1,12 @@
 # Tests for the alias utilities module.
 #   Written by: Tom Hicks. 8/6/2020.
-#   Last Modified: Add tests for substitute_aliases.
+#   Last Modified: Update for test resources change.
 #
 import pytest
 
 import imdtk.exceptions as errors
 import imdtk.core.alias_utils as utils
-from tests import TEST_DIR
+from tests import TEST_RESOURCES_DIR
 
 
 class TestAliasUtils(object):
@@ -36,9 +36,9 @@ class TestAliasUtils(object):
         "DEC": "s_dec"
     }
 
-    aliases_tstfyl = "{}/resources/test-aliases.ini".format(TEST_DIR)
-    empty_tstfyl = "{}/resources/empty.txt".format(TEST_DIR)
-    nosuch_tstfyl = "/tests/resources/NOSUCHFILE"
+    aliases_tstfyl = f"{TEST_RESOURCES_DIR}/test-aliases.ini"
+    empty_tstfyl   = f"{TEST_RESOURCES_DIR}/empty.txt"
+    nosuch_tstfyl  = "/bad/path/NOSUCHFILE"
 
 
     def test_copy_aliased_headers_empty(self):
