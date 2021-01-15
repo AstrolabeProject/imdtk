@@ -1,6 +1,6 @@
 # Tests for the PostgreSQL interface module.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Update for refactoring of PG SQL modules.
+#   Last Modified: Update for adding hybrid to TAP tables.
 #
 import pytest
 
@@ -157,7 +157,7 @@ class TestPgSql(object):
         assert 'sia.eazy' in cats
         assert 'sia.jaguar' in cats
         assert 'sia.jwst' in cats
-        assert 'sia.hybrid' not in cats
+        assert 'sia.hybrid' in cats
         assert 'sia.columns' not in cats
         assert 'sia.keys' not in cats
         assert 'sia.schemas' not in cats
@@ -171,7 +171,7 @@ class TestPgSql(object):
         assert 'sia.eazy' in cats
         assert 'sia.jaguar' in cats
         assert 'sia.jwst' in cats
-        assert 'sia.hybrid' not in cats
+        assert 'sia.hybrid' in cats
         assert 'sia.columns' not in cats
         assert 'sia.keys' not in cats
         assert 'sia.schemas' not in cats
