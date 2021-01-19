@@ -1,7 +1,7 @@
 #
 # Utilities to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/11/2020.
-#   Last Modified: Fill new file size field, recalculate access_estsize as kB.
+#   Last Modified: Redo calc_wcs_coordinates to use CRVALs from header.
 #
 import imdtk.exceptions as errors
 import imdtk.core.fits_utils as fits_utils
@@ -92,7 +92,7 @@ def calc_spatial_resolution (calculations, filter_resolutions=None):
             calculations['s_resolution'] = resolution
 
 
-def calc_wcs_coordinates (wcs_info, calculations):
+def calc_wcs_coordinates (wcs_info, metadata, calculations):
     """
     Extract the WCS coordinates for the reference pixel of the current image file.
     Sets both s_ra and s_dec fields simultaneously when either field is processed.
@@ -102,16 +102,19 @@ def calc_wcs_coordinates (wcs_info, calculations):
     if (('s_ra' in calculations) and ('s_dec' in calculations)):  # avoid repetition
         return                          # exit out now
 
-    crval = list(wcs_info.wcs.crval)
     ctype = list(wcs_info.wcs.ctype)
 
-    if ((len(crval) > 1) and (len(ctype) > 1)):
+    crval1 = metadata.get('headers').get('CRVAL1') # REMOVE LATER
+    crval2 = metadata.get('headers').get('CRVAL2') # REMOVE LATER
+    print(f"CRVAL=({crval1}, {crval2})")           # REMOVE LATER
+
+    if (crval1 is not None and (crval2 is not None)):
         if (ctype[0].startswith('RA')):        # if CRVAL1 has the RA value
-            calculations['s_ra'] = crval[0]    # put CRVAL1 value into s_ra
-            calculations['s_dec'] = crval[1]   # put CRVAL2 value into s_dec
+            calculations['s_ra'] = crval1      # put CRVAL1 value into s_ra
+            calculations['s_dec'] = crval2     # put CRVAL2 value into s_dec
         elif (ctype[0].startswith('DEC')):     # else if CRVAL1 has the DEC value
-            calculations['s_dec'] = crval[0]   # put CRVAL1 value into s_dec
-            calculations['s_ra'] = crval[1]    # put CRVAL2 value into s_ra
+            calculations['s_dec'] = crval1     # put CRVAL1 value into s_dec
+            calculations['s_ra'] = crval2      # put CRVAL2 value into s_ra
         else:
             errMsg = "(calc_wcs_coords) Unable to assign RA/DEC axes from ctype={}".format(ctype)
             raise errors.ProcessingError(errMsg)

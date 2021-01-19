@@ -1,7 +1,7 @@
 #
 # Class to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/14/2020.
-#   Last Modified: Refactor to allow abstract calc and default setting methods.
+#   Last Modified: Update call to rewritten calc_wcs_coordinates.
 #
 import abc
 
@@ -112,7 +112,7 @@ class IObsCoreCalcTask (IImdTask):
         This version may call abstract methods which call down to the concrete methods.
         """
         if (field_name in ['s_ra', 's_dec']):
-            occ_utils.calc_wcs_coordinates(wcs_info, calculations)
+            occ_utils.calc_wcs_coordinates(wcs_info, metadata, calculations)
 
         elif (field_name in ['im_naxis1', 'im_naxis2']):
             if (calculations.get('s_xel1') is not None):
