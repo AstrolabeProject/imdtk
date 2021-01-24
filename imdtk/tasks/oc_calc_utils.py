@@ -1,7 +1,7 @@
 #
 # Utilities to calculate values for the ObsCore fields in a FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/11/2020.
-#   Last Modified: Cleanup leftover debugging.
+#   Last Modified: Test & convert CRVALs from header to floats.
 #
 import imdtk.exceptions as errors
 import imdtk.core.fits_utils as fits_utils
@@ -100,20 +100,30 @@ def calc_wcs_coordinates (wcs_info, metadata, calculations):
     overwrite current values for both s_ra and s_dec if that assumption is not valid.
     """
     if (('s_ra' in calculations) and ('s_dec' in calculations)):  # avoid repetition
-        return                          # exit out now
+        return                                 # exit out now
 
     ctype = list(wcs_info.wcs.ctype)
 
-    crval1 = metadata.get('headers').get('CRVAL1')
-    crval2 = metadata.get('headers').get('CRVAL2')
+    md = metadata.get('headers')
+    if (md is None):
+        return                                 # exit out now
 
+    crval1 = md.get('CRVAL1')
+    crval2 = md.get('CRVAL2')
     if (crval1 is not None and (crval2 is not None)):
-        if (ctype[0].startswith('RA')):        # if CRVAL1 has the RA value
-            calculations['s_ra'] = crval1      # put CRVAL1 value into s_ra
-            calculations['s_dec'] = crval2     # put CRVAL2 value into s_dec
-        elif (ctype[0].startswith('DEC')):     # else if CRVAL1 has the DEC value
-            calculations['s_dec'] = crval1     # put CRVAL1 value into s_dec
-            calculations['s_ra'] = crval2      # put CRVAL2 value into s_ra
+        try:
+            val1 = float(crval1)
+            val2 = float(crval2)
+        except ValueError:                  # on string to number conversion
+            errMsg = "(calc_wcs_coords) Unable to convert CRVAL1 or CRVAL2 to a number."
+            raise errors.ProcessingError(errMsg)
+
+        if (ctype[0].startswith('RA')):     # if CRVAL1 has the RA value
+            calculations['s_ra'] = val1     # put CRVAL1 value into s_ra
+            calculations['s_dec'] = val2    # put CRVAL2 value into s_dec
+        elif (ctype[0].startswith('DEC')):  # else if CRVAL1 has the DEC value
+            calculations['s_dec'] = val1    # put CRVAL1 value into s_dec
+            calculations['s_ra'] = val2     # put CRVAL2 value into s_ra
         else:
             errMsg = "(calc_wcs_coords) Unable to assign RA/DEC axes from ctype={}".format(ctype)
             raise errors.ProcessingError(errMsg)
