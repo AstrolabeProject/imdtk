@@ -1,6 +1,6 @@
 # Tests for the ObsCore Calculation utilities module.
 #   Written by: Tom Hicks. 7/16/2020.
-#   Last Modified: Test revised access_estsize and new file_size.
+#   Last Modified: Update tests of calc_wcs_coordinates. Fix: rename some missed tests.
 #
 import pytest
 from pytest import approx
@@ -17,8 +17,10 @@ class TestOcCalcUtils(object):
 
     # empty_tstfyl  = "{}/resources/empty.txt".format(TEST_DIR)
     # mdkeys_tstfyl = "{}/resources/mdkeys.txt".format(TEST_DIR)
-    table_tstfyl  = "{}/resources/small_table.fits".format(TEST_DIR)
-    m13_tstfyl    = "{}/resources/m13.fits".format(TEST_DIR)
+    table_tstfyl = "{}/resources/small_table.fits".format(TEST_DIR)
+    m13_tstfyl   = "{}/resources/m13.fits".format(TEST_DIR)
+
+    m13_meta = { 'headers': { 'CRVAL1': '250.4226', 'CRVAL2': '36.4602' }}
 
     filt_res = {
         'X': 1, 'YY': 2, 'ZZZ': 4
@@ -117,7 +119,7 @@ class TestOcCalcUtils(object):
         assert calcs.get('im_pixtype') == 'long'
 
 
-    def test_calc_pixtype_long(self):
+    def test_calc_pixtype_long_str(self):
         md = { 'headers': { 'BITPIX': '64' }}
         calcs = dict()
         utils.calc_pixtype(md, calcs)
@@ -135,7 +137,7 @@ class TestOcCalcUtils(object):
         assert calcs.get('im_pixtype') == 'double'
 
 
-    def test_calc_pixtype_double(self):
+    def test_calc_pixtype_double_str(self):
         md = { 'headers': { 'BITPIX': '-64' }}
         calcs = dict()
         utils.calc_pixtype(md, calcs)
@@ -150,15 +152,15 @@ class TestOcCalcUtils(object):
         utils.calc_pixtype(md, calcs)
         print(calcs)
         assert len(calcs) == 1
-        assert calcs.get('im_pixtype') is None
+        assert calcs.get('im_pixtype') == 'UNKNOWN'
 
-    def test_calc_pixtype_badpixval(self):
+    def test_calc_pixtype_nobitpix(self):
         md = { 'headers': { 'NAXIS': 2 }}
         calcs = dict()
         utils.calc_pixtype(md, calcs)
         print(calcs)
         assert len(calcs) == 0
-        assert calcs.get('im_pixtype') is None
+        assert calcs.get('im_pixtype') == None
 
 
     def test_calc_spatial_limits_simple(self):
@@ -224,7 +226,7 @@ class TestOcCalcUtils(object):
         calcs = dict()
         with fits.open(self.m13_tstfyl) as hdus:
             wcs_info = wcs.WCS(hdus[0].header)
-        utils.calc_wcs_coordinates(wcs_info, calcs)
+        utils.calc_wcs_coordinates(wcs_info, self.m13_meta, calcs)
         print(calcs)
         assert len(calcs) == 2
         assert 's_ra' in calcs
@@ -238,7 +240,7 @@ class TestOcCalcUtils(object):
         with fits.open(self.m13_tstfyl) as hdus:
             wcs_info = wcs.WCS(hdus[0].header)
         wcs_info.wcs.ctype = [ 'DEC', 'RA' ]    # reverse axes order
-        utils.calc_wcs_coordinates(wcs_info, calcs)
+        utils.calc_wcs_coordinates(wcs_info, self.m13_meta, calcs)
         print(calcs)
         assert len(calcs) == 2
         assert 's_ra' in calcs
@@ -251,19 +253,30 @@ class TestOcCalcUtils(object):
         calcs = { 's_ra': 140.2, 's_dec': 14.004 }
         with fits.open(self.m13_tstfyl) as hdus:
             wcs_info = wcs.WCS(hdus[0].header)
-            utils.calc_wcs_coordinates(wcs_info, calcs)
+            utils.calc_wcs_coordinates(wcs_info, self.m13_meta, calcs)
         assert len(calcs) == 2
         assert 's_ra' in calcs
         assert 's_dec' in calcs
 
 
-    def test_calc_wcs_coords_fail(self):
+    def test_calc_wcs_coords_badmd(self):
+        calcs = dict()
+        with fits.open(self.m13_tstfyl) as hdus:
+            wcs_info = wcs.WCS(hdus[0].header)
+        md = { 'headers': { 'NOCRVAL1': None, 'NOCRVAL2': None }}
+        utils.calc_wcs_coordinates(wcs_info, md, calcs)
+        assert len(calcs) == 0
+        assert 's_ra' not in calcs
+        assert 's_dec' not in calcs
+
+
+    def test_calc_wcs_coords_badaxes(self):
         calcs = dict()
         with fits.open(self.m13_tstfyl) as hdus:
             wcs_info = wcs.WCS(hdus[0].header)
         wcs_info.wcs.ctype = [ 'BAD', 'AXES' ]    # bad values for axes
         with pytest.raises(errors.ProcessingError):
-            utils.calc_wcs_coordinates(wcs_info, calcs)
+            utils.calc_wcs_coordinates(wcs_info, self.m13_meta, calcs)
         assert len(calcs) == 0
         assert 's_ra' not in calcs
         assert 's_dec' not in calcs
