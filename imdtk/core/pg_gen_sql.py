@@ -1,7 +1,7 @@
 #
 # Module to curate FITS data with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/24/2020.
-#   Last Modified: Rename method to gen_insert_row. Add gen_insert_rows method.
+#   Last Modified: Set priviledges for newly created tables. Replace most format strings.
 #
 from config.settings import DEC_ALIASES, ID_ALIASES, RA_ALIASES, SQL_FIELDS_HYBRID
 import imdtk.exceptions as errors
@@ -67,7 +67,7 @@ def check_missing_parameters (config, required=REQUIRED_DB_PARAMETERS):
     """
     missing = missing_entries(config, required)
     if (missing):
-        errMsg = "Missing required parameters: {}".format(missing)
+        errMsg = f"Missing required parameters: {missing}"
         raise errors.ProcessingError(errMsg)
 
 
@@ -100,7 +100,7 @@ def fits_format_to_sql (tform):
     if (sql_decl != UNSUPPORTED):
         return sql_decl
     else:
-        errMsg = "FITS data column format '{}' is not supported.".format(tform)
+        errMsg = f"FITS data column format '{tform}' is not supported."
         raise errors.ProcessingError(errMsg)
 
 
@@ -149,6 +149,7 @@ def gen_create_table_sql (args, dbconfig, column_names, column_formats):
     ddl.extend(gen_search_path_sql(argmix))
     ddl.extend(gen_table_sql(argmix, column_names, column_formats))
     ddl.extend(gen_table_indices_sql(argmix, column_names))
+    ddl.extend(gen_table_grants_sql(argmix))
 
     return ddl
 
@@ -180,10 +181,10 @@ def gen_hybrid_insert (dbconfig, datadict, table_name):
     if (num_keys == num_vals):              # must have a value for each key
         values.append(to_JSON(datadict, sort_keys=True))  # add the JSON for the metadata field
         place_holders = ', '.join(['%s' for v in values])
-        sql_fmt_str = "insert into {0}.{1} ({2}) values ({3});".format(schema_clean, table_clean, keys, place_holders)
+        sql_fmt_str = f"insert into {schema_clean}.{table_clean} ({keys}) values ({place_holders});"
         return (sql_fmt_str, values)
     else:                                   # there was a mismatch of keys and values
-        errMsg = "Unable to find values for all {} required fields: {}".format(num_keys, required)
+        errMsg = f"Unable to find values for all {num_keys} required fields: {required}"
         raise errors.ProcessingError(errMsg)
 
 
@@ -205,7 +206,7 @@ def gen_insert_row (dbconfig, datadict, table_name):
 
     values = list(datadict.values())
     place_holders = ', '.join(['%s' for v in values])
-    sql_fmt_str = "insert into {0}.{1} ({2}) values ({3});".format(schema_clean, table_clean, keys, place_holders)
+    sql_fmt_str = f"insert into {schema_clean}.{table_clean} ({keys}) values ({place_holders});"
     return (sql_fmt_str, values)
 
 
@@ -220,7 +221,7 @@ def gen_insert_rows (dbconfig, table_name):
     """
     schema_clean = clean_id(dbconfig.get('db_schema_name'))
     table_clean = clean_id(table_name)
-    return "insert into {0}.{1} values %s;".format(schema_clean, table_clean)
+    return f"insert into {schema_clean}.{table_clean} values %s;"
 
 
 def gen_search_path_sql (argmix):
@@ -232,7 +233,30 @@ def gen_search_path_sql (argmix):
     :return: a list of SQL statements to execute to add the configured schema to the search path.
     """
     schema_clean = clean_id(argmix.get('db_schema_name'))
-    return [ "SET search_path TO {}, public;".format(schema_clean) ]
+    return [ f"SET search_path TO {schema_clean}, public;" ]
+
+
+def gen_table_grants_sql (argmix):
+    """
+    Generate and return a list of SQL statements to set priviledges for a table.
+
+    :param argmix: dictionary containing both CLI and database arguments used by this method:
+                   catalog_table, db_schema_name, db_user, default_tap_user
+    :return: a list of SQL statements to execute to set priviledges for the table.
+    """
+    ddl = []                                # hold list of SQL statements to execute
+
+    cattbl_clean = clean_id(argmix.get('catalog_table'))
+    schema_clean = clean_id(argmix.get('db_schema_name'))
+    tapuser_clean  = clean_id(argmix.get('default_tap_user'))
+
+    granttap = f"GRANT SELECT ON TABLE {schema_clean}.{cattbl_clean} TO {tapuser_clean};"
+    ddl.append(granttap)
+
+    grantalq = f"GRANT SELECT ON TABLE {schema_clean}.{cattbl_clean} TO alquery;"
+    ddl.append(grantalq)
+
+    return ddl                              # return list of SQL statements to execute
 
 
 def gen_table_sql (argmix, column_names, column_formats):
@@ -254,10 +278,10 @@ def gen_table_sql (argmix, column_names, column_formats):
     dbuser_clean  = clean_id(argmix.get('db_user'))
     schema_clean = clean_id(argmix.get('db_schema_name'))
 
-    ctable = "CREATE TABLE {0}.{1} ({2});".format(schema_clean, cattbl_clean, columns)
+    ctable = f"CREATE TABLE {schema_clean}.{cattbl_clean} ({columns});"
     ddl.append(ctable)
 
-    altable = "ALTER TABLE {0}.{1} OWNER to {2};".format(schema_clean, cattbl_clean, dbuser_clean)
+    altable = f"ALTER TABLE {schema_clean}.{cattbl_clean} OWNER TO {dbuser_clean};"
     ddl.append(altable)
 
     return ddl                              # return list of SQL statements to execute
