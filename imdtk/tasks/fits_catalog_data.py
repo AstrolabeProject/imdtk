@@ -1,7 +1,7 @@
 #
 # Class to extract a catalog data table from a FITS file and output it as JSON.
 #   Written by: Tom Hicks. 8/12/2020.
-#   Last Modified: Redo image/catalog files tests.
+#   Last Modified: Manually process rows from astropy.table.Table.
 #
 import os
 import sys
@@ -49,10 +49,9 @@ class FitsCatalogDataTask (IImdTask):
                 hdrs = fits_utils.get_header_fields(hdus_list, catalog_hdu, ignore_list)
                 cinfo = fits_utils.get_column_info(hdus_list, catalog_hdu)
 
-                fits_rec = hdus_list[catalog_hdu].data
-                data = fits_utils.rows_from_data(fits_rec)
-                table = Table.read(hdus_list, hdu=catalog_hdu)
-                meta = fits_utils.get_table_meta_attribute(table)
+                cattbl = Table.read(hdus_list, hdu=catalog_hdu)
+                meta = fits_utils.get_table_meta_attribute(cattbl)
+                data = fits_utils.rows_from_table(cattbl)
 
         except OSError as oserr:
             errMsg = "Unable to read catalog data from FITS file '{}': {}.".format(fits_file, oserr)

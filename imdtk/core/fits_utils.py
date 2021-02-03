@@ -1,7 +1,7 @@
 #
 # Module to provide FITS utility functions for Astrolabe code.
 #   Written by: Tom Hicks. 1/26/2020.
-#   Last Modified: Redo image/catalog files tests.
+#   Last Modified: Add method to convert & listify rows from astropy.table.Table.
 #
 import fnmatch
 import os
@@ -232,7 +232,23 @@ def rows_from_data (data):
     Return a list of rows for the given astropy.io.fits.fitsrec.FITS_rec data.
     Each row in the returned list is a heterogeneous list of values for the row.
     """
-    return data.tolist()                    # use numpy.ndarray conversion function
+    return data.tolist()                    # uses numpy.ndarray conversion function
+
+
+def rows_from_table (table):
+    """
+    Return a list of rows (each a list) for the given astropy.table.Table.
+    Each row in the returned list is a heterogeneous list of values for the row.
+    NB: this is very inefficient because the values of each row must be turned    
+    """
+    # return [ row.__array__().tolist() for row in table ]
+    # return [ row.tolist() for row in table.iterrows() ]
+    # return [ list(row) for row in table.iterrows() ]
+    # vals = [ list(row) for row in table.iterrows() ]
+    vals = [ row.__array__().tolist() for row in table ]
+    print(f"VALS={vals[0]}")
+    print("type(vals)={}".format([type(v) for v in vals[0]]))
+    return vals
 
 
 # def table_to_JSON (table, orient='values'):
