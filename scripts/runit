@@ -15,8 +15,21 @@
 # fits_cat_md -v -ff /vos/catalogs/DC20/hd_all.cat.fits | cat_aliases -v -g
 # fits_cat_md -v -ff /vos/catalogs/DC20/hd_all.cat.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -v -oo -g
 
-fits_cat_mktbl_pipe -v -ff /vos/catalogs/DC20/hd_all.cat.fits -ct hd_all_dc20
-fits_cat_table_pipe -v -ff /vos/catalogs/DC20/hd_all.cat.fits -ct hd_all_dc20
+# fits_cat_data -ff /vos/catalogs/DC20/hd_all.cat.fits -g -v
+
+# fits_cat_mktbl_pipe -v -ff /vos/catalogs/small_table.fits -ct small_table2
+# fits_cat_table_pipe -v -ff /vos/catalogs/small_table.fits -ct small_table2
+
+# fits_cat_mktbl_pipe -v -ff /vos/catalogs/DC20/hd_all.cat.fits -ct test_hd
+# fits_cat_table_pipe -v -ff /vos/catalogs/DC20/hd_all.cat.fits -ct test_hd
+
+# fits_cat_mktbl_pipe -v -ff /vos/catalogs/small_table.fits -ct small_table
+# fits_cat_table_pipe -v -ff /vos/catalogs/small_table.fits -ct small_table
+
+# fits_cat_mktbl_pipe -v -ff /vos/catalogs/DC20/hd_all.cat.fits -ct hd_all_dc20
+# fits_cat_table_pipe -v -ff /vos/catalogs/DC20/hd_all.cat.fits -ct hd_all_dc20
+# fits_cat_mktbl_pipe -v -ff /vos/catalogs/DC20/hd.cat.fits -ct hd_dc20
+# fits_cat_table_pipe -v -ff /vos/catalogs/DC20/hd.cat.fits -ct hd_dc20
 
 
 # echo "============================================"
@@ -68,5 +81,18 @@ fits_cat_table_pipe -v -ff /vos/catalogs/DC20/hd_all.cat.fits -ct hd_all_dc20
 # irods_md_sink -if ./tests/resources/test-md-full.json -imd /iplant/home/hickst/testDir/empty3.txt --remove -v
 
 # fits_img_md -v -ff /vos/images/XTRAS/HorseHead.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/XTRAS/HorseHead.fits -g
+
+echo "============================================"
+echo "Catalog Data extraction:"
+echo "--------------------------------------------"
+# Smallest (~60k) data file (with meta):
+fits_cat_data -v -ff /vos/catalogs/small_table.fits -v -g
+# Medium sized (~1M) data file:
+fits_cat_data -v -ff /vos/catalogs/DC19/EAZY_results_summary_F356W.fits -v -g
+# Medium sized (~2.9M) data file:
+fits_cat_data -v -ff /vos/catalogs/DC19/Photometric_Catalog.F200W_kron_f80.fits -v -g
+# Largest (~4M) and most complex (nested fields) data file:
+fits_cat_data -v -ff /vos/catalogs/DC19/photometry_table_psf_matched_v5.0.fits -v -g
+
 
 # echo "============================================"
