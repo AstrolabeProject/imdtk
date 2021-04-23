@@ -3,7 +3,7 @@
 # pandas==1.1.4
 
 # configuration
-pyyaml==5.3.1
+pyyaml==5.4
 toml==0.10.2
 
 # iRods distributed filesystem
