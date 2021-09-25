@@ -20,7 +20,7 @@ Usage () {
    echo "   other-args = additional arguments to the $EP program."
 }
 
-IMG='imdtk:latest'
+IMG='astrolabe/imdtk'
 
 while :; do
     case "$1" in
