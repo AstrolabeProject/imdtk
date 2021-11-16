@@ -1,12 +1,13 @@
 # environment variables for Docker container run parameters.
 TOPLVL=${PWD}
 SCRIPTS=${TOPLVL}/scripts
+VOS=/usr/local/data/vos
 WORK=${TOPLVL}/work
 
 ARGS=
 APP_ROOT=/imdtk
-CONCATS=/vos/catalogs
-CONIMGS=/vos/images
+CONCATS=${VOS}/catalogs
+CONIMGS=${VOS}/images
 CONIRODS=${APP_ROOT}/.irods
 CONSCRIPTS=${APP_ROOT}/scripts
 COLLECTION=JWST

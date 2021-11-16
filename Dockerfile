@@ -6,8 +6,9 @@ ARG TESTS=notests
 
 ENV RUNNING_IN_CONTAINER True
 ENV INSTALL_PATH /imdtk
+ENV VOS /usr/local/data/vos
 
-RUN mkdir -p $INSTALL_PATH $INSTALL_PATH/scripts /vos/catalogs /vos/images /work
+RUN mkdir -p $INSTALL_PATH $INSTALL_PATH/scripts ${VOS}/catalogs ${VOS}/images /work
 
 WORKDIR $INSTALL_PATH
 

@@ -6,6 +6,7 @@
 #
 
 # echo "ARGS=$*"
+VOS=/usr/local/data/vos
 
 echo "============================================"
 echo "All tools: show versions"
@@ -111,149 +112,149 @@ pickle_sink --help
 # echo "============================================"
 # echo "Headers only, verbose, to STANDARD OUTPUT:"
 # echo "--------------------------------------------"
-# fits_img_md -v -ff /vos/images/JADES/goods_s_F356W_2018_08_30.fits
+# fits_img_md -v -ff $VOS/images/JADES/goods_s_F356W_2018_08_30.fits
 
 echo "============================================"
 echo "Headers only, named filename:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/JADES/goods_s_F356W_2018_08_30.fits -of /work/GOODS_F356W_headers.json
+fits_img_md -v -ff $VOS/images/JADES/goods_s_F356W_2018_08_30.fits -of /work/GOODS_F356W_headers.json
 
 echo "============================================"
 echo "Headers only, generated filename:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/JADES/goods_s_F356W_2018_08_30.fits -g
+fits_img_md -v -ff $VOS/images/JADES/goods_s_F356W_2018_08_30.fits -g
 
 echo "============================================"
 echo "Headers to img_aliases:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC19/F356W.fits | img_aliases -v -g
+fits_img_md -v -ff $VOS/images/DC19/F356W.fits | img_aliases -v -g
 
 echo "============================================"
 echo "Headers to img_aliases to fields_info:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC19/F356W.fits | img_aliases -v | fields_info -v -g
+fits_img_md -v -ff $VOS/images/DC19/F356W.fits | img_aliases -v | fields_info -v -g
 
 echo "============================================"
 echo "Headers to img_aliases to fields_info to jwst_oc_calc:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC19/F356W.fits -g
+fits_img_md -v -ff $VOS/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff $VOS/images/DC19/F356W.fits -g
 
 echo "============================================"
 echo "Headers to img_aliases to fields_info to jwst_oc_calc to miss_report:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC19/F356W.fits | miss_report -v -g
+fits_img_md -v -ff $VOS/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff $VOS/images/DC19/F356W.fits | miss_report -v -g
 
 echo "============================================"
 echo "Headers to img_aliases to fields_info to jwst_oc_calc to miss_report, specify COLLECTION:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -c TEST -ff /vos/images/DC19/F356W.fits | miss_report -v -g
+fits_img_md -v -ff $VOS/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -c TEST -ff $VOS/images/DC19/F356W.fits | miss_report -v -g
 
 echo "============================================"
 echo "Headers to img_aliases to fields_info to jwst_oc_calc to miss_report to no_op:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC19/F356W.fits | miss_report -v | no_op -v -g
+fits_img_md -v -ff $VOS/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff $VOS/images/DC19/F356W.fits | miss_report -v | no_op -v -g
 
 echo "============================================"
 echo "Headers to img_aliases to fields_info to jwst_oc_calc to miss_report to no_op to pickle_sink:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC19/F356W.fits | miss_report -v | no_op -v | pickle_sink -v -g
+fits_img_md -v -ff $VOS/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff $VOS/images/DC19/F356W.fits | miss_report -v | no_op -v | pickle_sink -v -g
 
 
 echo "============================================"
 echo "Pickle pipeline, generated filename:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC19/F356W.fits | miss_report -v | pickle_sink -v -g
+fits_img_md -v -ff $VOS/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff $VOS/images/DC19/F356W.fits | miss_report -v | pickle_sink -v -g
 
 echo "============================================"
 echo "Pickle pipeline, named filename:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC19/F356W.fits | miss_report -v | pickle_sink -v -of /work/DC_F356W.pickle
+fits_img_md -v -ff $VOS/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff $VOS/images/DC19/F356W.fits | miss_report -v | pickle_sink -v -of /work/DC_F356W.pickle
 
 echo "============================================"
 echo "Pickle pipeline, all DEBUG:"
 echo "--------------------------------------------"
-fits_img_md -d -ff /vos/images/DC19/F356W.fits | img_aliases -d | fields_info -d | jwst_oc_calc -d -ff /vos/images/DC19/F356W.fits | miss_report -d | pickle_sink -d -g
+fits_img_md -d -ff $VOS/images/DC19/F356W.fits | img_aliases -d | fields_info -d | jwst_oc_calc -d -ff $VOS/images/DC19/F356W.fits | miss_report -d | pickle_sink -d -g
 
 echo "============================================"
 echo "Pickle pipeline, all SILENT:"
-fits_img_md -ff /vos/images/DC19/F356W.fits | img_aliases | fields_info | jwst_oc_calc -ff /vos/images/DC19/F356W.fits | miss_report | pickle_sink -g
+fits_img_md -ff $VOS/images/DC19/F356W.fits | img_aliases | fields_info | jwst_oc_calc -ff $VOS/images/DC19/F356W.fits | miss_report | pickle_sink -g
 
 
 echo "============================================"
 echo "PG SQL pipeline, generated filename:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC19/F356W.fits | miss_report -v | jwst_pgsql_sink -v -oo -g
+fits_img_md -v -ff $VOS/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff $VOS/images/DC19/F356W.fits | miss_report -v | jwst_pgsql_sink -v -oo -g
 
 echo "============================================"
 echo "PG SQL pipeline, named filename:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC19/F356W.fits | miss_report -v | jwst_pgsql_sink -v -oo -of /work/testql.sql
+fits_img_md -v -ff $VOS/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff $VOS/images/DC19/F356W.fits | miss_report -v | jwst_pgsql_sink -v -oo -of /work/testql.sql
 
 echo "============================================"
 echo "PG SQL pipeline, all DEBUG:"
 echo "--------------------------------------------"
-fits_img_md -d -ff /vos/images/DC19/F356W.fits | img_aliases -d | fields_info -d | jwst_oc_calc -d -ff /vos/images/DC19/F356W.fits | miss_report -d | jwst_pgsql_sink -d -oo -g
+fits_img_md -d -ff $VOS/images/DC19/F356W.fits | img_aliases -d | fields_info -d | jwst_oc_calc -d -ff $VOS/images/DC19/F356W.fits | miss_report -d | jwst_pgsql_sink -d -oo -g
 
 echo "============================================"
 echo "PG SQL pipeline, all SILENT:"
-fits_img_md -ff /vos/images/DC19/F356W.fits | img_aliases | fields_info | jwst_oc_calc -ff /vos/images/DC19/F356W.fits | miss_report | jwst_pgsql_sink -oo -g
+fits_img_md -ff $VOS/images/DC19/F356W.fits | img_aliases | fields_info | jwst_oc_calc -ff $VOS/images/DC19/F356W.fits | miss_report | jwst_pgsql_sink -oo -g
 
 
 echo "============================================"
 echo "CSV pipeline, generated filename:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC19/F356W.fits | miss_report -v | csv_sink -v -g
+fits_img_md -v -ff $VOS/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff $VOS/images/DC19/F356W.fits | miss_report -v | csv_sink -v -g
 
 echo "============================================"
 echo "CSV pipeline, named filename:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC19/F356W.fits | miss_report -v | csv_sink -v -of /work/test.csv
+fits_img_md -v -ff $VOS/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff $VOS/images/DC19/F356W.fits | miss_report -v | csv_sink -v -of /work/test.csv
 
 echo "============================================"
 echo "CSV pipeline, all DEBUG:"
 echo "--------------------------------------------"
-fits_img_md -d -ff /vos/images/DC19/F356W.fits | img_aliases -d | fields_info -d | jwst_oc_calc -d -ff /vos/images/DC19/F356W.fits | miss_report -d | csv_sink -d -g
+fits_img_md -d -ff $VOS/images/DC19/F356W.fits | img_aliases -d | fields_info -d | jwst_oc_calc -d -ff $VOS/images/DC19/F356W.fits | miss_report -d | csv_sink -d -g
 
 echo "============================================"
 echo "CSV pipeline, all SILENT:"
-fits_img_md -ff /vos/images/DC19/F356W.fits | img_aliases | fields_info | jwst_oc_calc -ff /vos/images/DC19/F356W.fits | miss_report | csv_sink -g
+fits_img_md -ff $VOS/images/DC19/F356W.fits | img_aliases | fields_info | jwst_oc_calc -ff $VOS/images/DC19/F356W.fits | miss_report | csv_sink -g
 
 
 echo "============================================"
 echo "PG Hybrid pipeline, generated filename:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC19/F356W.fits | miss_report -v | jwst_pghyb_sink -v -oo -g
+fits_img_md -v -ff $VOS/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff $VOS/images/DC19/F356W.fits | miss_report -v | jwst_pghyb_sink -v -oo -g
 
 echo "============================================"
 echo "PG Hybrid pipeline, named filename:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff /vos/images/DC19/F356W.fits | miss_report -v | jwst_pghyb_sink -v -oo -of /work/hyb1.sql
+fits_img_md -v -ff $VOS/images/DC19/F356W.fits | img_aliases -v | fields_info -v | jwst_oc_calc -v -ff $VOS/images/DC19/F356W.fits | miss_report -v | jwst_pghyb_sink -v -oo -of /work/hyb1.sql
 
 echo "============================================"
 echo "PG Hybrid pipeline, all DEBUG:"
 echo "--------------------------------------------"
-fits_img_md -d -ff /vos/images/DC19/F356W.fits | img_aliases -d | fields_info -d | jwst_oc_calc -d -ff /vos/images/DC19/F356W.fits | miss_report -d | jwst_pghyb_sink -d -oo -g
+fits_img_md -d -ff $VOS/images/DC19/F356W.fits | img_aliases -d | fields_info -d | jwst_oc_calc -d -ff $VOS/images/DC19/F356W.fits | miss_report -d | jwst_pghyb_sink -d -oo -g
 
 echo "============================================"
 echo "PG Hybrid pipeline, all SILENT:"
-fits_img_md -ff /vos/images/DC19/F356W.fits | img_aliases | fields_info | jwst_oc_calc -ff /vos/images/DC19/F356W.fits | miss_report | jwst_pghyb_sink -oo -g
+fits_img_md -ff $VOS/images/DC19/F356W.fits | img_aliases | fields_info | jwst_oc_calc -ff $VOS/images/DC19/F356W.fits | miss_report | jwst_pghyb_sink -oo -g
 
 
 echo "============================================"
 echo "NO-OPs in various positions:"
 echo "--------------------------------------------"
-fits_img_md -v -ff /vos/images/DC19/F356W.fits | img_aliases -v | no_op -v -g
-fits_img_md -v -ff /vos/images/DC19/F356W.fits | no_op -v | img_aliases -v -g
-fits_img_md -d -ff /vos/images/DC19/F356W.fits | no_op -d | img_aliases -d -g
+fits_img_md -v -ff $VOS/images/DC19/F356W.fits | img_aliases -v | no_op -v -g
+fits_img_md -v -ff $VOS/images/DC19/F356W.fits | no_op -v | img_aliases -v -g
+fits_img_md -d -ff $VOS/images/DC19/F356W.fits | no_op -d | img_aliases -d -g
 
 
 echo "============================================"
 echo "Explicit intermediate file pipeline:"
 echo "--------------------------------------------"
-fits_img_md -d -ff /vos/images/DC19/F356W.fits -of /work/h.json
+fits_img_md -d -ff $VOS/images/DC19/F356W.fits -of /work/h.json
 img_aliases -d -if /work/h.json -of /work/ha.json
 fields_info -d -if /work/ha.json -of /work/hafi.json
-jwst_oc_calc -d -ff /vos/images/DC19/F356W.fits -if /work/hafi.json -of /work/hafijoc.json
+jwst_oc_calc -d -ff $VOS/images/DC19/F356W.fits -if /work/hafi.json -of /work/hafijoc.json
 miss_report -d -if /work/hafijoc.json -of /work/hafijocmr.json
 pickle_sink -d -if /work/hafijocmr.json -of /work/hafijocmrpk.pickle
 jwst_pgsql_sink -d -oo -if /work/hafijocmr.json -of /work/hafijocmrsql.sql
@@ -263,10 +264,10 @@ csv_sink -d -if /work/hafijocmr.json -of /work/hafijocmr.csv
 echo "============================================"
 echo "Explicit intermediate file pipeline with non-json names:"
 echo "--------------------------------------------"
-fits_img_md -d -ff /vos/images/DC19/F356W.fits -of /work/h1
+fits_img_md -d -ff $VOS/images/DC19/F356W.fits -of /work/h1
 img_aliases -d -if /work/h1 -of /work/ha1
 fields_info -d -if /work/ha1 -of /work/hafi1
-jwst_oc_calc -d -ff /vos/images/DC19/F356W.fits -if /work/hafi1 -of /work/hafijoc1
+jwst_oc_calc -d -ff $VOS/images/DC19/F356W.fits -if /work/hafi1 -of /work/hafijoc1
 miss_report -d -if /work/hafijoc1 -of /work/hafijocmr1
 pickle_sink -d -if /work/hafijocmr1 -of /work/hafijocmrpk1
 jwst_pgsql_sink -d -oo -if /work/hafijocmr1 -of /work/hafijocmrsql1
@@ -277,58 +278,58 @@ csv_sink -d -if /work/hafijocmr1 -of /work/hafijocmrcsv1
 echo "=================================================="
 echo "Exception catching on bad files (ERRORS EXPECTED):"
 echo "--------------------------------------------------"
-fits_img_md -ff /vos/images/BAD.fits -g -v
-fits_img_md -ff /vos/images/small_table.fits -g -v
-fits_img_md -ff /vos/images/NOSUCH.fits -g -v
-fits_img_md -ff /vos/images/m13.fits | pickle_sink -v
-fits_cat_md -ff /vos/images/BAD.fits -g -v
-fits_cat_md -ff /vos/images/m13.fits -g -v
-fits_cat_md -ff /vos/images/NOSUCH.fits -g -v
+fits_img_md -ff $VOS/images/BAD.fits -g -v
+fits_img_md -ff $VOS/images/small_table.fits -g -v
+fits_img_md -ff $VOS/images/NOSUCH.fits -g -v
+fits_img_md -ff $VOS/images/m13.fits | pickle_sink -v
+fits_cat_md -ff $VOS/images/BAD.fits -g -v
+fits_cat_md -ff $VOS/images/m13.fits -g -v
+fits_cat_md -ff $VOS/images/NOSUCH.fits -g -v
 
 
 echo "============================================"
 echo "Catalog Metadata:"
 echo "--------------------------------------------"
-# fits_cat_md -ff /vos/catalogs/DC19/EAZY_results_summary_F356W.fits -d -g
-fits_cat_md -ff /vos/catalogs/DC19/EAZY_results_summary_F356W.fits -v -g
-fits_cat_md -ff /vos/catalogs/DC19/EAZY_results_summary_F356W.fits -v -of /work/ez_cat.json
+# fits_cat_md -ff $VOS/catalogs/DC19/EAZY_results_summary_F356W.fits -d -g
+fits_cat_md -ff $VOS/catalogs/DC19/EAZY_results_summary_F356W.fits -v -g
+fits_cat_md -ff $VOS/catalogs/DC19/EAZY_results_summary_F356W.fits -v -of /work/ez_cat.json
 echo "--------------------------------------------"
-# fits_cat_md -ff /vos/catalogs/DC19/Photometric_Catalog.F356W_kron_f80.fits -d -g
-fits_cat_md -v -ff /vos/catalogs/DC19/Photometric_Catalog.F356W_kron_f80.fits -v -g
-fits_cat_md -ff /vos/catalogs/DC19/Photometric_Catalog.F356W_kron_f80.fits -v -of /work/photo_cat.json
+# fits_cat_md -ff $VOS/catalogs/DC19/Photometric_Catalog.F356W_kron_f80.fits -d -g
+fits_cat_md -v -ff $VOS/catalogs/DC19/Photometric_Catalog.F356W_kron_f80.fits -v -g
+fits_cat_md -ff $VOS/catalogs/DC19/Photometric_Catalog.F356W_kron_f80.fits -v -of /work/photo_cat.json
 
 
 echo "============================================"
 echo "Catalog Metadata with Aliases:"
 echo "--------------------------------------------"
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | cat_aliases -v -g
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | cat_aliases -v -of /work/small_table_fits_cat_md_alias.json
+fits_cat_md -v -ff $VOS/catalogs/small_table.fits | cat_aliases -v -g
+fits_cat_md -v -ff $VOS/catalogs/small_table.fits | cat_aliases -v -of /work/small_table_fits_cat_md_alias.json
 
 
 echo "============================================"
 echo "Catalog Make Table:"
 echo "--------------------------------------------"
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v -oo -g
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v -oo -of /work/small_table_fits_cat_mktbl.sql
+fits_cat_md -v -ff $VOS/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v -oo -g
+fits_cat_md -v -ff $VOS/catalogs/small_table.fits | fits_cat_mktbl -ct test_tbl -v -oo -of /work/small_table_fits_cat_mktbl.sql
 echo "--------------------------------------------"
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -v -oo -g
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -v -oo -of /work/small_table_fits_cat_mktbl_alias.sql
+fits_cat_md -v -ff $VOS/catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -v -oo -g
+fits_cat_md -v -ff $VOS/catalogs/small_table.fits | cat_aliases -v | fits_cat_mktbl -ct test_tbl -v -oo -of /work/small_table_fits_cat_mktbl_alias.sql
 echo "--------------------------------------------"
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct noalias -v -oo -g
-fits_cat_md -v -ff /vos/catalogs/small_table.fits | fits_cat_mktbl -ct noalias -v -oo -of /work/small_table_fits_cat_mktbl_noalias.sql
+fits_cat_md -v -ff $VOS/catalogs/small_table.fits | fits_cat_mktbl -ct noalias -v -oo -g
+fits_cat_md -v -ff $VOS/catalogs/small_table.fits | fits_cat_mktbl -ct noalias -v -oo -of /work/small_table_fits_cat_mktbl_noalias.sql
 
 
 # echo "============================================"
 # echo "Catalog Data extraction:"
 # echo "--------------------------------------------"
 # Smallest (~60k) data file (with meta):
-# fits_cat_data -v -ff /vos/catalogs/small_table.fits -v -g
+# fits_cat_data -v -ff $VOS/catalogs/small_table.fits -v -g
 # Medium sized (~1M) data file:
-# fits_cat_data -v -ff /vos/catalogs/DC19/EAZY_results_summary_F356W.fits -v -g
+# fits_cat_data -v -ff $VOS/catalogs/DC19/EAZY_results_summary_F356W.fits -v -g
 # Medium sized (~2.9M) data file:
-# fits_cat_data -v -ff /vos/catalogs/DC19/Photometric_Catalog.F200W_kron_f80.fits -v -g
+# fits_cat_data -v -ff $VOS/catalogs/DC19/Photometric_Catalog.F200W_kron_f80.fits -v -g
 # Largest (~4M) and most complex (nested fields) data file:
-# fits_cat_data -v -ff /vos/catalogs/DC19/photometry_table_psf_matched_v5.0.fits -v -g
+# fits_cat_data -v -ff $VOS/catalogs/DC19/photometry_table_psf_matched_v5.0.fits -v -g
 
 
 echo "======================================================="
@@ -336,12 +337,12 @@ echo "Single FITS metadata to PostgreSQL JWST table pipeline:"
 echo "-------------------------------------------------------"
 echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 echo "--------------------------------------------------"
-md_pgsql_pipe -ff /vos/images/BAD.fits -g -v
-md_pgsql_pipe -ff /vos/images/small_table.fits -g -v
-md_pgsql_pipe -ff /vos/images/NOSUCH.fits -g -v
+md_pgsql_pipe -ff $VOS/images/BAD.fits -g -v
+md_pgsql_pipe -ff $VOS/images/small_table.fits -g -v
+md_pgsql_pipe -ff $VOS/images/NOSUCH.fits -g -v
 echo "--------------------------------------------------"
-md_pgsql_pipe -ff /vos/images/DC19/F356W.fits -v -oo -g
-md_pgsql_pipe -ff /vos/images/DC19/F444W.fits -v -oo -g
+md_pgsql_pipe -ff $VOS/images/DC19/F356W.fits -v -oo -g
+md_pgsql_pipe -ff $VOS/images/DC19/F444W.fits -v -oo -g
 
 
 echo "==================================================================="
@@ -349,12 +350,12 @@ echo "Single FITS metadata to PostgreSQL/JSON hybrid JWST table pipeline:"
 echo "-------------------------------------------------------------------"
 echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 echo "--------------------------------------------------"
-md_pghyb_pipe -ff /vos/images/BAD.fits -g -v
-md_pghyb_pipe -ff /vos/images/small_table.fits -g -v
-md_pghyb_pipe -ff /vos/images/NOSUCH.fits -g -v
+md_pghyb_pipe -ff $VOS/images/BAD.fits -g -v
+md_pghyb_pipe -ff $VOS/images/small_table.fits -g -v
+md_pghyb_pipe -ff $VOS/images/NOSUCH.fits -g -v
 echo "--------------------------------------------------"
-md_pghyb_pipe -ff /vos/images/DC19/F356W.fits -v -oo -g
-md_pghyb_pipe -ff /vos/images/DC19/F444W.fits -v -oo -g
+md_pghyb_pipe -ff $VOS/images/DC19/F356W.fits -v -oo -g
+md_pghyb_pipe -ff $VOS/images/DC19/F444W.fits -v -oo -g
 
 
 # echo "========================================================="
@@ -362,16 +363,16 @@ md_pghyb_pipe -ff /vos/images/DC19/F444W.fits -v -oo -g
 # echo "---------------------------------------------------------"
 # mmd_pgsql_pipe -idir /tmp/nosuchdir -c JADES -oo -g -v
 # echo "--------------------------------------------"
-# mmd_pgsql_pipe -idir /vos/images/JADES -v
-# mmd_pgsql_pipe -idir /vos/images/JADES -c JADES -v
-# mmd_pgsql_pipe -idir /vos/images/JADES -oo -g -v
+# mmd_pgsql_pipe -idir $VOS/images/JADES -v
+# mmd_pgsql_pipe -idir $VOS/images/JADES -c JADES -v
+# mmd_pgsql_pipe -idir $VOS/images/JADES -oo -g -v
 # echo "--------------------------------------------"
-# mmd_pgsql_pipe -idir /vos/images/DC19 -v
-# mmd_pgsql_pipe -idir /vos/images/DC19 -c DC19 -v
-# mmd_pgsql_pipe -idir /vos/images/DC19 -oo -g -v
+# mmd_pgsql_pipe -idir $VOS/images/DC19 -v
+# mmd_pgsql_pipe -idir $VOS/images/DC19 -c DC19 -v
+# mmd_pgsql_pipe -idir $VOS/images/DC19 -oo -g -v
 # echo "--------------------------------------------"
-# mmd_pgsql_pipe -idir /vos/images -c TEST_ALL -v
-# mmd_pgsql_pipe -idir /vos/images -c TEST_ALL -oo -g -v
+# mmd_pgsql_pipe -idir $VOS/images -c TEST_ALL -v
+# mmd_pgsql_pipe -idir $VOS/images -c TEST_ALL -oo -g -v
 
 
 # echo "============================================"
@@ -379,16 +380,16 @@ md_pghyb_pipe -ff /vos/images/DC19/F444W.fits -v -oo -g
 # echo "--------------------------------------------"
 # mmd_pghyb_pipe -idir /tmp/nosuchdir -c JADES -oo -g -v
 # echo "--------------------------------------------"
-# mmd_pghyb_pipe -idir /vos/images/JADES -v
-# mmd_pghyb_pipe -idir /vos/images/JADES -c JADES -v
-# mmd_pghyb_pipe -idir /vos/images/JADES -oo -g -v
+# mmd_pghyb_pipe -idir $VOS/images/JADES -v
+# mmd_pghyb_pipe -idir $VOS/images/JADES -c JADES -v
+# mmd_pghyb_pipe -idir $VOS/images/JADES -oo -g -v
 # echo "--------------------------------------------"
-# mmd_pghyb_pipe -idir /vos/images/DC19 -v
-# mmd_pghyb_pipe -idir /vos/images/DC19 -c DC19 -v
-# mmd_pghyb_pipe -idir /vos/images/DC19 -oo -g -v
+# mmd_pghyb_pipe -idir $VOS/images/DC19 -v
+# mmd_pghyb_pipe -idir $VOS/images/DC19 -c DC19 -v
+# mmd_pghyb_pipe -idir $VOS/images/DC19 -oo -g -v
 # echo "--------------------------------------------"
-# mmd_pghyb_pipe -idir /vos/images -c TEST_ALL -v
-# mmd_pghyb_pipe -idir /vos/images -c TEST_ALL -oo -g -v
+# mmd_pghyb_pipe -idir $VOS/images -c TEST_ALL -v
+# mmd_pghyb_pipe -idir $VOS/images -c TEST_ALL -oo -g -v
 
 
 echo "=================================================="
