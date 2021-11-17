@@ -1,6 +1,6 @@
 # Tests for the iRods interface module.
 #   Written by: Tom Hicks. 10/20/20.
-#   Last Modified: Update for refactor of iRods default files/paths.
+#   Last Modified: Load test data root from test config settings.
 #
 import os
 import pytest
@@ -13,18 +13,18 @@ class TestIRodsHelper(object):
 
     defargs = { 'debug': True, 'verbose': True, 'TOOL_NAME': 'TestIrodsHelper' }
 
-    irff_m13 = '/iplant/home/hickst/vos/images/m13.fits'
+    irff_m13 = f"{TEST_IPLANT_DATA_ROOT}/images/m13.fits"
     hdr0_size_m13 = 2880                    # size of primary header
     hdr0_datasize_m13 = 181440              # size of primary data table
 
-    irff_hh = '/iplant/home/hickst/vos/images/HorseHead.fits'
+    irff_hh = f"{TEST_IPLANT_DATA_ROOT}/images/HorseHead.fits"
     hdr0_size_hh = 14400                    # size of primary header
     hdr0_datasize_hh = 1592640              # size of primary data table
     hdr1_size_hh = 2880                     # size of first extension
     hdr1_datasize_hh = 40320                # size of first extension data table
 
-    irff_BAD =      '/iplant/home/hickst/vos/images/BAD.fits'
-    irff_smallcat = '/iplant/home/hickst/vos/catalogs/small_table.fits'
+    irff_BAD =      f"{TEST_IPLANT_DATA_ROOT}/images/BAD.fits"
+    irff_smallcat = f"{TEST_IPLANT_DATA_ROOT}/catalogs/small_table.fits"
 
 
     def test_ctor_defaults (self):
@@ -108,7 +108,7 @@ class TestIRodsHelper(object):
 
 
     def test_getc_badpath (self):
-        bad_path = '/iplant/home/hickst/vos/images2'
+        bad_path = f"{TEST_IPLANT_DATA_ROOT}/images2"
 
         ihelper = IRodsHelper(self.defargs)
         assert ihelper is not None
@@ -118,7 +118,7 @@ class TestIRodsHelper(object):
 
 
     def test_getc (self):
-        img_path = '/iplant/home/hickst/vos/images'
+        img_path = f"{TEST_IPLANT_DATA_ROOT}/images"
 
         ihelper = IRodsHelper(self.defargs)
         assert ihelper is not None
