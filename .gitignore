@@ -96,6 +96,7 @@ RCS
 imdtk.code-workspace
 
 # Application specific directories
+/EXTRAS
 /images
 /imgtmp
 /catalogs
