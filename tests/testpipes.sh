@@ -7,6 +7,7 @@
 
 # echo "ARGS=$*"
 VOS=/usr/local/data/vos
+IPLANT_VOS=/iplant/home/hickst/vos
 
 echo "============================================"
 echo "All tools: show versions"
@@ -397,22 +398,22 @@ echo "iRods Image Metadata extraction:"
 echo "--------------------------------------------------"
 echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 echo "--------------------------------------------------"
-irods_fits_img_md -iff /iplant/home/hickst/vos/images/m14.fits -v
-irods_fits_img_md -iff /iplant/home/hickst/vos/images/BAD.fits -v
-irods_fits_img_md -iff /iplant/home/hickst/vos/images/m13.fits -v -hdu 1
-irods_fits_img_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v -hdu 1
-irods_fits_img_md -iff /iplant/home/hickst/vos/images/small_table.fits -v
-irods_fits_img_md -iff /iplant/home/hickst/vos/images/small_table.fits -v -hdu 1
+irods_fits_img_md -iff $IPLANT_VOS/images/m14.fits -v
+irods_fits_img_md -iff $IPLANT_VOS/images/BAD.fits -v
+irods_fits_img_md -iff $IPLANT_VOS/images/m13.fits -v -hdu 1
+irods_fits_img_md -iff $IPLANT_VOS/images/HorseHead.fits -v -hdu 1
+irods_fits_img_md -iff $IPLANT_VOS/images/small_table.fits -v
+irods_fits_img_md -iff $IPLANT_VOS/images/small_table.fits -v -hdu 1
 irods_fits_img_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -v -hdu 1
-irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC19/F444W.fits -v -hdu 1
-irods_fits_img_md -iff /iplant/home/hickst/vos/catalogs/DC19/EAZY_results_summary_F356W.fits -v
-irods_fits_img_md -iff /iplant/home/hickst/vos/catalogs/DC19/EAZY_results_summary_F356W.fits -v -hdu 0
-irods_fits_img_md -iff /iplant/home/hickst/vos/catalogs/DC19/EAZY_results_summary_F356W.fits -v -hdu 1
+irods_fits_img_md -iff $IPLANT_VOS/images/DC19/F444W.fits -v -hdu 1
+irods_fits_img_md -iff $IPLANT_VOS/catalogs/DC19/EAZY_results_summary_F356W.fits -v
+irods_fits_img_md -iff $IPLANT_VOS/catalogs/DC19/EAZY_results_summary_F356W.fits -v -hdu 0
+irods_fits_img_md -iff $IPLANT_VOS/catalogs/DC19/EAZY_results_summary_F356W.fits -v -hdu 1
 echo "--------------------------------------------------"
-irods_fits_img_md -iff /iplant/home/hickst/vos/images/m13.fits -g -v
-irods_fits_img_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -g -v
+irods_fits_img_md -iff $IPLANT_VOS/images/m13.fits -g -v
+irods_fits_img_md -iff $IPLANT_VOS/images/HorseHead.fits -g -v
 irods_fits_img_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -g -v
-irods_fits_img_md -iff /iplant/home/hickst/vos/images/DC19/F444W.fits -g -v
+irods_fits_img_md -iff $IPLANT_VOS/images/DC19/F444W.fits -g -v
 
 
 echo "=================================================="
@@ -420,27 +421,27 @@ echo "iRods Catalog Metadata extraction:"
 echo "--------------------------------------------------"
 echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 echo "--------------------------------------------------"
-irods_fits_cat_md -iff /iplant/home/hickst/vos/images/m14.fits -v
-irods_fits_cat_md -iff /iplant/home/hickst/vos/images/BAD.fits -v
-irods_fits_cat_md -iff /iplant/home/hickst/vos/images/m13.fits -v
-irods_fits_cat_md -iff /iplant/home/hickst/vos/images/m13.fits -v -chdu 1
-irods_fits_cat_md -iff /iplant/home/hickst/vos/images/m13.fits -v -chdu 0
-irods_fits_cat_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -v -chdu 0
-irods_fits_cat_md -iff /iplant/home/hickst/vos/images/small_table.fits -v -chdu 0
+irods_fits_cat_md -iff $IPLANT_VOS/images/m14.fits -v
+irods_fits_cat_md -iff $IPLANT_VOS/images/BAD.fits -v
+irods_fits_cat_md -iff $IPLANT_VOS/images/m13.fits -v
+irods_fits_cat_md -iff $IPLANT_VOS/images/m13.fits -v -chdu 1
+irods_fits_cat_md -iff $IPLANT_VOS/images/m13.fits -v -chdu 0
+irods_fits_cat_md -iff $IPLANT_VOS/images/HorseHead.fits -v -chdu 0
+irods_fits_cat_md -iff $IPLANT_VOS/images/small_table.fits -v -chdu 0
 irods_fits_cat_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -v
 irods_fits_cat_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -v -chdu 1
 irods_fits_cat_md -iff /iplant/home/hickst/astrolabe/data/w5/w5.fits -v -chdu 0
-irods_fits_cat_md -iff /iplant/home/hickst/vos/images/DC19/F444W.fits -v
-irods_fits_cat_md -iff /iplant/home/hickst/vos/images/DC19/F444W.fits -v -chdu 0
-irods_fits_cat_md -iff /iplant/home/hickst/vos/images/DC19/F444W.fits -v -chdu 1
-irods_fits_cat_md -iff /iplant/home/hickst/vos/catalogs/DC19/EAZY_results_summary_F356W.fits -v -chdu 0
+irods_fits_cat_md -iff $IPLANT_VOS/images/DC19/F444W.fits -v
+irods_fits_cat_md -iff $IPLANT_VOS/images/DC19/F444W.fits -v -chdu 0
+irods_fits_cat_md -iff $IPLANT_VOS/images/DC19/F444W.fits -v -chdu 1
+irods_fits_cat_md -iff $IPLANT_VOS/catalogs/DC19/EAZY_results_summary_F356W.fits -v -chdu 0
 echo "--------------------------------------------------"
-irods_fits_cat_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -g -v
-irods_fits_cat_md -iff /iplant/home/hickst/vos/images/HorseHead.fits -g -v -chdu 1
-irods_fits_cat_md -iff /iplant/home/hickst/vos/images/small_table.fits -g -v
-irods_fits_cat_md -iff /iplant/home/hickst/vos/images/small_table.fits -g -v -chdu 1
-irods_fits_cat_md -iff /iplant/home/hickst/vos/catalogs/DC19/EAZY_results_summary_F356W.fits -g -v
-irods_fits_cat_md -iff /iplant/home/hickst/vos/catalogs/DC19/EAZY_results_summary_F356W.fits -g -v -chdu 1
+irods_fits_cat_md -iff $IPLANT_VOS/images/HorseHead.fits -g -v
+irods_fits_cat_md -iff $IPLANT_VOS/images/HorseHead.fits -g -v -chdu 1
+irods_fits_cat_md -iff $IPLANT_VOS/images/small_table.fits -g -v
+irods_fits_cat_md -iff $IPLANT_VOS/images/small_table.fits -g -v -chdu 1
+irods_fits_cat_md -iff $IPLANT_VOS/catalogs/DC19/EAZY_results_summary_F356W.fits -g -v
+irods_fits_cat_md -iff $IPLANT_VOS/catalogs/DC19/EAZY_results_summary_F356W.fits -g -v -chdu 1
 
 
 echo "============================================================="
@@ -448,14 +449,14 @@ echo "Single FITS iRods metadata to PostgreSQL JWST table pipeline:"
 echo "-------------------------------------------------------------"
 echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 echo "--------------------------------------------------"
-irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images -v
-irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/BAD.fits -v
-irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/small_table.fits -v
+irods_md_pgsql_pipe -iff $IPLANT_VOS/images -v
+irods_md_pgsql_pipe -iff $IPLANT_VOS/images/BAD.fits -v
+irods_md_pgsql_pipe -iff $IPLANT_VOS/images/small_table.fits -v
 echo "-------------------------------------------------------------"
-irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/m13.fits -oo -g -v
-irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/HorseHead.fits -oo -g -v
-irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/DC19/F444W.fits -oo -g -v
-irods_md_pgsql_pipe -iff /iplant/home/hickst/vos/images/DC19/F356W.fits -oo -g -v
+irods_md_pgsql_pipe -iff $IPLANT_VOS/images/m13.fits -oo -g -v
+irods_md_pgsql_pipe -iff $IPLANT_VOS/images/HorseHead.fits -oo -g -v
+irods_md_pgsql_pipe -iff $IPLANT_VOS/images/DC19/F444W.fits -oo -g -v
+irods_md_pgsql_pipe -iff $IPLANT_VOS/images/DC19/F356W.fits -oo -g -v
 
 
 echo "========================================================================="
@@ -463,14 +464,14 @@ echo "Single FITS iRods metadata to PostgreSQL/JSON hybrid JWST table pipeline:"
 echo "-------------------------------------------------------------------------"
 echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 echo "--------------------------------------------------"
-irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images -v
-irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/BAD.fits -v
-irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/small_table.fits -v
+irods_md_pghyb_pipe -iff $IPLANT_VOS/images -v
+irods_md_pghyb_pipe -iff $IPLANT_VOS/images/BAD.fits -v
+irods_md_pghyb_pipe -iff $IPLANT_VOS/images/small_table.fits -v
 echo "-------------------------------------------------------------"
-irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/m13.fits -oo -g -v
-irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/HorseHead.fits -oo -g -v
-irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/DC19/F444W.fits -oo -g -v
-irods_md_pghyb_pipe -iff /iplant/home/hickst/vos/images/DC19/F356W.fits -oo -g -v
+irods_md_pghyb_pipe -iff $IPLANT_VOS/images/m13.fits -oo -g -v
+irods_md_pghyb_pipe -iff $IPLANT_VOS/images/HorseHead.fits -oo -g -v
+irods_md_pghyb_pipe -iff $IPLANT_VOS/images/DC19/F444W.fits -oo -g -v
+irods_md_pghyb_pipe -iff $IPLANT_VOS/images/DC19/F356W.fits -oo -g -v
 
 
 echo "==============================================================="
@@ -478,11 +479,11 @@ echo "Multiple FITS iRods metadata to PostgreSQL JWST table pipeline:"
 echo "---------------------------------------------------------------"
 echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 echo "--------------------------------------------------"
-irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/nosuchdir -v
+irods_mmd_pgsql_pipe -idir $IPLANT_VOS/nosuchdir -v
 echo "---------------------------------------------------------------"
 irods_mmd_pgsql_pipe -idir /iplant/home/hickst/resources -c EMPTY -v
-irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/JADES -oo -g -v
-irods_mmd_pgsql_pipe -idir /iplant/home/hickst/vos/images/DC19 -oo -g -v
+irods_mmd_pgsql_pipe -idir $IPLANT_VOS/images/JADES -oo -g -v
+irods_mmd_pgsql_pipe -idir $IPLANT_VOS/images/DC19 -oo -g -v
 
 
 echo "==========================================================================="
@@ -490,11 +491,11 @@ echo "Multiple FITS iRods metadata to hybrid PostgreSQL/JSON JWST table pipeline
 echo "---------------------------------------------------------------------------"
 echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 echo "--------------------------------------------------"
-irods_mmd_pghyb_pipe -idir /iplant/home/hickst/vos/nosuchdir -v
+irods_mmd_pghyb_pipe -idir $IPLANT_VOS/nosuchdir -v
 echo "---------------------------------------------------------------------------"
 irods_mmd_pghyb_pipe -idir /iplant/home/hickst/resources -c EMPTY -v
-irods_mmd_pghyb_pipe -idir /iplant/home/hickst/vos/images/JADES -oo -g -v
-irods_mmd_pghyb_pipe -idir /iplant/home/hickst/vos/images/DC19 -oo -g -v
+irods_mmd_pghyb_pipe -idir $IPLANT_VOS/images/JADES -oo -g -v
+irods_mmd_pghyb_pipe -idir $IPLANT_VOS/images/DC19 -oo -g -v
 
 
 echo "======================================================="
@@ -503,19 +504,19 @@ echo "-------------------------------------------------------"
 echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 echo "--------------------------------------------------"
 irods_md_irods_pipe -iff /iplant/home/hickst/nosuchdir -v
-irods_md_irods_pipe -iff /iplant/home/hickst/vos/images -v
-irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/BAD.fits -v
-irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/small_table.fits -v
-irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/m13.fits -imd /iplant/tmp/nosuchfile -v
+irods_md_irods_pipe -iff $IPLANT_VOS/images -v
+irods_md_irods_pipe -iff $IPLANT_VOS/images/BAD.fits -v
+irods_md_irods_pipe -iff $IPLANT_VOS/images/small_table.fits -v
+irods_md_irods_pipe -iff $IPLANT_VOS/images/m13.fits -imd /iplant/tmp/nosuchfile -v
 echo "-------------------------------------------------------------"
-irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/m13.fits -oo -g -v
-irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/HorseHead.fits -oo -g -v
-irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/DC19/F444W.fits -oo -g -v
-irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/DC19/F356W.fits -oo -g -v
+irods_md_irods_pipe -iff $IPLANT_VOS/images/m13.fits -oo -g -v
+irods_md_irods_pipe -iff $IPLANT_VOS/images/HorseHead.fits -oo -g -v
+irods_md_irods_pipe -iff $IPLANT_VOS/images/DC19/F444W.fits -oo -g -v
+irods_md_irods_pipe -iff $IPLANT_VOS/images/DC19/F356W.fits -oo -g -v
 # echo "-------------------------------------------------------------"
-# irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/HorseHead.fits -imd /iplant/home/hickst/testDir/empty2.txt -v
-# irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/JADES/SubDir/m13_2.fits -v
-# irods_md_irods_pipe -iff /iplant/home/hickst/vos/images/HorseHead.fits -v
+# irods_md_irods_pipe -iff $IPLANT_VOS/images/HorseHead.fits -imd /iplant/home/hickst/testDir/empty2.txt -v
+# irods_md_irods_pipe -iff $IPLANT_VOS/images/JADES/SubDir/m13_2.fits -v
+# irods_md_irods_pipe -iff $IPLANT_VOS/images/HorseHead.fits -v
 
 
 echo "=========================================================="
@@ -523,11 +524,11 @@ echo "Multiple FITS iRods metadata back to iRods files pipeline:"
 echo "----------------------------------------------------------"
 echo "BAD inputs or invalid arguments (ERRORS EXPECTED):"
 echo "--------------------------------------------------"
-irods_mmd_irods_pipe -idir /iplant/home/hickst/vos/nosuchdir -v
+irods_mmd_irods_pipe -idir $IPLANT_VOS/nosuchdir -v
 echo "---------------------------------------------------------------"
 irods_mmd_irods_pipe -idir /iplant/home/hickst/resources -c EMPTY -v
-irods_mmd_irods_pipe -idir /iplant/home/hickst/vos/images/JADES -oo -g -v
-irods_mmd_irods_pipe -idir /iplant/home/hickst/vos/images/DC19 -oo -g -v
+irods_mmd_irods_pipe -idir $IPLANT_VOS/images/JADES -oo -g -v
+irods_mmd_irods_pipe -idir $IPLANT_VOS/images/DC19 -oo -g -v
 
 
 echo "=================================================="
