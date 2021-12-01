@@ -1,6 +1,6 @@
 # Tests for the iRods interface module.
 #   Written by: Tom Hicks. 10/20/20.
-#   Last Modified: Load test data root from test config settings.
+#   Last Modified: Update to import TEST_IPLANT_DATA_ROOT.
 #
 import os
 import pytest
@@ -8,6 +8,8 @@ import pytest
 import imdtk.exceptions as errors
 from imdtk.core.irods_helper import IRodsHelper
 from irods.exception import CollectionDoesNotExist
+from tests import TEST_IPLANT_DATA_ROOT
+
 
 class TestIRodsHelper(object):
 

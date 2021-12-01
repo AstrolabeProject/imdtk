@@ -1,6 +1,6 @@
 # Tests for the iRods interface module.
 #   Written by: Tom Hicks. 11/5/20.
-#   Last Modified: Load test data root from test config settings.
+#   Last Modified: Update to import TEST_IPLANT_DATA_ROOT.
 #
 import os
 import pytest
@@ -11,7 +11,7 @@ import imdtk.exceptions as errors
 import imdtk.core.fits_irods_helper as firh
 
 from imdtk.core import FitsHeaderInfo
-from tests import TEST_DIR
+from tests import TEST_DIR, TEST_IPLANT_DATA_ROOT
 
 
 class TestFitsIRodsHelper(object):
