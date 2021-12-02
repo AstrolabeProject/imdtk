@@ -1,8 +1,10 @@
 #!/bin/bash
 #
 # Shell script to create and fill some different size catalog tables for testing.
-# This script is run inside the ImdTk Docker container, and uses the tools it contains.
+# This script is run inside the ImdTk Docker container, and uses the tools it contains:
+#   make runtep EP=scripts/make_catalog_tables.sh
 #
+VOS=/usr/local/data/vos
 
 # echo "ARGS=$*"
 
@@ -27,7 +29,7 @@ case "$SIZE" in
         exit 1 ;;
 esac
 
-fits_cat_mktbl_pipe -ff /catalogs/${CAT_NAME} -a /imdtk/config/jwst-cat-aliases.ini -ct ${TBL_NAME} -v
+fits_cat_mktbl_pipe -ff $VOS/catalogs/${CAT_NAME} -a /imdtk/config/jwst-cat-aliases.ini -ct ${TBL_NAME} -v
 if [ $? -eq 0 ]; then
-    fits_cat_table_pipe -ff /catalogs/${CAT_NAME} -ct ${TBL_NAME} -v
+    fits_cat_table_pipe -ff $VOS/catalogs/${CAT_NAME} -ct ${TBL_NAME} -v
 fi
