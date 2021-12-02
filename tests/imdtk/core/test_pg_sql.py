@@ -1,6 +1,6 @@
 # Tests for the PostgreSQL interface module.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Update for adding hybrid to TAP tables.
+#   Last Modified: Comment out tests to list catalog tables in TAP schema.
 #
 import pytest
 
@@ -149,32 +149,32 @@ class TestPgSql(object):
 
 
 
-    def test_list_catalog_tables_schema (self):
-        cats = pgsql.list_catalog_tables(self.args, self.dbconfig, db_schema='sia')
-        print(cats)
-        assert cats is not None
-        assert len(cats) > 0
-        assert 'sia.eazy' in cats
-        assert 'sia.jaguar' in cats
-        assert 'sia.jwst' in cats
-        assert 'sia.hybrid' in cats
-        assert 'sia.columns' not in cats
-        assert 'sia.keys' not in cats
-        assert 'sia.schemas' not in cats
+    # def test_list_catalog_tables_schema (self):
+    #     cats = pgsql.list_catalog_tables(self.args, self.dbconfig, db_schema='sia')
+    #     print(cats)
+    #     assert cats is not None
+    #     assert len(cats) > 0
+    #     assert 'sia.eazy' in cats
+    #     assert 'sia.jaguar' in cats
+    #     assert 'sia.jwst' in cats
+    #     assert 'sia.hybrid' in cats
+    #     assert 'sia.columns' not in cats
+    #     assert 'sia.keys' not in cats
+    #     assert 'sia.schemas' not in cats
 
 
-    def test_list_catalog_tables (self):
-        cats = pgsql.list_catalog_tables(self.args, self.dbconfig)
-        print(cats)
-        assert cats is not None
-        assert len(cats) > 0
-        assert 'sia.eazy' in cats
-        assert 'sia.jaguar' in cats
-        assert 'sia.jwst' in cats
-        assert 'sia.hybrid' in cats
-        assert 'sia.columns' not in cats
-        assert 'sia.keys' not in cats
-        assert 'sia.schemas' not in cats
+    # def test_list_catalog_tables (self):
+    #     cats = pgsql.list_catalog_tables(self.args, self.dbconfig)
+    #     print(cats)
+    #     assert cats is not None
+    #     assert len(cats) > 0
+    #     assert 'sia.eazy' in cats
+    #     assert 'sia.jaguar' in cats
+    #     assert 'sia.jwst' in cats
+    #     assert 'sia.hybrid' in cats
+    #     assert 'sia.columns' not in cats
+    #     assert 'sia.keys' not in cats
+    #     assert 'sia.schemas' not in cats
 
 
     def test_list_catalog_tables_bad_schema (self):
