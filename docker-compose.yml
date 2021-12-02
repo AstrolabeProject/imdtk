@@ -1,11 +1,9 @@
-version: '3.7'
+version: '3.9'
 
 services:
   imdtk:
     image: astrolabe/imdtk
-    deploy:
-      restart_policy:
-        condition: none
+    restart: "no"
     environment:
       PYTHONUNBUFFERED: 'true'
     volumes:
