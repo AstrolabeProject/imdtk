@@ -1,4 +1,3 @@
-# environment variables for Docker container run parameters.
 TOPLVL=${PWD}
 SCRIPTS=${TOPLVL}/scripts
 VOS=/usr/local/data/vos
@@ -18,15 +17,14 @@ NAME=imdtk
 NET=vos_net
 PROG=imdtk
 SHELL=/bin/bash
-STACK=vos
 TARG=/imdtk
-TSTIMG=imdtk:test
+TSTIMG=astrolabe/imdtk:test
 
 
-.PHONY: help bash cleancache cleanwork docker dockert down exec run runit runtc runte stop up watch
+.PHONY: help bash cleancache cleanwork docker dockert exec run runit runt1 runtc runtep stop watch
 
 help:
-	@echo "Make what? Try: bash, cleancache, cleanwork, docker, dockert, down, run, runit, runt1, runtc, runtep, stop, up, watch"
+	@echo "Make what? Try: bash, cleancache, cleanwork, docker, dockert, exec, run, runit, runt1, runtc, runtep, stop, watch"
 	@echo '  where:'
 	@echo '     help      - show this help message'
 	@echo '     bash      - run Bash in a ${PROG} container (for development)'
@@ -34,7 +32,6 @@ help:
 	@echo '     cleanwork - REMOVE ALL input and output files from the work directory!'
 	@echo '     docker    - build a production container image'
 	@echo '     dockert   - build a container image with tests (for testing)'
-	@echo '     down      - stop the ${PROG} container, which is running in the VOS stack'
 	@echo '     exec      - exec into running development server (CLI arg: NAME=containerID)'
 	@echo '     run       - start a container (CLI: ARGS=args)'
 	@echo '     runit     - run the runit program in a test container'
@@ -42,7 +39,6 @@ help:
 	@echo '     runtc     - run all tests and code coverage in a container'
 	@echo '     runtep    - run a test container with alternate entrypoint (CLI: EP=entrypoint, ARGS=args)'
 	@echo '     stop      - stop a running container'
-	@echo '     up        - start a ${PROG} container, running in the VOS stack'
 	@echo '     watch     - show logfile for a running container'
 
 bash:
@@ -60,9 +56,6 @@ docker:
 dockert:
 	docker build --build-arg TESTS=tests -t ${TSTIMG} .
 
-down:
-	docker stack rm ${STACK}
-
 exec:
 	docker cp .bash_env ${NAME}:${ENVLOC}
 	docker exec -it ${NAME} ${EP}
@@ -73,20 +66,17 @@ run:
 runit:
 	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CONCATS}:${CONCATS}:ro -v ${CONIMGS}:${CONIMGS}:ro -v ${SCRIPTS}:${CONSCRIPTS} -v ${HOME}/.irods:${CONIRODS}:ro -v ${WORK}:/work ${TSTIMG} ${ARGS}
 
-runtep:
-	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CONCATS}:${CONCATS}:ro -v ${CONIMGS}:${CONIMGS}:ro -v ${SCRIPTS}:${CONSCRIPTS} -v ${HOME}/.irods:${CONIRODS}:ro -v ${WORK}:/work --entrypoint ${EP} ${TSTIMG} ${ARGS}
-
 runt1:
 	docker run -it --rm --network ${NET} --name ${NAME} -v ${CONCATS}:${CONCATS}:ro -v ${CONIMGS}:${CONIMGS}:ro -v ${HOME}/.irods:${CONIRODS}:ro --entrypoint pytest ${TSTIMG} -vv ${TARG}
 
 runtc:
 	docker run -it --rm --network ${NET} --name ${NAME} -v ${CONCATS}:${CONCATS}:ro -v ${CONIMGS}:${CONIMGS}:ro -v ${HOME}/.irods:${CONIRODS}:ro --entrypoint pytest ${TSTIMG} -vv --cov-report term-missing --cov ${TARG}
 
+runtep:
+	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CONCATS}:${CONCATS}:ro -v ${CONIMGS}:${CONIMGS}:ro -v ${SCRIPTS}:${CONSCRIPTS} -v ${HOME}/.irods:${CONIRODS}:ro -v ${WORK}:/work --entrypoint ${EP} ${TSTIMG} ${ARGS}
+
 stop:
 	docker stop ${NAME}
-
-up:
-	docker stack deploy -c docker-compose.yml ${STACK}
 
 watch:
 	docker logs -f ${NAME}
