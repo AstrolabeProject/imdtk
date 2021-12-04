@@ -1,20 +1,20 @@
-# numpy==1.21.2
+# numpy==1.21.4
 # numpyencoder==0.3.0
-# pandas==1.3.3
+# pandas==1.3.4
 
 # configuration
-pyyaml==5.4.1
+pyyaml==6.0
 toml==0.10.2
 
 # iRods distributed filesystem
 python-irodsclient==1.0.0
 
 # Astronomical processing
-astropy==4.3.1
+astropy==5.0
+
+# Database
+psycopg2-binary==2.9.2
 
 # Testing
 pytest==6.2.5
-pytest-cov==2.12.1
-
-# Database
-psycopg2-binary==2.9.1
+pytest-cov==3.0.0
