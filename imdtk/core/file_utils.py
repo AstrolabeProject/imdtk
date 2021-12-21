@@ -1,24 +1,31 @@
 #
 # Module to provide general file utility functions.
 #   Written by: Tom Hicks. 1/29/2020.
-#   Last Modified: Update is_acceptable_filename.
+#   Last Modified: Add method to get md5 hash of a file. Canonicalize method doc strings.
 #
 import os
+import hashlib
 
 def filename_core (apath):
-    """ Return the core filename string without the path prefix or extension. """
+    """
+    Return the core filename string without the path prefix or extension.
+    """
     if (apath is None):                     # sanity check
         return ''
     return os.path.basename(os.path.splitext(apath)[0])
 
 
 def full_path (apath):
-    """ Full expand the given path into an absolute path. Supports the home ('~') shortcut. """
+    """
+    Full expand the given path into an absolute path. Supports the home ('~') shortcut.
+    """
     return os.path.abspath(os.path.normpath(os.path.expanduser(apath)))
 
 
 def gather_file_info (apath):
-    """ Return a dictionary of common file information given a filepath. """
+    """
+    Return a dictionary of common file information given a filepath.
+    """
     file_info = dict()
     file_info['file_name'] = os.path.basename(apath)
     file_info['file_path'] = os.path.abspath(apath)
@@ -27,7 +34,9 @@ def gather_file_info (apath):
 
 
 def gen_file_paths (root_dir):
-    """ Generator to yield all files in the file tree under the given root directory. """
+    """
+    Generator to yield all files in the file tree under the given root directory.
+    """
     for root, dirs, files in os.walk(root_dir, followlinks=True):
         for fyl in files:
             file_path = os.path.join(root, fyl)
@@ -35,41 +44,66 @@ def gen_file_paths (root_dir):
 
 
 def good_dir_path (apath, writeable=False):
-    """ Tell whether the given path points to a readable (and, optionally, writeable) directory
-        or not. Follows symbolic links. """
+    """
+    Tell whether the given path points to a readable (and, optionally, writeable)
+    directory or not. Follows symbolic links.
+    """
     return (apath and os.path.isdir(apath) and
             is_readable(apath) and
             ((not writeable) or is_writable(apath)) )
 
 
 def good_file_path (apath, writeable=False):
-    """ Tell whether the given path points to a readable (and, optionally, writeable) file
-        or not. Follows symbolic links. """
+    """
+    Tell whether the given path points to a readable (and, optionally, writeable)
+    file or not. Follows symbolic links.
+    """
     return (apath and os.path.isfile(apath) and
             is_readable(apath) and
             ((not writeable) or is_writable(apath)) )
 
 
 def is_acceptable_filename (filename, extents):
-    """ Tell whether the given filename has one of the given set of accepatable
-        file extensions or not. """
+    """
+    Tell whether the given filename has one of the given set of accepatable
+    file extensions or not.
+    """
     if (filename is None):                  # sanity check
         return False
     return (filename.endswith(tuple(extents)))
 
 
 def is_readable (apath):
-    """ Tell whether given path points to a readable file or directory. Follows symbolic links. """
+    """
+    Tell whether given path points to a readable file or directory.
+    Follows symbolic links.
+    """
     return (apath and os.access(apath, os.R_OK))
 
 
 def is_writable (apath):
-    """ Tell whether given path points to a writable file or directory. Follows symbolic links. """
+    """
+    Tell whether given path points to a writable file or directory.
+    Follows symbolic links.
+    """
     return (apath and os.access(apath, os.W_OK))
 
 
+def md5_hash_of_file (apath):
+    """
+    Return an MD5 hash of the file at the given filepath.
+    """
+    md5_hash = hashlib.md5()
+    with open(apath, "rb") as fyl:
+        for byte_block in iter(lambda: fyl.read(8192), b""):
+            md5_hash.update(byte_block)
+    return md5_hash.hexdigest()
+
+
 def path_has_dots (apath):
-    """ Tell whether the given path contains '.' or '..' """
+    """
+    Tell whether the given path contains '.' or '..'
+    """
     if (apath is None):                     # sanity check
         return False
     pieces = apath.split(os.sep)
@@ -77,12 +111,16 @@ def path_has_dots (apath):
 
 
 def validate_file_path (apath, file_extents, writable=False):
-    """ Tell whether the named file is acceptable and is readable (and writable). """
+    """
+    Tell whether the named file is acceptable and is readable (and writable).
+    """
     return (is_acceptable_filename(apath, file_extents) and good_file_path(apath, writable))
 
 
 def validate_path_strings (pathstrings, file_extents):
-    """ Return a (possibly empty) list of valid file/directory paths. """
+    """
+    Return a (possibly empty) list of valid file/directory paths.
+    """
     path_list = []
     for pathname in pathstrings:
         if (validate_file_path(pathname, file_extents)):
