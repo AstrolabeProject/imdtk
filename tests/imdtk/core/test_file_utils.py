@@ -1,6 +1,6 @@
 # Tests for the file utilities module.
 #   Written by: Tom Hicks. 5/22/2020.
-#   Last Modified: Add test for gather_file_info.
+#   Last Modified: Add tests for md5_hash_of_file.
 #
 import os
 from pathlib import Path
@@ -179,6 +179,13 @@ class TestFileUtils(object):
         assert utils.is_acceptable_filename('YYY.EXE', FITS_EXTS) is False
         assert utils.is_acceptable_filename('BAD.ONE', FITS_EXTS) is False
         assert utils.is_acceptable_filename('BAD.ONE.gz', FITS_EXTS) is False
+
+
+    def test_md5_hash_of_file(self):
+        assert utils.md5_hash_of_file(self.empty_tstfyl) == 'd41d8cd98f00b204e9800998ecf8427e'
+        assert utils.md5_hash_of_file(self.m13_tstfyl) == 'fe57e89d674e1e52071f674c60974968'
+        assert utils.md5_hash_of_file(self.table_tstfyl) == '810a83a753b0095b16762ad8cffa6851'
+        assert utils.md5_hash_of_file(self.mdkeys_tstfyl) == '73c357058bf6d34e72bd9c374d7df528'
 
 
     def test_path_has_dots(self):
