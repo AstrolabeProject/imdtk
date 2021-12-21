@@ -12,19 +12,24 @@ CONSCRIPTS=${APP_ROOT}/scripts
 COLLECTION=JWST
 ENVLOC=/etc/trhenv
 EP=/bin/bash
-IMG=astrolabe/imdtk
+IGNORE='tests/imdtk/core/*irods_helper.py'
+IMG=astrolabe/imdtk:imgmd
 NAME=imdtk
 NET=vos_net
+ONLY=
 PROG=imdtk
+SCOPE=imdtk
 SHELL=/bin/bash
 TARG=/imdtk
+TESTS=tests
 TSTIMG=astrolabe/imdtk:test
 
 
-.PHONY: help bash cleancache cleanwork docker dockert exec run runit runt1 runtc runtep stop watch
+.PHONY: help bash cleancache cleanwork docker dockert exec run runit runt1 runtc runtep stop testall test1 tests watch
 
 help:
-	@echo "Make what? Try: bash, cleancache, cleanwork, docker, dockert, exec, run, runit, runt1, runtc, runtep, stop, watch"
+	@echo "Make what? Try: bash, cleancache, cleanwork, docker, dockert, exec, run, runit, runt1, runtc, runtep,"
+	@echo "                stop, testall, test1, tests, watch"
 	@echo '  where:'
 	@echo '     help      - show this help message'
 	@echo '     bash      - run Bash in a ${PROG} container (for development)'
@@ -39,6 +44,9 @@ help:
 	@echo '     runtc     - run all tests and code coverage in a container'
 	@echo '     runtep    - run a test container with alternate entrypoint (CLI: EP=entrypoint, ARGS=args)'
 	@echo '     stop      - stop a running container'
+	@echo '     testall   - run ALL tests but stop at the first failure (CLI: TESTS=test_module)'
+	@echo '     test1     - run tests with a single name prefix (CLI: ONLY=tests_name_prefix)'
+	@echo '     tests     - run one or all unit tests in the tests directory (CLI: TESTS=test_module)'
 	@echo '     watch     - show logfile for a running container'
 
 bash:
@@ -77,6 +85,15 @@ runtep:
 
 stop:
 	docker stop ${NAME}
+
+testall:
+	pytest -vv -x ${TESTS} ${ARGS} --cov-report term-missing --cov=${SCOPE}
+
+test1:
+	pytest -vv ${TESTS} -k ${ONLY} --cov-report term-missing --cov=${SCOPE}
+
+tests:
+	pytest -vv --ignore-glob ${IGNORE} ${TESTS} ${ARGS} --cov-report term-missing --cov=${SCOPE}
 
 watch:
 	docker logs -f ${NAME}
