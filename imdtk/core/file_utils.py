@@ -1,7 +1,7 @@
 #
 # Module to provide general file utility functions.
 #   Written by: Tom Hicks. 1/29/2020.
-#   Last Modified: Add method to get md5 hash of a file. Canonicalize method doc strings.
+#   Last Modified: Enlarge md5sum read block size in attempt to speed it up.
 #
 import os
 import hashlib
@@ -30,6 +30,7 @@ def gather_file_info (apath):
     file_info['file_name'] = os.path.basename(apath)
     file_info['file_path'] = os.path.abspath(apath)
     file_info['file_size'] = os.path.getsize(apath)
+    file_info['md5sum'] = md5_hash_of_file(apath)
     return file_info
 
 
@@ -93,9 +94,10 @@ def md5_hash_of_file (apath):
     """
     Return an MD5 hash of the file at the given filepath.
     """
+    read_block_size = 8388608   # 8 meg
     md5_hash = hashlib.md5()
     with open(apath, "rb") as fyl:
-        for byte_block in iter(lambda: fyl.read(8192), b""):
+        for byte_block in iter(lambda: fyl.read(read_block_size), b""):
             md5_hash.update(byte_block)
     return md5_hash.hexdigest()
 

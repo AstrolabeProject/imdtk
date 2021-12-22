@@ -1,6 +1,6 @@
 # Tests for the metata utilities module.
 #   Written by: Tom Hicks. 7/16/2020.
-#   Last Modified: Add test for get_data.
+#   Last Modified: Update for is_public boolean.
 #
 import imdtk.tasks.metadata_utils as utils
 
@@ -52,7 +52,7 @@ class TestMetadataUtils(object):
             "obs_creator_name": "JWST",
             "im_naxes": 2,
             "im_nsubarrays": 1,
-            "is_public": 0,
+            "is_public": False,
             "equinox": 2000.0,
             "radesys": "ICRS"
         },
@@ -66,7 +66,7 @@ class TestMetadataUtils(object):
             "dataproduct_type": "image",
             "s_ra": 53.157662568,
             "s_dec": -27.8075199236,
-            "is_public": 0
+            "is_public": False
         }
     }
 

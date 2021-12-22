@@ -1,6 +1,6 @@
 # Tests for the file utilities module.
 #   Written by: Tom Hicks. 5/22/2020.
-#   Last Modified: Add tests for md5_hash_of_file.
+#   Last Modified: Update for image only database.
 #
 import os
 from pathlib import Path
@@ -44,7 +44,7 @@ class TestFileUtils(object):
         finfo = utils.gather_file_info(self.empty_tstfyl)
         assert finfo is not None
         assert finfo != {}
-        assert len(finfo) == 3
+        assert len(finfo) == 4
         assert finfo.get('file_size') == 0
 
 

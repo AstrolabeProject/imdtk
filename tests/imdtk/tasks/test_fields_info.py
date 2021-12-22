@@ -1,6 +1,6 @@
 # Tests for the FieldsInfoTask.
 #   Written by: Tom Hicks. 8/8/2020.
-#   Last Modified: Initial creation: test non-interface methods only.
+#   Last Modified: Update for is_public boolean.
 #
 import pytest
 from pytest import approx
@@ -66,7 +66,7 @@ class TestFieldsInfoTask(object):
         assert 'equinox' in defaults
         assert defaults.get('equinox') == 2000.0
         assert 'is_public' in defaults
-        assert defaults.get('is_public') == 0
+        assert defaults.get('is_public') is False
 
         assert 'filter' not in defaults
         assert 'target_name' not in defaults

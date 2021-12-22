@@ -1,7 +1,7 @@
 #
 # Module to interact with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Add insert_rows_sql method. Implement fill_table* methods. Update for rename to gen_insert_row.
+#   Last Modified: Update for image only database.
 #
 import sys
 
@@ -152,7 +152,7 @@ def insert_hybrid_row_str (dbconfig, datadict, table_name):
     """
     Return an SQL string to insert a data dictionary into the named hybrid SQL/JSON table.
     Returns None if the given data dictionary does not contain the field names required
-    for the hybrid table (including the 'metadata' field).
+    for the hybrid table (including the 'md' (metadata) field).
     """
     (sql_fmt_str, sql_values) = pg_gen.gen_hybrid_insert(dbconfig, datadict, table_name)
     return sql_as_string(dbconfig, sql_fmt_str, sql_values)
@@ -197,27 +197,6 @@ def insert_rows_sql (dbconfig, sql_query_string, data_rows):
                 execute_values(cursor, sql_query_string, data_rows)
     finally:
         conn.close()
-
-
-def list_catalog_tables (args, dbconfig, db_schema=None):
-    """
-    List available image catalogs from the VOS database.
-
-    :param args: dictionary containing context arguments used by this method: debug
-    :param dbconfig: dictionary containing database parameters used by this method: db_uri
-    :return a list of catalog names from the TAP schema "tables" table for the selected schema.
-    """
-    db_schema_name = db_schema or dbconfig.get('db_schema_name')
-
-    catq = "SELECT table_name FROM tap_schema.tables WHERE schema_name = (%s);"
-
-    rows = fetch_rows(dbconfig, catq, [db_schema_name])
-    catalogs = [row[0] for row in rows]     # extract names from row tuples
-
-    if (args.get('debug')):
-        print("(list_catalog_tables): => '{}'".format(catalogs), file=sys.stderr)
-
-    return catalogs
 
 
 def list_table_names (args, dbconfig, db_schema=None):

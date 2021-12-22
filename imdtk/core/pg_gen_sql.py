@@ -1,7 +1,7 @@
 #
 # Module to curate FITS data with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/24/2020.
-#   Last Modified: Set priviledges for newly created tables. Replace most format strings.
+#   Last Modified: Update for image only database.
 #
 from config.settings import DEC_ALIASES, ID_ALIASES, RA_ALIASES, SQL_FIELDS_HYBRID
 import imdtk.exceptions as errors
@@ -161,7 +161,7 @@ def gen_hybrid_insert (dbconfig, datadict, table_name):
     so return a tuple of an INSERT template string and a sequence of values.
 
     Returns (None, None) if the given data dictionary does not contain the field
-    names required for the hybrid table (including the 'metadata' field).
+    names required for the hybrid table (including the 'md' (metadata) field).
     """
     if (not datadict):                      # sanity check
         errMsg = "(gen_hybrid_insert): Empty data dictionary cannot be inserted into table."
@@ -173,7 +173,7 @@ def gen_hybrid_insert (dbconfig, datadict, table_name):
     required = SQL_FIELDS_HYBRID.copy()
     fieldnames = [clean_id(field) for field in required]
     num_keys = len(fieldnames)              # number of keys minus 1 (w/o metadata)
-    fieldnames.append('metadata')           # add name of the JSON metadata field
+    fieldnames.append('md')                 # add name of the JSON metadata field
     keys = ', '.join(fieldnames)            # made from cleaned fieldnames
 
     values = [ datadict.get(key) for key in required if datadict.get(key) is not None ]
@@ -241,17 +241,13 @@ def gen_table_grants_sql (argmix):
     Generate and return a list of SQL statements to set priviledges for a table.
 
     :param argmix: dictionary containing both CLI and database arguments used by this method:
-                   catalog_table, db_schema_name, db_user, default_tap_user
+                   catalog_table, db_schema_name, db_user.
     :return: a list of SQL statements to execute to set priviledges for the table.
     """
     ddl = []                                # hold list of SQL statements to execute
 
     cattbl_clean = clean_id(argmix.get('catalog_table'))
     schema_clean = clean_id(argmix.get('db_schema_name'))
-    tapuser_clean  = clean_id(argmix.get('default_tap_user'))
-
-    granttap = f"GRANT SELECT ON TABLE {schema_clean}.{cattbl_clean} TO {tapuser_clean};"
-    ddl.append(granttap)
 
     grantalq = f"GRANT SELECT ON TABLE {schema_clean}.{cattbl_clean} TO alquery;"
     ddl.append(grantalq)

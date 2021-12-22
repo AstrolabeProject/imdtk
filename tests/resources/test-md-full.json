@@ -45,7 +45,7 @@
     "im_naxis2": 24554,
     "im_nsubarrays": 1,
     "im_pixtype": "float",
-    "is_public": 0,
+    "is_public": False,
     "nircam_channel": "LONG",
     "nircam_module": "A",
     "pupil": "CLEAR"

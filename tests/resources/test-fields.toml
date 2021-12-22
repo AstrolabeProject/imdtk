@@ -16,7 +16,7 @@ target_name = { required = true }
 
 # some more real values.
 #
-is_public = { required = true, default = 0 }
+is_public = { required = true, default = false }
 equinox = { required = false, default = 2000.0 }
 radesys = { required = false, default = "ICRS" }
 filter = { required = false }

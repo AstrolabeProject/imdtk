@@ -1,7 +1,7 @@
 #
 # Class defining interface methods to store incoming data to an SQL database.
 #   Written by: Tom Hicks. 6/21/2020.
-#   Last Modified: Better formatting in file_info_to_comment_string.
+#   Last Modified: Update for image only database.
 #
 import configparser
 import sys
@@ -19,8 +19,8 @@ class ISQLSink (IImdTask):
     Class defining interface methods to store incoming data to an SQL database.
     """
 
-    # Value which identifies records which are public: 0 means is_public = false
-    IS_PUBLIC_VALUE = 0
+    # Value which identifies records which are public
+    IS_PUBLIC_VALUE = False
 
     # String which defines a comment line in the SQL output.
     SQL_COMMENT = '--'

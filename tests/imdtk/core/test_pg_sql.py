@@ -1,6 +1,6 @@
 # Tests for the PostgreSQL interface module.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Comment out tests to list catalog tables in TAP schema.
+#   Last Modified: Update for image only database.
 #
 import pytest
 
@@ -59,26 +59,16 @@ class TestPgSql(object):
     }
 
     datad_hyb = {
-        "obs_collection": "JWST",
+        "md5sum" : 'fe57e89d674e1e52071f674c60974968',  # m13.fits
         "s_dec": 53.157662568,
         "s_ra": -27.8075199236,
-        "is_public": 0,
-        "metadata": {
+        "is_public": False,
+        "md": {
             "file_name": "some.fits",
             "file_size": 4305,
             "timesys": "UTC",
         }
     }
-
-
-    # def test_create_table_empty (self):
-    #     self.args['catalog_table'] = 'test_tbl'
-    #     pgsql.create_table(self.args, self.dbconfig, [], [])
-
-
-    # def test_create_table (self):
-    #     self.args['catalog_table'] = 'test_tbl2'
-    #     ret = pgsql.create_table(self.args, self.dbconfig, self.cat_names, self.cat_formats)
 
 
     def test_create_table_str_empty (self):
@@ -88,7 +78,7 @@ class TestPgSql(object):
         assert tbl is not None
         assert 'CREATE TABLE' in tbl
         assert 'NEWTBL' in tbl
-        assert 'SET search_path TO sia' in tbl
+        assert 'SET search_path TO hyb' in tbl
 
         assert 'ID text' not in tbl
         assert 'RA double precision' not in tbl
@@ -102,7 +92,7 @@ class TestPgSql(object):
         assert tbl is not None
         assert 'CREATE TABLE' in tbl
         assert 'NEWTBL' in tbl
-        assert 'SET search_path TO sia' in tbl
+        assert 'SET search_path TO hyb' in tbl
         assert 'ID text' in tbl
         assert 'RA double precision' in tbl
         assert 'DEC real' in tbl
@@ -114,14 +104,14 @@ class TestPgSql(object):
 
 
     def test_list_table_names_schema (self):
-        tbls = pgsql.list_table_names(self.args, self.dbconfig, db_schema='sia')
+        tbls = pgsql.list_table_names(self.args, self.dbconfig, db_schema='hyb')
         print(tbls)
         assert tbls is not None
         assert len(tbls) > 0
-        assert 'eazy' in tbls
-        assert 'jaguar' in tbls
-        assert 'jwst' in tbls
-        assert 'hybrid' in tbls
+        assert 'imgmd' in tbls
+        assert 'collections' in tbls
+        assert 'jwst' not in tbls
+        assert 'hybrid' not in tbls
         assert 'columns' not in tbls
         assert 'keys' not in tbls
         assert 'schemas' not in tbls
@@ -132,10 +122,10 @@ class TestPgSql(object):
         print(tbls)
         assert tbls is not None
         assert len(tbls) > 0
-        assert 'eazy' in tbls
-        assert 'jaguar' in tbls
-        assert 'jwst' in tbls
-        assert 'hybrid' in tbls
+        assert 'imgmd' in tbls
+        assert 'collections' in tbls
+        assert 'jwst' not in tbls
+        assert 'hybrid' not in tbls
         assert 'columns' not in tbls
         assert 'keys' not in tbls
         assert 'schemas' not in tbls
@@ -146,43 +136,6 @@ class TestPgSql(object):
         print(tbls)
         assert tbls is not None
         assert len(tbls) == 0
-
-
-
-    # def test_list_catalog_tables_schema (self):
-    #     cats = pgsql.list_catalog_tables(self.args, self.dbconfig, db_schema='sia')
-    #     print(cats)
-    #     assert cats is not None
-    #     assert len(cats) > 0
-    #     assert 'sia.eazy' in cats
-    #     assert 'sia.jaguar' in cats
-    #     assert 'sia.jwst' in cats
-    #     assert 'sia.hybrid' in cats
-    #     assert 'sia.columns' not in cats
-    #     assert 'sia.keys' not in cats
-    #     assert 'sia.schemas' not in cats
-
-
-    # def test_list_catalog_tables (self):
-    #     cats = pgsql.list_catalog_tables(self.args, self.dbconfig)
-    #     print(cats)
-    #     assert cats is not None
-    #     assert len(cats) > 0
-    #     assert 'sia.eazy' in cats
-    #     assert 'sia.jaguar' in cats
-    #     assert 'sia.jwst' in cats
-    #     assert 'sia.hybrid' in cats
-    #     assert 'sia.columns' not in cats
-    #     assert 'sia.keys' not in cats
-    #     assert 'sia.schemas' not in cats
-
-
-    def test_list_catalog_tables_bad_schema (self):
-        cats = pgsql.list_catalog_tables(self.args, self.dbconfig, db_schema='nosuch')
-        print(cats)
-        assert cats is not None
-        assert len(cats) == 0
-
 
 
     def test_insert_row_str_empty (self):
@@ -222,10 +175,10 @@ class TestPgSql(object):
 
     def test_insert_hybrid_row_str_min (self):
         datad_hyb_min = {
-            "obs_collection": "JWST",
+            "md5sum": "2c9202ae878ecfcb60878ceb63837f5f",  # HorseHead.fits
             "s_dec": 53.157662568,
             "s_ra": -27.8075199236,
-            "is_public": 0
+            "is_public": False
         }
         sql = pgsql.insert_hybrid_row_str(self.dbconfig, datad_hyb_min, 'test_tbl')
         print(sql)
@@ -236,7 +189,6 @@ class TestPgSql(object):
         assert 'values' in sql
         assert '53.157662568' in sql
         assert '-27.8075199236' in sql
-        assert 'JWST' in sql
 
         assert 'true' not in sql
         assert 'SIMPLE' not in sql
@@ -265,7 +217,7 @@ class TestPgSql(object):
 
     def test_insert_hybrid_row_str_noval (self):
         datad_hyb_min = {
-            "obs_collection": "JWST",
+            "md5sum": "fe57e89d674e1e52071f674c60974968",  # m13.fits
             "s_dec": 53.157662568,
             "s_ra": -27.8075199236,
             "is_public": None

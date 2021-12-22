@@ -45,7 +45,7 @@ ID_ALIASES = [ 'ID', 'id', 's_obs_id', 'galaxy_id' ]
 RA_ALIASES = [ 'RA', 'ra', 's_ra' ]
 
 # List of required SQL fields in the hybrid PG/JSON database table (excluding JSON fields):
-SQL_FIELDS_HYBRID = [ 's_dec', 's_ra', 'obs_collection', 'is_public' ]
+SQL_FIELDS_HYBRID = [ 'md5sum', 's_dec', 's_ra', 'is_public' ]
 
 # Work directory: the mount point in the container for file input and output.
 WORK_DIR = '/work'

@@ -116,7 +116,7 @@ file_size = { required = true }
 #
 # JWST-specific fieldnames
 #
-is_public = { required = true, default = 0 }
+is_public = { required = true, default = false }
 equinox = { required = false, default = 2000.0 }
 radesys = { required = false, default = "ICRS" }
 
