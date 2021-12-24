@@ -11,7 +11,7 @@
 #   -- alter SEQUENCE jwst_id_seq RESTART;
 #
 # Then run this script, from the IMDTK project root:
-#   make runtep EP=scripts/fill_hybrid_table.sh
+#   make runtep EP=scripts/fill_imgmd_table.sh
 #
 VOS=/usr/local/data/vos
 
