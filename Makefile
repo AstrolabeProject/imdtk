@@ -52,6 +52,8 @@ help:
 bash:
 	docker run -it --rm --network ${NET} --name ${NAME} -v ${CONCATS}:${CONCATS}:ro -v ${CONIMGS}:${CONIMGS}:ro -v ${SCRIPTS}:${CONSCRIPTS} -v ${HOME}/.irods:${CONIRODS}:ro -v ${WORK}:/work --entrypoint ${SHELL} ${TSTIMG} ${ARGS}
 
+cc: cleancache
+
 cleancache:
 	find . -name __pycache__ -print | grep -v .venv | xargs rm -rf
 
