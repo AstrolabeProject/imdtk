@@ -1,6 +1,6 @@
 # Tests for the PostgreSQL interface module.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Update for image only database.
+#   Last Modified: Update for now required obs_collection field.
 #
 import pytest
 
@@ -63,6 +63,7 @@ class TestPgSql(object):
         "s_dec": 53.157662568,
         "s_ra": -27.8075199236,
         "is_public": False,
+        "obs_collection": "TEST2",
         "md": {
             "file_name": "some.fits",
             "file_size": 4305,
@@ -109,7 +110,7 @@ class TestPgSql(object):
         assert tbls is not None
         assert len(tbls) > 0
         assert 'imgmd' in tbls
-        assert 'collections' in tbls
+        assert 'collections' not in tbls
         assert 'jwst' not in tbls
         assert 'hybrid' not in tbls
         assert 'columns' not in tbls
@@ -123,7 +124,7 @@ class TestPgSql(object):
         assert tbls is not None
         assert len(tbls) > 0
         assert 'imgmd' in tbls
-        assert 'collections' in tbls
+        assert 'collections' not in tbls
         assert 'jwst' not in tbls
         assert 'hybrid' not in tbls
         assert 'columns' not in tbls
@@ -178,7 +179,8 @@ class TestPgSql(object):
             "md5sum": "2c9202ae878ecfcb60878ceb63837f5f",  # HorseHead.fits
             "s_dec": 53.157662568,
             "s_ra": -27.8075199236,
-            "is_public": False
+            "is_public": False,
+            "obs_collection": "TEST"
         }
         sql = pgsql.insert_hybrid_row_str(self.dbconfig, datad_hyb_min, 'test_tbl')
         print(sql)
@@ -220,7 +222,7 @@ class TestPgSql(object):
             "md5sum": "fe57e89d674e1e52071f674c60974968",  # m13.fits
             "s_dec": 53.157662568,
             "s_ra": -27.8075199236,
-            "is_public": None
+            "is_public": None,
         }
         with pytest.raises(errors.ProcessingError, match='Unable to find .* required fields'):
             pgsql.insert_hybrid_row_str(self.dbconfig, datad_hyb_min, 'test_tbl')
