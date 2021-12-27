@@ -1,6 +1,6 @@
 # Tests for the PostgreSQL interface module.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Update for now required obs_collection field.
+#   Last Modified: Update for now required file_name field.
 #
 import pytest
 
@@ -64,6 +64,7 @@ class TestPgSql(object):
         "s_ra": -27.8075199236,
         "is_public": False,
         "obs_collection": "TEST2",
+        "file_name": "some.fits",
         "md": {
             "file_name": "some.fits",
             "file_size": 4305,
@@ -180,7 +181,8 @@ class TestPgSql(object):
             "s_dec": 53.157662568,
             "s_ra": -27.8075199236,
             "is_public": False,
-            "obs_collection": "TEST"
+            "obs_collection": "TEST",
+            "file_name": "HorseHead.fits"
         }
         sql = pgsql.insert_hybrid_row_str(self.dbconfig, datad_hyb_min, 'test_tbl')
         print(sql)
