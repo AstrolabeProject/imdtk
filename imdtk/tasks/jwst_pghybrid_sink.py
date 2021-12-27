@@ -1,12 +1,13 @@
 #
 # Class to sink incoming image metadata to a Hybrid (SQL/JSON) PostgreSQL database.
 #   Written by: Tom Hicks. 7/3/2020.
-#   Last Modified: Remove unused DB import.
+#   Last Modified: Update to skip file_path and access_url fields.
 #
 import sys
 
 from config.settings import DEFAULT_DBCONFIG_FILEPATH, DEFAULT_HYBRID_TABLE_NAME
 import imdtk.exceptions as errors
+from imdtk.core.misc_utils import remove_entries
 import imdtk.core.pg_sql as pg_sql
 import imdtk.tasks.metadata_utils as md_utils
 from imdtk.tasks.i_task import STDOUT_NAME
@@ -16,11 +17,16 @@ from imdtk.tasks.i_sql_sink import ISQLSink, SQL_EXTENSION
 class JWST_HybridPostgreSQLSink (ISQLSink):
     """ Class to sink incoming image metadata to a Hybrid PostgreSQL database. """
 
+    # List of metadata field names to skip when sinking metadata
+    DEFAULT_SKIP_LIST = [ 'file_path', 'access_url' ]
+
+
     def __init__(self, args):
         """
         Constructor for class to sink incoming image metadata to a Hybrid PostgreSQL database.
         """
         super().__init__(args)
+        self.skip_list = args.get('skip_list', self.DEFAULT_SKIP_LIST)
 
 
     #
@@ -40,6 +46,10 @@ class JWST_HybridPostgreSQLSink (ISQLSink):
 
         # select and/or filter the data for output
         outdata = self.select_data_for_output(metadata)
+
+        # remove any entries which should be skipped
+        if (self.skip_list):
+            remove_entries(outdata, ignore=self.skip_list)
 
         # decide whether we are storing data in the DB or just outputting SQL statements
         sql_only = self.args.get('output_only')
