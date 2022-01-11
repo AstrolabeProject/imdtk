@@ -13,11 +13,11 @@
 # Then run this script, from the IMDTK project root:
 #   make runtep EP=scripts/fill_jwst_table.sh
 #
-VOS=/usr/local/data/vos
+CONVOS=/Users/hickst/UAZ/iSchool/data
 
-mmd_pgsql_pipe -tn jwst -idir $VOS/images/JADES -c JADES -v
-mmd_pgsql_pipe -tn jwst -idir $VOS/images/DC19 -c DC19 -v
-mmd_pgsql_pipe -tn jwst -idir $VOS/images/DC20 -c DC20 -v
-mmd_pgsql_pipe -tn jwst -idir $VOS/images/XTRAS -c XTRAS -v
+mmd_pgsql_pipe -tn jwst -idir $CONVOS/images/JADES -c JADES -v
+mmd_pgsql_pipe -tn jwst -idir $CONVOS/images/DC19 -c DC19 -v
+mmd_pgsql_pipe -tn jwst -idir $CONVOS/images/DC20 -c DC20 -v
+mmd_pgsql_pipe -tn jwst -idir $CONVOS/images/XTRAS -c XTRAS -v
 md_pgsql_pipe -tn jwst -ff tests/resources/HorseHead.fits -c TEST -v
 md_pgsql_pipe -tn jwst -ff tests/resources/m13.fits -c TEST -v

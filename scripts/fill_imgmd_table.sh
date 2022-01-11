@@ -13,9 +13,9 @@
 # Then run this script, from the IMDTK project root:
 #   make runtep EP=scripts/fill_imgmd_table.sh
 #
-VOS=/usr/local/data/vos
+CONVOS=/vos
 
-mmd_pghyb_pipe -tn imgmd -idir $VOS/images/JADES -c JADES -v
-mmd_pghyb_pipe -tn imgmd -idir $VOS/images/DC19 -c DC19 -v
-mmd_pghyb_pipe -tn imgmd -idir $VOS/images/DC20 -c DC20 -v
-mmd_pghyb_pipe -tn imgmd -idir $VOS/images/XTRAS -c XTRAS -v
+mmd_pghyb_pipe -tn imgmd -idir $CONVOS/images/JADES -c JADES -v
+mmd_pghyb_pipe -tn imgmd -idir $CONVOS/images/DC19 -c DC19 -v
+mmd_pghyb_pipe -tn imgmd -idir $CONVOS/images/DC20 -c DC20 -v
+mmd_pghyb_pipe -tn imgmd -idir $CONVOS/images/XTRAS -c XTRAS -v

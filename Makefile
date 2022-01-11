@@ -1,12 +1,16 @@
+# These top paths must be bind-mountable to Docker!
+# On Docker Mac, this may require sharing directories with the VM,
+# usually via Docker Desktop/RESOURCES/file-sharing)
+VOS=/Users/hickst/UAZ/iSchool/data/vos
 TOPLVL=${PWD}
 SCRIPTS=${TOPLVL}/scripts
-VOS=/usr/local/data/vos
 WORK=${TOPLVL}/work
 
 ARGS=
 APP_ROOT=/imdtk
-CONCATS=${VOS}/catalogs
-CONIMGS=${VOS}/images
+CONVOS=/vos
+CONCATS=${CONVOS}/catalogs
+CONIMGS=${CONVOS}/images
 CONIRODS=${APP_ROOT}/.irods
 CONSCRIPTS=${APP_ROOT}/scripts
 COLLECTION=JWST
@@ -14,6 +18,8 @@ ENVLOC=/etc/trhenv
 EP=/bin/bash
 IGNORE='tests/imdtk/core/*irods_helper.py'
 IMG=astrolabe/imdtk:imgmd
+IMCATS=${VOS}/catalogs
+IMIMGS=${VOS}/images
 NAME=imdtk
 NET=vos_net
 ONLY=
@@ -50,7 +56,7 @@ help:
 	@echo '     watch     - show logfile for a running container'
 
 bash:
-	docker run -it --rm --network ${NET} --name ${NAME} -v ${CONCATS}:${CONCATS}:ro -v ${CONIMGS}:${CONIMGS}:ro -v ${SCRIPTS}:${CONSCRIPTS} -v ${HOME}/.irods:${CONIRODS}:ro -v ${WORK}:/work --entrypoint ${SHELL} ${TSTIMG} ${ARGS}
+	docker run -it --rm --network ${NET} --name ${NAME} -v ${IMCATS}:${CONCATS}:ro -v ${IMIMGS}:${CONIMGS}:ro -v ${SCRIPTS}:${CONSCRIPTS} -v ${HOME}/.irods:${CONIRODS}:ro -v ${WORK}:/work --entrypoint ${SHELL} ${TSTIMG} ${ARGS}
 
 cc: cleancache
 
@@ -71,19 +77,19 @@ exec:
 	docker exec -it ${NAME} ${EP}
 
 run:
-	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CONCATS}:${CONCATS}:ro -v ${CONIMGS}:${CONIMGS}:ro -v ${SCRIPTS}:${CONSCRIPTS} -v ${HOME}/.irods:${CONIRODS}:ro -v ${WORK}:/work ${IMG} ${ARGS}
+	@docker run -it --rm --network ${NET} --name ${NAME} -v ${IMCATS}:${CONCATS}:ro -v ${IMIMGS}:${CONIMGS}:ro -v ${SCRIPTS}:${CONSCRIPTS} -v ${HOME}/.irods:${CONIRODS}:ro -v ${WORK}:/work ${IMG} ${ARGS}
 
 runit:
-	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CONCATS}:${CONCATS}:ro -v ${CONIMGS}:${CONIMGS}:ro -v ${SCRIPTS}:${CONSCRIPTS} -v ${HOME}/.irods:${CONIRODS}:ro -v ${WORK}:/work ${TSTIMG} ${ARGS}
+	@docker run -it --rm --network ${NET} --name ${NAME} -v ${IMCATS}:${CONCATS}:ro -v ${IMIMGS}:${CONIMGS}:ro -v ${SCRIPTS}:${CONSCRIPTS} -v ${HOME}/.irods:${CONIRODS}:ro -v ${WORK}:/work ${TSTIMG} ${ARGS}
 
 runt1:
-	docker run -it --rm --network ${NET} --name ${NAME} -v ${CONCATS}:${CONCATS}:ro -v ${CONIMGS}:${CONIMGS}:ro -v ${HOME}/.irods:${CONIRODS}:ro --entrypoint pytest ${TSTIMG} -vv ${TARG}
+	docker run -it --rm --network ${NET} --name ${NAME} -v ${IMCATS}:${CONCATS}:ro -v ${IMIMGS}:${CONIMGS}:ro -v ${HOME}/.irods:${CONIRODS}:ro --entrypoint pytest ${TSTIMG} -vv ${TARG}
 
 runtc:
-	docker run -it --rm --network ${NET} --name ${NAME} -v ${CONCATS}:${CONCATS}:ro -v ${CONIMGS}:${CONIMGS}:ro -v ${HOME}/.irods:${CONIRODS}:ro --entrypoint pytest ${TSTIMG} -vv --cov-report term-missing --cov ${TARG}
+	docker run -it --rm --network ${NET} --name ${NAME} -v ${IMCATS}:${CONCATS}:ro -v ${IMIMGS}:${CONIMGS}:ro -v ${HOME}/.irods:${CONIRODS}:ro --entrypoint pytest ${TSTIMG} -vv --cov-report term-missing --cov ${TARG}
 
 runtep:
-	@docker run -it --rm --network ${NET} --name ${NAME} -v ${CONCATS}:${CONCATS}:ro -v ${CONIMGS}:${CONIMGS}:ro -v ${SCRIPTS}:${CONSCRIPTS} -v ${HOME}/.irods:${CONIRODS}:ro -v ${WORK}:/work --entrypoint ${EP} ${TSTIMG} ${ARGS}
+	@docker run -it --rm --network ${NET} --name ${NAME} -v ${IMCATS}:${CONCATS}:ro -v ${IMIMGS}:${CONIMGS}:ro -v ${SCRIPTS}:${CONSCRIPTS} -v ${HOME}/.irods:${CONIRODS}:ro -v ${WORK}:/work --entrypoint ${EP} ${TSTIMG} ${ARGS}
 
 stop:
 	docker stop ${NAME}
