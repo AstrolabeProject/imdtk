@@ -1,7 +1,7 @@
 #
 # Class to report on the presence of missing fields in the FITS-derived metadata structure.
 #   Written by: Tom Hicks. 6/13/2020.
-#   Last Modified: Raise exception on missing calculated data.
+#   Last Modified: Add ObsCore to missing field warning.
 #
 import sys
 
@@ -60,7 +60,7 @@ class MissingFieldsTask (IImdTask):
         for field_name, props in fields_info.items():
             if (field_name not in calculated):
                 req_fld = 'Required' if props.get('required') else 'Optional'
-                msg = "WARNING: {0} field '{1}' still does not have a value.".format(req_fld, field_name)
+                msg = "WARNING: ObsCore {0} field '{1}' still does not have a value.".format(req_fld, field_name)
                 report.append(msg)
 
         return report                       # return list of message strings
