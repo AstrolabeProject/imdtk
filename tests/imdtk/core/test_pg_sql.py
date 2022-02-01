@@ -1,10 +1,10 @@
 # Tests for the PostgreSQL interface module.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Update for using public schema.
+#   Last Modified: Update for "core" and "other" SQL fields.
 #
 import pytest
 
-from config.settings import SQL_FIELDS_HYBRID
+from config.settings import CORE_SQL_FIELDS, OTHER_SQL_FIELDS
 import imdtk.exceptions as errors
 import imdtk.core.pg_sql as pgsql
 import imdtk.tasks.i_sql_sink as isql
@@ -212,7 +212,9 @@ class TestPgSql(object):
         assert 'TESTTBL' in sql
         assert 'values' in sql
 
-        for fld in SQL_FIELDS_HYBRID:
+        for fld in CORE_SQL_FIELDS:
+            assert fld in sql
+        for fld in OTHER_SQL_FIELDS:
             assert fld in sql
         assert '53.157662568' in sql
         assert '-27.8075199236' in sql

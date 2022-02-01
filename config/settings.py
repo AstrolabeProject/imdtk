@@ -44,8 +44,11 @@ ID_ALIASES = [ 'ID', 'id', 's_obs_id', 'galaxy_id' ]
 # Set of possible field names which will contain right ascension values:
 RA_ALIASES = [ 'RA', 'ra', 's_ra' ]
 
-# List of required SQL fields in the hybrid PG/JSON database table (excluding JSON fields):
-SQL_FIELDS_HYBRID = [ 'md5sum', 's_dec', 's_ra', 'is_public', 'obs_collection', 'file_name', 'file_size' ]
+# List of core (required) fields in the hybrid PG/JSON database table (excluding JSON MD fields):
+CORE_SQL_FIELDS = [ 'md5sum', 's_dec', 's_ra', 'is_public', 'obs_collection', 'file_name', 'file_size' ]
+
+# List of other (optional) fields in the hybrid PG/JSON database table (excluding JSON MD fields):
+OTHER_SQL_FIELDS = [ 'filter' ]
 
 # Work directory: the mount point in the container for file input and output.
 WORK_DIR = '/work'

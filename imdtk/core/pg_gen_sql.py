@@ -1,9 +1,11 @@
 #
 # Module to curate FITS data with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/24/2020.
-#   Last Modified: Update for using public schema.
+#   Last Modified: Update to use "core" and "other" SQL fields.
 #
-from config.settings import DEC_ALIASES, ID_ALIASES, RA_ALIASES, SQL_FIELDS_HYBRID
+from config.settings import (
+  DEC_ALIASES, ID_ALIASES, RA_ALIASES, CORE_SQL_FIELDS, OTHER_SQL_FIELDS
+)
 import imdtk.exceptions as errors
 from imdtk.core.misc_utils import keep_characters, missing_entries, to_JSON
 from string import ascii_letters, digits
@@ -170,22 +172,27 @@ def gen_hybrid_insert (dbconfig, datadict, table_name):
     schema_clean = clean_id(dbconfig.get('db_schema_name'))
     table_clean = clean_id(table_name)
 
-    required = SQL_FIELDS_HYBRID.copy()
-    fieldnames = [clean_id(field) for field in required]
-    num_keys = len(fieldnames)              # number of keys minus 1 (w/o metadata)
-    fieldnames.append('md')                 # add name of the JSON metadata field
-    keys = ', '.join(fieldnames)            # made from cleaned fieldnames
-
-    values = [ datadict.get(key) for key in required if datadict.get(key) is not None ]
-    num_vals = len(values)                  # number of values minus 1 (no metadata yet)
-    if (num_keys == num_vals):              # must have a value for each key
-        values.append(to_JSON(datadict, sort_keys=True))  # add the JSON for the metadata field
-        place_holders = ', '.join(['%s' for v in values])
-        sql_fmt_str = f"insert into {schema_clean}.{table_clean} ({keys}) values ({place_holders});"
-        return (sql_fmt_str, values)
-    else:                                   # there was a mismatch of keys and values
-        errMsg = f"Unable to find values for all {num_keys} required fields: {required}"
+    # make list of core (required) field names and get metadata values for each:
+    req_fields = [clean_id(field) for field in CORE_SQL_FIELDS.copy()]
+    req_values = [datadict.get(key) for key in req_fields]
+    if (None in req_values):                # missing values for some required fields
+        errMsg = f"Unable to find values for all {len(req_fields)} required fields: {req_fields}"
         raise errors.ProcessingError(errMsg)
+
+    # make list of other (optional) field names and get metadata values for each:
+    other_fields = [clean_id(field) for field in OTHER_SQL_FIELDS.copy()]
+    other_values = [datadict.get(key) for key in other_fields]
+
+    # make lists of all field names and values, append JSON metadata name and value to them:
+    fieldnames = req_fields + other_fields + ['md']
+    values = req_values + other_values
+    values.append(to_JSON(datadict, sort_keys=True))  # add the JSON for the metadata field
+
+    # create the SQL string to perform the insertion:
+    keys = ', '.join(fieldnames)            # made from cleaned fieldnames
+    place_holders = ', '.join(['%s' for v in values])
+    sql_fmt_str = f"insert into {schema_clean}.{table_clean} ({keys}) values ({place_holders});"
+    return (sql_fmt_str, values)
 
 
 def gen_insert_row (dbconfig, datadict, table_name):
