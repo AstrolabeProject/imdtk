@@ -1,7 +1,7 @@
 #
 # Module to curate FITS data with a PostgreSQL database.
 #   Written by: Tom Hicks. 7/24/2020.
-#   Last Modified: Update for image only database.
+#   Last Modified: Update for using public schema.
 #
 from config.settings import DEC_ALIASES, ID_ALIASES, RA_ALIASES, SQL_FIELDS_HYBRID
 import imdtk.exceptions as errors
@@ -233,7 +233,10 @@ def gen_search_path_sql (argmix):
     :return: a list of SQL statements to execute to add the configured schema to the search path.
     """
     schema_clean = clean_id(argmix.get('db_schema_name'))
-    return [ f"SET search_path TO {schema_clean}, public;" ]
+    if (schema_clean == 'public'):
+      return [ f"SET search_path TO public;" ]
+    else:
+      return [ f"SET search_path TO {schema_clean}, public;" ]
 
 
 def gen_table_grants_sql (argmix):

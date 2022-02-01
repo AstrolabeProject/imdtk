@@ -1,6 +1,6 @@
 # Tests for the PostgreSQL interface module.
 #   Written by: Tom Hicks. 7/25/2020.
-#   Last Modified: Update for now required file_size field.
+#   Last Modified: Update for using public schema.
 #
 import pytest
 
@@ -82,7 +82,7 @@ class TestPgSql(object):
         assert tbl is not None
         assert 'CREATE TABLE' in tbl
         assert 'NEWTBL' in tbl
-        assert 'SET search_path TO hyb' in tbl
+        assert 'SET search_path TO public' in tbl
 
         assert 'ID text' not in tbl
         assert 'RA double precision' not in tbl
@@ -96,7 +96,7 @@ class TestPgSql(object):
         assert tbl is not None
         assert 'CREATE TABLE' in tbl
         assert 'NEWTBL' in tbl
-        assert 'SET search_path TO hyb' in tbl
+        assert 'SET search_path TO public' in tbl
         assert 'ID text' in tbl
         assert 'RA double precision' in tbl
         assert 'DEC real' in tbl
@@ -108,7 +108,7 @@ class TestPgSql(object):
 
 
     def test_list_table_names_schema (self):
-        tbls = pgsql.list_table_names(self.args, self.dbconfig, db_schema='hyb')
+        tbls = pgsql.list_table_names(self.args, self.dbconfig, db_schema='public')
         print(tbls)
         assert tbls is not None
         assert len(tbls) > 0

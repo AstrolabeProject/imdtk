@@ -1,6 +1,6 @@
 # Tests for the FITS-specific PostgreSQL interface module.
 #   Written by: Tom Hicks. 8/10/2020.
-#   Last Modified: Update for image only database.
+#   Last Modified: Update for using public schema.
 #
 import pytest
 
@@ -184,7 +184,7 @@ class TestFitsPgSql(object):
 
 
     def test_gen_search_path_sql(self):
-        schema = self.dbconfig.get('DB_SCHEMA_NAME') or 'hyb'
+        schema = self.dbconfig.get('DB_SCHEMA_NAME') or 'public'
         sql = pg_gen.gen_search_path_sql(self.dbconfig)
         print(sql)
         assert sql is not None
